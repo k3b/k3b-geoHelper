@@ -1,4 +1,4 @@
-#k3b-geoHelper v1.1
+#k3b-geoHelper v1.1.1
 
 A j2se geo support library that is compatible with Android
 
@@ -29,7 +29,7 @@ Add repository to root build.gradle at the end of repositories:
 Add dependencies to local build.gradle
 
 	dependencies {
-		compile 'com.github.k3b:k3b-geoHelper:v1.1'
+		compile 'com.github.k3b:k3b-geoHelper:v1.1.1'
 	}
 
 for details see https://jitpack.io/
