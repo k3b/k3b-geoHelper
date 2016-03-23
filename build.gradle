@@ -14,4 +14,10 @@ allprojects {
         jcenter()
         // maven { url "https://jitpack.io" } // 
     }
+
+	// http://stackoverflow.com/questions/28450703/how-to-set-the-language-level-in-gradle-so-it-is-ide-agnostic/35827609#35827609
+    tasks.withType(JavaCompile) {
+        sourceCompatibility = '1.7'
+        targetCompatibility = '1.7'
+    } 
 }
