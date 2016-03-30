@@ -79,6 +79,13 @@ public class GeoUri {
     private final static Pattern patternLatLonAlt = Pattern.compile(regexpLatLonAlt);
     private final static Pattern patternLatLonLatLon = Pattern.compile(regexpLatLonLatLon);
     private final static Pattern patternTime = Pattern.compile("([12]\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ)");
+
+    private final static String regexpHref = "(?:\\s*href\\s?\\=\\s?['\"]([^'\"]*)['\"])"; // i.e. href='hallo'
+    private final static Pattern patternHref = Pattern.compile(regexpHref);
+
+    private final static String regexpSrc = "(?:\\s*src\\s?\\=\\s?['\"]([^'\"]*)['\"])"; // i.e. src='hallo'
+    private final static Pattern patternSrc = Pattern.compile(regexpSrc);
+
     /* current state */
 
     /** formating/parsing options */
@@ -124,18 +131,23 @@ public class GeoUri {
             whereToSearch.add(uri);
             whereToSearch.add(parmLookup.get(GeoUriDef.LAT_LON));
 
-            if (isSet(GeoUri.OPT_PARSE_INFER_MISSING)) {
+            final boolean inferMissing = isSet(GeoUri.OPT_PARSE_INFER_MISSING);
+            if (inferMissing) {
                 whereToSearch.add(parseResult.getDescription());
                 whereToSearch.addAll(parmLookup.values());
             }
 
             parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));
-            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parmLookup.get(GeoUriDef.TIME), whereToSearch));
+            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), parmLookup.get(GeoUriDef.TIME), whereToSearch));
 
             parseLatOrLon(parseResult, whereToSearch);
 
             if (parseResult.getName() == null) {
                 parseResult.setName(parmLookup.get(GeoUriDef.NAME));
+            }
+            if (inferMissing) {
+                parseResult.setLink(parseFindFromPattern(patternHref, parseResult.getLink(), whereToSearch));
+                parseResult.setSymbol(parseFindFromPattern(patternSrc, parseResult.getSymbol(), whereToSearch));
             }
         } else {
             // no query parameter
@@ -164,6 +176,21 @@ public class GeoUri {
             }
         }
         return null;
+    }
+
+    /** infer name,time,link,symbol from textToBeAnalysed if not already set. */
+    public static GeoPointDto inferMissing(GeoPointDto parseResult, String textToBeAnalysed) {
+
+        if (textToBeAnalysed != null) {
+            ArrayList<String> whereToSearch = new ArrayList<String>();
+            whereToSearch.add(textToBeAnalysed);
+
+            parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));
+            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), null, whereToSearch));
+            parseResult.setLink(parseFindFromPattern(patternHref, parseResult.getLink(), whereToSearch));
+            parseResult.setSymbol(parseFindFromPattern(patternSrc, parseResult.getSymbol(), whereToSearch));
+        }
+        return parseResult;
     }
 
     private static ArrayList<String> toStringArray(String[] whereToSearch) {
@@ -198,7 +225,7 @@ public class GeoUri {
 
     /** parsing helper: Get the first finding of pattern in whereToSearch if currentValue is not set yet.
      * Returns currentValue or content of first matching group of pattern. */
-    private String parseFindFromPattern(Pattern pattern, String currentValue, List<String> whereToSearch) {
+    private static String parseFindFromPattern(Pattern pattern, String currentValue, List<String> whereToSearch) {
         if ((currentValue == null) || (currentValue.length() == 0)) {
             Matcher m = parseFindWithPattern(pattern, whereToSearch);
             String found = (m != null) ? m.group(1) : null;
@@ -211,13 +238,13 @@ public class GeoUri {
 
     /** parsing helper: Get the first datetime finding in whereToSearch if currentValue is not set yet.
      * Returns currentValue or finding as Date . */
-    private Date parseTimeFromPattern(String currentValue, List<String> whereToSearch) {
-        String match = parseFindFromPattern(IsoDateTimeParser.ISO8601_FRACTIONAL_PATTERN, currentValue, whereToSearch);
+    private static Date parseTimeFromPattern(Date currentValue, String stringValue, List<String> whereToSearch) {
+        String match = parseFindFromPattern(IsoDateTimeParser.ISO8601_FRACTIONAL_PATTERN, stringValue, whereToSearch);
 
         if (match != null) {
             return IsoDateTimeParser.parse(match);
         }
-        return null;
+        return currentValue;
     }
 
     /** parsing helper: returns the match of the first finding of pattern in whereToSearch. */

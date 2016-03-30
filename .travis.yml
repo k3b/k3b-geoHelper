@@ -1,0 +1,11 @@
+# travis build for LocationMapViewer
+language: android
+android:
+  components:
+    - build-tools-22.0.1
+    - android-19
+    - add-on
+    - extra
+
+script:
+  - gradle k3b-geoHelper:check assemble k3b-geoHelper:reports
