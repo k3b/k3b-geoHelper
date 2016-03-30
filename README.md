@@ -1,4 +1,4 @@
-#k3b-geoHelper v1.1.2 library
+#k3b-geoHelper v1.1.3 library
 
 A j2se geo support library that is compatible with Android
 
@@ -9,6 +9,7 @@ A j2se geo support library that is compatible with Android
 	* [gpx](https://github.com/k3b/k3b-geoHelper/wiki/data#gpx)
 	* [kml](https://github.com/k3b/k3b-geoHelper/wiki/data#kml)
 	* [poi](https://github.com/k3b/k3b-geoHelper/wiki/data#poi)
+	* [wikimedia](https://github.com/k3b/k3b-geoHelper/wiki/data#wikimedia) that is used by web-apis of wikipedia and wikivoyage
 	* [Example files](https://github.com/k3b/k3b-geoHelper/blob/master/k3b-geoHelper/src/test/resources/de/k3b/geo/io/regressionTests/)
 * parse different flavours of [ISO_8601 Date Formats](https://en.wikipedia.org/wiki/ISO_8601). 
 	* Java examples [IsoDateTimeParserTests.java](https://github.com/k3b/k3b-geoHelper/blob/master/k3b-geoHelper/src/test/java/de/k3b/util/IsoDateTimeParserTests.java)
@@ -29,7 +30,7 @@ Add repository to root build.gradle at the end of repositories:
 Add dependencies to local build.gradle
 
 	dependencies {
-		compile 'com.github.k3b:k3b-geoHelper:v1.1.2'
+		compile 'com.github.k3b:k3b-geoHelper:v1.1.3'
 	}
 
 for details see https://jitpack.io/

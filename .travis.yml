@@ -1,4 +1,4 @@
-# travis build for LocationMapViewer
+# travis build for k3b-geoHelper
 language: android
 android:
   components:
@@ -8,4 +8,4 @@ android:
     - extra
 
 script:
-  - gradle k3b-geoHelper:check assemble k3b-geoHelper:reports
+  - gradle check assemble reports
