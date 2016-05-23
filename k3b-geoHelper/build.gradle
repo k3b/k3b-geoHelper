@@ -5,6 +5,12 @@ apply plugin: 'maven'
 group = 'com.github.k3b'
 description = "k3b-geoHelper"
 
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
 dependencies {
     // compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.11'
