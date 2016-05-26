@@ -1,4 +1,19 @@
-#k3b-geoHelper v1.1.3 library
+#k3b-geoHelper library
+
+A j2se geo support library that is compatible with Android
+
+## Status
+
+* Current Release 
+  * [![GitHub release](https://img.shields.io/github/release/k3b/k3b-geoHelper.svg?maxAge=2592000)](https://github.com/k3b/k3b-geoHelper/wiki/History)
+* Sourcecode 
+  * https://github.com/k3b/k3b-geoHelper/
+* Last Release build 
+  * [![Build Status](https://travis-ci.org/k3b/k3b-geoHelper.svg?branch=master)](https://travis-ci.org/k3b/k3b-geoHelper)
+* Automated Tests Code Coverage 
+  * [![codecov](https://codecov.io/gh/k3b/k3b-geoHelper/branch/master/graph/badge.svg)](https://codecov.io/gh/k3b/k3b-geoHelper)
+
+## Purpose
 
 A j2se geo support library that is compatible with Android
 
