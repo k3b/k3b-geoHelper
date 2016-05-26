@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GeoFileRepository.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io</a> &gt; <span class="el_source">GeoFileRepository.java</span></div><h1>GeoFileRepository.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2015-2016 by k3b.
+ *
+ * This file is part of k3b-geoHelper library.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.k3b.geo.io;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.api.IGeoPointInfo;
+import de.k3b.geo.api.IGeoRepository;
+
+/**
+ * Repository to load/save List&lt; {@link de.k3b.geo.api.GeoPointDto} &gt; in a file.
+ *
+ * Created by k3b on 17.03.2015.
+ */
+public class GeoFileRepository&lt;T extends IGeoPointInfo&gt; implements IGeoRepository&lt;T&gt; {
+<span class="fc" id="L45">    private static final Logger logger = LoggerFactory.getLogger(GeoFileRepository.class);</span>
+
+    /** used to translate between {@link de.k3b.geo.api.IGeoPointInfo} and geo-uri string */
+<span class="fc" id="L48">    private static final GeoUri converter = new GeoUri(GeoUri.OPT_DEFAULT);</span>
+    public static final java.lang.String COMMENT = &quot;#&quot;;
+
+    /** where data is loaded from/saved to */
+    private final File mFile;
+    private final GeoPointDto mFactory;
+
+    /** the content of the repository */
+<span class="fc" id="L56">    protected List&lt;T&gt; mData = null;</span>
+
+    /** connect repository to file */
+<span class="fc" id="L59">    public GeoFileRepository(File file, GeoPointDto factory) {</span>
+<span class="fc" id="L60">        this.mFile = file;</span>
+<span class="fc" id="L61">        this.mFactory = factory;</span>
+<span class="fc" id="L62">    }</span>
+
+    /** load from repository
+     *
+     * @return data loaded
+     */
+    public List&lt;T&gt; load() {
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        if (mData == null) {</span>
+<span class="nc" id="L70">            mData = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">            if (this.mFile.exists()) {</span>
+                try {
+<span class="nc" id="L73">                    load(mData, new FileReader(this.mFile));</span>
+<span class="nc" id="L74">                } catch (IOException e) {</span>
+<span class="nc" id="L75">                    e.printStackTrace();</span>
+<span class="nc" id="L76">                }</span>
+            }
+<span class="nc bnc" id="L78" title="All 2 branches missed.">            if (logger.isDebugEnabled()) {</span>
+<span class="nc" id="L79">                logger.debug(&quot;load(): &quot; + mData.size() + &quot; items from &quot; + this.mFile);</span>
+            }
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        } else if (logger.isDebugEnabled()) {</span>
+<span class="nc" id="L82">            logger.debug(&quot;load() cached value : &quot; + mData.size() + &quot; items from &quot; + this.mFile);</span>
+        }
+<span class="nc" id="L84">        return mData;</span>
+    }
+
+    /**
+     * uncached, fresh load from repository
+     *
+     * @return data loaded
+     */
+    @Override
+    public List&lt;T&gt; reload() {
+<span class="nc" id="L94">        this.mData = null;</span>
+<span class="nc" id="L95">        return load();</span>
+    }
+
+    /** generate a new id */
+    public String createId() {
+<span class="nc" id="L100">        return UUID.randomUUID().toString();</span>
+    }
+
+    /**
+     * removes item from repository.
+     *
+     * @param item that should be removed
+     * @return true if successful
+     */
+    @Override
+    public boolean delete(T item) {
+<span class="nc bnc" id="L111" title="All 4 branches missed.">        if ((item != null) &amp;&amp; load().remove(item)) {</span>
+<span class="nc" id="L112">            save();</span>
+<span class="nc" id="L113">            return true;</span>
+        }
+
+<span class="nc" id="L116">        return false;</span>
+    }
+
+    /** save to repository
+     *
+     * @return false: error.
+     */
+    public boolean save() {
+        try {
+<span class="nc bnc" id="L125" title="All 4 branches missed.">            if ((mData != null) &amp;&amp; (mData.size() &gt; 0)) {</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">                if (!this.mFile.exists()) {</span>
+<span class="nc" id="L127">                    this.mFile.getParentFile().mkdirs();</span>
+                }
+<span class="nc bnc" id="L129" title="All 2 branches missed.">                if (logger.isDebugEnabled()) {</span>
+<span class="nc" id="L130">                    logger.debug(&quot;save(): &quot; + mData.size() + &quot; items to &quot; + this.mFile);</span>
+                }
+<span class="nc" id="L132">                save(mData, new FileWriter(this.mFile, false));</span>
+            }
+<span class="nc" id="L134">            return true;</span>
+<span class="nc" id="L135">        } catch (IOException e) {</span>
+<span class="nc" id="L136">            e.printStackTrace();</span>
+        }
+<span class="nc bnc" id="L138" title="All 2 branches missed.">        if (logger.isDebugEnabled()) {</span>
+<span class="nc" id="L139">            logger.debug(&quot;save(): no items for &quot; + this.mFile);</span>
+        }
+<span class="nc" id="L141">        return false;</span>
+    }
+
+    // load(new InputStreamReader(inputStream, &quot;UTF-8&quot;))
+    /** load points from reader */
+    public void load(List&lt;T&gt; result, Reader reader) throws IOException {
+        String line;
+<span class="fc" id="L148">        BufferedReader br = new BufferedReader(reader);</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        while ((line = br.readLine()) != null) {</span>
+<span class="fc" id="L150">            line = line.trim();</span>
+<span class="pc bpc" id="L151" title="1 of 4 branches missed.">            if ((line.length() &gt; 0) &amp;&amp; (!line.startsWith(COMMENT))) {</span>
+<span class="fc" id="L152">                GeoPointDto geo = loadItem(line);</span>
+<span class="fc" id="L153">                final boolean valid = isValid(geo);</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">                if (logger.isDebugEnabled()) {</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">                    logger.debug(&quot;load(&quot; + line + &quot;): &quot; + ((valid) ? &quot;loaded&quot; : &quot;ignored&quot;));</span>
+                }
+
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">                if (valid) result.add((T) geo);</span>
+<span class="fc" id="L159">            }</span>
+        }
+<span class="fc" id="L161">        br.close();</span>
+<span class="fc" id="L162">    }</span>
+
+    protected GeoPointDto loadItem(String line) {
+<span class="fc" id="L165">        return converter.fromUri(line, create());</span>
+    }
+
+    protected GeoPointDto create() {
+<span class="fc" id="L169">        return (GeoPointDto) mFactory.clone().clear();</span>
+    }
+
+    /** save points to writer */
+    void save(List&lt;T&gt; source, Writer writer) throws IOException {
+<span class="nc bnc" id="L174" title="All 2 branches missed.">        for (T geo : source) {</span>
+<span class="nc" id="L175">            saveItem(writer, geo);</span>
+<span class="nc" id="L176">        }</span>
+<span class="nc" id="L177">        writer.close();</span>
+<span class="nc" id="L178">    }</span>
+
+    protected boolean saveItem(Writer writer, T geo) throws IOException {
+<span class="nc" id="L181">        final boolean valid = isValid(geo);</span>
+
+<span class="nc" id="L183">        final String line = converter.toUriString(geo);</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">        if (valid) {</span>
+<span class="nc" id="L185">            writer.write(line);</span>
+<span class="nc" id="L186">            writer.write(&quot;\n&quot;);</span>
+        }
+<span class="nc bnc" id="L188" title="All 2 branches missed.">        if (logger.isDebugEnabled()) {</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">            logger.debug(&quot;save(&quot; + line + &quot;): &quot; + ((valid) ? &quot;saved&quot; : &quot;ignored&quot; ));</span>
+        }
+<span class="nc" id="L191">        return valid;</span>
+    }
+
+    /** returns true if geo should be loaded from / saved to repository */
+    protected boolean isValid(IGeoPointInfo geo) {
+<span class="nc bnc" id="L196" title="All 4 branches missed.">        return ((geo != null) &amp;&amp; (isValidId(geo.getId())));</span>
+    }
+
+    /** returns true if geo.id should be loaded from / saved to repository */
+    private boolean isValidId(String id) {
+<span class="nc bnc" id="L201" title="All 4 branches missed.">        return ((id != null) &amp;&amp; (!id.startsWith(&quot;#&quot;)));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>

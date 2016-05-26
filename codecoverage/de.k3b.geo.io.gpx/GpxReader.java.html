@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GpxReader.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io.gpx</a> &gt; <span class="el_source">GpxReader.java</span></div><h1>GpxReader.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2015-2016 by k3b.
+ *
+ * This file is part of k3b-geoHelper library.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ package de.k3b.geo.io.gpx;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.xml.sax.InputSource;
+
+import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.api.IGeoInfoHandler;
+import de.k3b.geo.api.IGeoPointInfo;
+
+/**
+ * Reads {@link de.k3b.geo.api.GeoPointDto} from gpx file or stream.&lt;br/&gt;
+ *
+ * inspired by http://stackoverflow.com/questions/672454/how-to-parse-gpx-files-with-saxreader
+ */
+public class GpxReader&lt;T extends IGeoPointInfo&gt; extends GpxReaderBase implements IGeoInfoHandler {
+    private List&lt;T&gt; track;
+
+    /**
+     * Creates a new GpxReader
+     * @param reuse if not null this instance is cleared and then reused for every new gpx found
+     */
+    public GpxReader(final GeoPointDto reuse) {
+<span class="fc" id="L43">        super(null,reuse);</span>
+<span class="fc" id="L44">        this.onGotNewWaypoint = this; // cannot do this in constructor</span>
+<span class="fc" id="L45">    }</span>
+
+    public List&lt;T&gt; getTracks(InputSource in) throws IOException {
+<span class="fc" id="L48">        track = new ArrayList&lt;T&gt;();</span>
+<span class="fc" id="L49">        parse(in);</span>
+<span class="fc" id="L50">        return track;</span>
+    }
+
+    /** is called for every completed gpx-trackpoint */
+    @Override
+    public boolean onGeoInfo(IGeoPointInfo geoInfo) {
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        if (mReuse != null) {</span>
+<span class="fc" id="L57">            track.add((T) mReuse.clone());</span>
+        } else {
+<span class="fc" id="L59">            track.add((T) this.current);</span>
+        }
+<span class="fc" id="L61">        return true;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>

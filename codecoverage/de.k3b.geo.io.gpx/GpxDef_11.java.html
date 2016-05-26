@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GpxDef_11.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io.gpx</a> &gt; <span class="el_source">GpxDef_11.java</span></div><h1>GpxDef_11.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2015-2016 by k3b.
+ *
+ * This file is part of k3b-geoHelper library.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.k3b.geo.io.gpx;
+
+/** xml-elements for gpx version 1.1 */
+<span class="nc" id="L22">class GpxDef_11 {</span>
+    static final String TRKPT = &quot;trkpt&quot;;
+    static final String ATTR_LAT = &quot;lat&quot;;
+    static final String ATTR_LON = &quot;lon&quot;;
+    static final String NAME = &quot;name&quot;;
+    static final String DESC = &quot;desc&quot;;
+    static final String TIME = &quot;time&quot;;
+    static final String LINK = &quot;link&quot;; // &lt;link href=.. /&gt; also used by atom
+    static final String ATTR_LINK = &quot;href&quot;;
+}
+
+/** xml-elements for gpx version 1.0 */
+<span class="nc" id="L34">class GpxDef_10 {</span>
+    static final String WPT = &quot;wpt&quot;; // alias for &quot;trkpt&quot;
+    static final String URL = &quot;url&quot;; // alias for &quot;link&quot;
+}
+
+/** xml-elements for kml */
+<span class="nc" id="L40">class KmlDef_22 {</span>
+    static final String PLACEMARK = &quot;Placemark&quot;;
+    static final String DESCRIPTION = &quot;description&quot;;
+    static final String COORDINATES = &quot;coordinates&quot;;
+    static final String COORDINATES2 = &quot;coord&quot;;
+    static final String TIMESTAMP_WHEN = &quot;when&quot;;
+    static final String TIMESPAN_BEGIN = &quot;begin&quot;;
+}
+
+/** xml-elements for wikimedia (i.e. wikipedia or wikivoyage) */
+<span class="nc" id="L50">class WikimediaDef {</span>
+    static final String PAGE = &quot;page&quot;;
+    static final String ATTR_LINK = &quot;fullurl&quot;; // &lt;page fullurl=...
+    static final String ATTR_ID = &quot;pageid&quot;;
+    static final String ATTR_TITLE = &quot;title&quot;;
+    static final String ATTR_TIME = &quot;touched&quot;;
+
+    static final String COORDINATE = &quot;co&quot;;
+
+    static final String IMAGE = &quot;thumbnail&quot;;
+    static final String ATTR_IMAGE = &quot;source&quot;;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>

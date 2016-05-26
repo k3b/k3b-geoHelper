@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GeoUriDef.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io</a> &gt; <span class="el_source">GeoUriDef.java</span></div><h1>GeoUriDef.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2015-2016 by k3b.
+ *
+ * This file is part of k3b-geoHelper library.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.k3b.geo.io;
+
+/** these constants are part of the geo-uri schema geo:lat,lon?q=.... and the poi xml format */
+<span class="nc" id="L22">public class GeoUriDef {</span>
+
+    public static final String DESCRIPTION = &quot;d&quot;;
+    public static final String LINK = &quot;link&quot;;
+    public static final String SYMBOL = &quot;s&quot;;
+    public static final String QUERY = &quot;q&quot;;
+    public static final String ZOOM = &quot;z&quot;;
+    public static final String ZOOM_MAX = &quot;z2&quot;;
+    public static final String ID = &quot;id&quot;;
+    public static final String TIME = &quot;t&quot;;
+
+    // n=name is an alternative to geo:...q=(name)
+    public static final String NAME = &quot;n&quot;;
+    // ll=lat,lon is an alternative to geo:...q=lat,lon
+    public static final String LAT_LON = &quot;ll&quot;;
+
+    // xml-only
+    public static final String XML_ELEMENT_POI = &quot;poi&quot;;
+    public static final String XML_ATTR_GEO_URI = &quot;geoUri&quot;;
+
+    // &quot;true&quot; of &quot;1&quot; means infer missing parameters
+    public static final String XML_ATTR_GEO_URI_INFER_MISSING = &quot;infer&quot;;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>

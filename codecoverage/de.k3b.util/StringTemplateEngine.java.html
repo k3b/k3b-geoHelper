@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>StringTemplateEngine.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.util</a> &gt; <span class="el_source">StringTemplateEngine.java</span></div><h1>StringTemplateEngine.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2015-2016 by k3b.
+ *
+ * This file is part of k3b-geoHelper library.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.k3b.util;
+
+import java.util.ListIterator;
+import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * Engine that replaces all occurences of ${name} with corresponding values from callback.&lt;br/&gt;
+ * new StringTemplate(valueResolver).format(&quot;hello ${first.name}!&quot;) will produce
+ * &quot;hello world!&quot; if valueResolver.get(&quot;first&quot;,&quot;name&quot;) returns &quot;world&quot;
+ * becomes &quot;hello world!&quot;
+ *
+ * Created by k3b on 01.04.2015.
+ */
+public class StringTemplateEngine {
+<span class="fc" id="L35">    protected IValueResolver valueResolver = null;</span>
+<span class="fc" id="L36">    protected Stack&lt;String&gt; debugStack = null; // new Stack&lt;String&gt;();</span>
+<span class="fc" id="L37">    private StringBuilder errors = null;</span>
+
+
+    // ${a.b}
+<span class="fc" id="L41">    private static final Pattern pattern = Pattern.compile(&quot;\\$\\{([^ \\.\\}]+)\\.([^ }]+)\\}&quot;);</span>
+
+    /** return strue, if value contains tempate parameters */
+    protected boolean hasParameters(String value) {
+<span class="nc bnc" id="L45" title="All 4 branches missed.">        return ((value != null) &amp;&amp; (value.contains(&quot;${&quot;)));</span>
+    }
+
+    public StringTemplateEngine sedDebugEnabled(boolean enabled) {
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        if (enabled) {</span>
+<span class="nc" id="L50">            this.debugStack = new Stack&lt;String&gt;();</span>
+<span class="nc" id="L51">            errors = new StringBuilder();</span>
+        } else {
+<span class="nc" id="L53">            this.debugStack = null;</span>
+<span class="nc" id="L54">            errors = null;</span>
+        }
+<span class="nc" id="L56">        return this;</span>
+    }
+
+    public interface IValueResolver {
+        String get(String className, String propertyName, String templateParameter);
+    }
+
+<span class="fc" id="L63">    public StringTemplateEngine(IValueResolver valueResolver) {</span>
+<span class="fc" id="L64">        this.valueResolver = valueResolver;</span>
+<span class="fc" id="L65">    }</span>
+
+    public String format(String template) {
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">        if (template == null) {</span>
+<span class="nc" id="L69">            return null;</span>
+        }
+
+<span class="fc" id="L72">        final StringBuffer buffer = new StringBuffer();</span>
+<span class="fc" id="L73">        final Matcher match = pattern.matcher(template);</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        while (match.find()) {</span>
+<span class="fc" id="L75">            final String templateParameter = match.group(0);</span>
+<span class="fc" id="L76">            final String className = match.group(1);</span>
+<span class="fc" id="L77">            final String propertyName = match.group(2);</span>
+<span class="fc" id="L78">            debugPush(templateParameter);</span>
+<span class="fc" id="L79">            String resolverResult = valueResolver.get(className, propertyName, templateParameter);</span>
+<span class="fc" id="L80">            resolverResult = onResolverResult(templateParameter, resolverResult);</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">            if (resolverResult != null) {</span>
+<span class="fc" id="L82">                match.appendReplacement(buffer, resolverResult);</span>
+            } else {
+<span class="nc" id="L84">                match.appendReplacement(buffer, &quot;&quot;);</span>
+            }
+<span class="fc" id="L86">            debugPop();</span>
+<span class="fc" id="L87">        }</span>
+<span class="fc" id="L88">        match.appendTail(buffer);</span>
+<span class="fc" id="L89">        return buffer.toString();</span>
+    }
+
+    protected String onResolverResult(String templateParameter, String resolverResult) {
+        // log error if resolve failed
+<span class="pc bpc" id="L94" title="3 of 4 branches missed.">        if ((errors != null) &amp;&amp; (resolverResult == null)) {</span>
+<span class="nc" id="L95">            this.errors</span>
+                    .append(templateParameter)
+                    .append(&quot; not found in &quot;)
+                    .append(getDebugStackTrace())
+                    .append(&quot;\n&quot;);
+        }
+
+<span class="fc" id="L102">        return resolverResult;</span>
+    }
+
+    protected void debugPush(String parameter) {
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">        if (debugStack != null) {</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">            if (debugStack.contains(parameter)) {</span>
+<span class="nc" id="L108">                final String errorMessage = this.getClass().toString() +</span>
+                        &quot;.format() : &quot; + parameter +
+                        &quot; - endless recursion detected &quot; + getDebugStackTrace();
+<span class="nc bnc" id="L111" title="All 2 branches missed.">                if (errors != null) {</span>
+<span class="nc" id="L112">                    this.errors</span>
+                            .append(errorMessage)
+                            .append(&quot;\n&quot;);
+                }
+<span class="nc" id="L116">                throw new StackOverflowError(errorMessage);</span>
+            }
+<span class="nc" id="L118">            debugStack.push(parameter);</span>
+        }
+<span class="fc" id="L120">    }</span>
+
+    protected void debugPop() {
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">        if (debugStack != null) {</span>
+<span class="nc" id="L124">            debugStack.pop();</span>
+        }
+<span class="fc" id="L126">    }</span>
+
+    protected String getDebugStackTrace() {
+<span class="nc" id="L129">        StringBuilder result = new StringBuilder();</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        if (debugStack != null) {</span>
+<span class="nc" id="L131">            ListIterator&lt;String&gt; iter = debugStack.listIterator();</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">            if (iter.hasNext()) {</span>
+<span class="nc" id="L133">                result.append(&quot; &gt; &quot;).append(iter.next());</span>
+            }
+        }
+<span class="nc" id="L136">        return result.toString();</span>
+    }
+
+    public String getErrors() {
+<span class="nc bnc" id="L140" title="All 2 branches missed.">        if (errors == null) return null;</span>
+
+<span class="nc" id="L142">        final String result = errors.toString();</span>
+<span class="nc" id="L143">        errors.setLength(0);</span>
+<span class="nc" id="L144">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>

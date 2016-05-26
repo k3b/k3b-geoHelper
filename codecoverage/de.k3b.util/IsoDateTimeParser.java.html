@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>IsoDateTimeParser.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.util</a> &gt; <span class="el_source">IsoDateTimeParser.java</span></div><h1>IsoDateTimeParser.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2015-2016 by k3b.
+ *
+ * This file is part of k3b-geoHelper library.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.k3b.util;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * Class to parse iso 8601 dateTime.&lt;br/&gt;
+ *
+ * Created by k3b on 12.02.2015.
+ */
+<span class="nc" id="L32">public class IsoDateTimeParser {</span>
+    // &quot;(?:&quot; start of non capturing group
+<span class="fc" id="L34">    public static final Pattern ISO8601_FRACTIONAL_PATTERN</span>
+            = Pattern.compile(&quot;((\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(?:[\\.,](\\d{1,3}))?(Z|[\\+-]\\d{2}(?::?\\d{2})?Z?)?)&quot;);
+    //                            year     month     day T  hour    minute    sec             millisec   Z or +/-  hours  :   minutes
+
+    private static final int YEAR = 0;
+    private static final int MONTH = 1;
+    private static final int DAY = 2;
+    private static final int HOUR = 3;
+    private static final int MINUTE = 4;
+    private static final int SECOND = 5;
+    private static final int FRACTIONAL_SECONDS = 6;
+    private static final int TIMEZONE = 7;
+
+    /**
+     * Similar to
+     * SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm:ss.SSSZ&quot;).parse()
+     * where SSS (millisecs) and Z(timezone in hours i.e. &quot;-01:00&quot;) are optional.
+     *
+     * returns null if not a valid date */
+    public static Date parse(String dateString) {
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">        if (dateString != null) {</span>
+<span class="fc" id="L55">            final Matcher matcher = ISO8601_FRACTIONAL_PATTERN.matcher(dateString);</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">            if (matcher.matches()) {</span>
+                try {
+                    // +2: matcher.group(0) returns the whole expression, matcher.group(1) is overall &quot;()&quot;
+                    // matchingGroup starts with 2
+<span class="fc" id="L60">                    return toDate(matcher.group(YEAR + 2),</span>
+                            matcher.group(MONTH + 2),
+                            matcher.group(DAY + 2),
+                            matcher.group(HOUR + 2),
+                            matcher.group(MINUTE + 2),
+                            matcher.group(SECOND + 2),
+                            matcher.group(FRACTIONAL_SECONDS + 2),
+                            matcher.group(TIMEZONE + 2));
+<span class="nc" id="L68">                } catch (NumberFormatException nfe) {</span>
+                }
+            }
+        }
+<span class="nc" id="L72">        return null;</span>
+    }
+
+    /**
+     * Convert the given timestamp parameters into a number of milliseconds
+     * @param dateFragments year month day hour minute seconds fractionsOfASecond timezone
+     * @return number of milliseconds
+     */
+    private static Date toDate(String... dateFragments)
+    {
+<span class="fc" id="L82">        return toDate(get(dateFragments, YEAR, -1),</span>
+                get(dateFragments, MONTH, -1),
+                get(dateFragments, DAY, -1),
+                get(dateFragments, HOUR, -1),
+                get(dateFragments, MINUTE, -1),
+                get(dateFragments, SECOND, -1),
+                getFraction(dateFragments),
+                getTimeZone(dateFragments));
+
+    }
+
+    public static Date toDate(int year, int month, int day, int hour, int minute, int second, int millisec, TimeZone timeZone) {
+<span class="fc" id="L94">        Calendar cal = Calendar.getInstance();</span>
+
+<span class="fc" id="L96">        cal.set(Calendar.YEAR, year);</span>
+<span class="fc" id="L97">        cal.set(Calendar.MONTH, month - 1);</span>
+<span class="fc" id="L98">        cal.set(Calendar.DAY_OF_MONTH, day);</span>
+<span class="fc" id="L99">        cal.set(Calendar.HOUR_OF_DAY, hour);</span>
+<span class="fc" id="L100">        cal.set(Calendar.MINUTE, minute);</span>
+<span class="fc" id="L101">        cal.set(Calendar.SECOND, second);</span>
+
+<span class="fc" id="L103">        cal.set(Calendar.MILLISECOND, millisec);</span>
+<span class="fc" id="L104">        cal.setTimeZone(timeZone);</span>
+<span class="fc" id="L105">        return new Date(cal.getTimeInMillis());</span>
+    }
+
+    private static int getFraction(String[] dateFragments) {
+<span class="fc" id="L109">        String inFraction = get(dateFragments, FRACTIONAL_SECONDS, null);</span>
+<span class="fc" id="L110">        int millis = 0;</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">        if (inFraction != null)</span>
+        {
+            try {
+<span class="fc" id="L114">                millis = Integer.parseInt((inFraction+&quot;000&quot;).substring(3));</span>
+            }
+<span class="pc" id="L116">            catch (NumberFormatException nfe) {} // ignore errors, millis stay at 0</span>
+        }
+<span class="fc" id="L118">        return millis;</span>
+    }
+
+    /** returns values[paramNo] or notFoundValue if result is empty or if values is too short */
+    private static String get(String[] values, int paramNo, String notFoundValue) {
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">        if (paramNo &gt;= values.length) return notFoundValue;</span>
+<span class="fc" id="L124">        String strValue = values[paramNo];</span>
+<span class="pc bpc" id="L125" title="1 of 4 branches missed.">        return ((strValue != null) &amp;&amp; (strValue.length() &gt; 0)) ? strValue : null;</span>
+    }
+
+    /** returns int of values[paramNo] or notFoundValue if result is empty or if values is too short */
+    private static int get(String[] values, int paramNo, int notFoundValue) throws NumberFormatException {
+<span class="fc" id="L130">        String strValue = get(values, paramNo, null);</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">        if (strValue != null) {</span>
+<span class="fc" id="L132">            return Integer.parseInt(strValue);</span>
+        }
+<span class="nc" id="L134">        return notFoundValue;</span>
+    }
+
+    private static TimeZone getTimeZone(String[] values) {
+<span class="fc" id="L138">        String inTimezone = get(values, TIMEZONE, null);</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        if (inTimezone == null) {</span>
+            // No timezone : use local
+<span class="nc" id="L141">            return TimeZone.getDefault();</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        } else if (inTimezone.equals(&quot;Z&quot;)) {</span>
+            // timezone &quot;Z&quot; : use zulu
+<span class="fc" id="L144">            return TimeZone.getTimeZone(&quot;GMT&quot;);</span>
+        } else {
+            // Timezone specified, pass to calendar
+<span class="fc" id="L147">            return TimeZone.getTimeZone(&quot;GMT&quot; + inTimezone);</span>
+        }
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>
