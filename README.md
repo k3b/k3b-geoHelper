@@ -12,6 +12,8 @@ A j2se geo support library that is compatible with Android
   * [![Build Status](https://travis-ci.org/k3b/k3b-geoHelper.svg?branch=master)](https://travis-ci.org/k3b/k3b-geoHelper)
 * Automated Tests Code Coverage 
   * [![codecov](https://codecov.io/gh/k3b/k3b-geoHelper/branch/master/graph/badge.svg)](https://codecov.io/gh/k3b/k3b-geoHelper)
+* Licence
+  * [<img src="https://img.shields.io/github/license/k3b/k3b-geoHelper.svg"></img>](https://github.com/k3b/k3b-geoHelper/blob/master/LICENSE)
 
 ## Purpose
 
@@ -49,10 +51,6 @@ Add dependencies to local build.gradle
 	}
 
 for details see https://jitpack.io/
-
-##Licence:##
-
-[Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)<br/>
 
 ##Dependencies##
 
