@@ -1,9 +1,12 @@
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
 group = 'com.github.k3b'
 description = "k3b-geoHelper"
+archivesBaseName = "k3b-geoHelper"
+version = "1.1.4-SNAPSHOT"
 
 jacocoTestReport {
     reports {
@@ -22,18 +25,16 @@ dependencies {
     // compile 'joda-time:joda-time:2.7'
 }
 
-task javadocZip(type: Zip, dependsOn: javadoc) {
-    group = 'Distribution'
-    classifier = 'docs'
-    description = "Builds -${classifier} archive containing api and reference ."
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    description = "Builds -${classifier} archive containing api-doc."
+    from javadoc
+}
 
-    from('src/dist') {
-        // include 'changelog.txt'
-    }
-
-    from ('build/docs/javadoc' ) {
-        into 'api'
-    }
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    description = "Builds -${classifier} archive containing source code."
+    from sourceSets.main.allSource
 }
 
 task testZip(type: Zip, dependsOn: [test, jacocoTestReport]) {
@@ -63,3 +64,62 @@ task copyTestResources(type: Copy) {
     into sourceSets.test.output.classesDir
 }
 processTestResources.dependsOn copyTestResources
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+ext.uploadRepository = (isReleaseVersion) ? "https://oss.sonatype.org/service/local/staging/deploy/maven2/" : "https://oss.sonatype.org/content/repositories/snapshots/"
+boolean hasCredentials = hasProperty('sonatypeUsername') && hasProperty('sonatypeUsername')
+
+print "uploadRepository " + uploadRepository + "\n"
+
+signing {
+    required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
+
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: uploadRepository) {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name 'k3b-geoHelper'
+        packaging 'jar'
+        // optionally artifactId can be defined here 
+        description 'A j2se geo support library that is compatible with Android.'
+        url 'https://github.com/k3b/k3b-geoHelper'
+
+		scm {
+			url 'http://www.github.com/k3b/k3b-geoHelper'
+			connection 'scm:git://github.com/k3b/k3b-geoHelper.git'
+			developerConnection 'scm:git://github.com/k3b/k3b-geoHelper.git'
+		}
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+			url 'https://raw.github.com/k3b/k3b-geoHelper/master/license'
+			distribution 'repo'
+          }
+        }
+
+        developers {
+          developer {
+            id 'k3b'
+            name 'Klaus Tevos'
+            email 'klaus3b-mvn@yahoo.de'
+          }
+        }
+      }
+    }
+  }
+}
+
