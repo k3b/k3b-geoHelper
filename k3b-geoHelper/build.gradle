@@ -1,10 +1,11 @@
+// subproject k3b-geoHelper
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
 // vvv maven upload stuff
-group = 'com.github.k3b'
+group = "com.github.${githubUserId}"
 description = "k3b-geoHelper"
 archivesBaseName = "k3b-geoHelper"
 
@@ -58,77 +59,4 @@ task copyTestResources(type: Copy) {
 }
 processTestResources.dependsOn copyTestResources
 
-// vvv maven upload stuff
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    description = "Builds -${classifier} archive containing api-doc."
-    from javadoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    description = "Builds -${classifier} archive containing source code."
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives javadocJar, sourcesJar
-}
-
-if (hasProperty("signing.keyId")) {
-	signing {
-		print "signing archives\n"
-		sign configurations.archives
-	}
-}
-
-uploadArchives {
-	repositories {
-		mavenDeployer {
-			if (hasProperty("signing.keyId")) {
-				beforeDeployment { 
-					MavenDeployment deployment -> signing.signPom(deployment) 
-				}
-			}
-
-			repository(url: uploadRepository) {
-				print "uploading to repository '" + uploadRepository + "'\n"
-				if (hasProperty('sonatypeUsername') && hasProperty('sonatypeUsername')) {
-					authentication(userName: ossrhUsername, password: ossrhPassword)
-				}
-			}
-
-			pom.project {
-				name 'k3b-geoHelper'
-				packaging 'jar'
-				// optionally artifactId can be defined here 
-				description 'A j2se geo support library that is compatible with Android.'
-				url 'https://github.com/k3b/k3b-geoHelper'
-
-				scm {
-					url 'http://www.github.com/k3b/k3b-geoHelper'
-					connection 'scm:git://github.com/k3b/k3b-geoHelper.git'
-					developerConnection 'scm:git://github.com/k3b/k3b-geoHelper.git'
-				}
-
-				licenses {
-					license {
-						name 'The Apache License, Version 2.0'
-						url 'https://raw.github.com/k3b/k3b-geoHelper/master/license'
-						distribution 'repo'
-					}
-				}
-
-				developers {
-					developer {
-						id 'k3b'
-						name 'Klaus Tevos'
-						email 'klaus3b-mvn@yahoo.de'
-					}
-				}
-			}
-		}
-	}
-
-}
+apply from: '../uploadArchives.gradle'
