@@ -3,10 +3,15 @@ apply plugin: 'jacoco'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+// vvv maven upload stuff
 group = 'com.github.k3b'
 description = "k3b-geoHelper"
 archivesBaseName = "k3b-geoHelper"
-version = "1.1.4-SNAPSHOT"
+
+version = globalVersion
+
+print description + ":" + version + "\n"
+// ^^^ maven upload stuff
 
 jacocoTestReport {
     reports {
@@ -23,18 +28,6 @@ dependencies {
     //  compile 'org.slf4j:slf4j-api:1.7.6@jar'
     // compile 'com.darwinsys:hirondelle-date4j:1.5.1'
     // compile 'joda-time:joda-time:2.7'
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    description = "Builds -${classifier} archive containing api-doc."
-    from javadoc
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    description = "Builds -${classifier} archive containing source code."
-    from sourceSets.main.allSource
 }
 
 task testZip(type: Zip, dependsOn: [test, jacocoTestReport]) {
@@ -65,15 +58,25 @@ task copyTestResources(type: Copy) {
 }
 processTestResources.dependsOn copyTestResources
 
+// vvv maven upload stuff
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    description = "Builds -${classifier} archive containing api-doc."
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    description = "Builds -${classifier} archive containing source code."
+    from sourceSets.main.allSource
+}
+
 artifacts {
     archives javadocJar, sourcesJar
 }
 
-ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
-ext.uploadRepository = (isReleaseVersion) ? "https://oss.sonatype.org/service/local/staging/deploy/maven2/" : "https://oss.sonatype.org/content/repositories/snapshots/"
 boolean hasCredentials = hasProperty('sonatypeUsername') && hasProperty('sonatypeUsername')
-
-print "uploadRepository " + uploadRepository + "\n"
 
 signing {
     required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
