@@ -5,13 +5,14 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 // vvv maven upload stuff
-group = "com.github.${githubUserId}"
-description = "k3b-geoHelper"
-archivesBaseName = "k3b-geoHelper"
+ext {
+	mavenUpload_archivesBaseName = 'k3b-geoHelper'
+	mavenUpload_description = 'A j2se geo support library that is compatible with Android.'
+}
 
-version = globalVersion
-
-print description + ":" + version + "\n"
+group = "com.github.${github_userId}"
+description = "${mavenUpload_description}"
+version = project_version
 // ^^^ maven upload stuff
 
 jacocoTestReport {
