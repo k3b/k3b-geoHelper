@@ -66,8 +66,18 @@ uploadArchives {
 				licenses {
 					license {
 						name "${project_licence_name}"
-						url "https://raw.github.com/${github_userId}/${github_repository}/master/license"
+						url "https://raw.github.com/${github_userId}/${github_repository}/master/LICENSE"
 						distribution 'repo'
+					}
+				}
+
+				if (parent.hasProperty("mavenUpload_publisher_name") && parent.hasProperty("mavenUpload_publisher_email")) {
+					developers {
+						developer {
+							id "${github_userId}"
+							name "${mavenUpload_publisher_name}"
+							email "${mavenUpload_publisher_email}"
+						}
 					}
 				}
 			}
