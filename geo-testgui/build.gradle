@@ -1,0 +1,31 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion = 23
+    buildToolsVersion = '23.0.2'
+    defaultConfig {
+        applicationId "de.k3b.android.geo.testgui"
+        minSdkVersion 14
+        targetSdkVersion 21
+
+        // appXXX are defined in gradle.properties
+        versionCode = 1
+        versionName = '1.0.1'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileSdkVersion 21
+    buildToolsVersion '23.0.2'
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}
