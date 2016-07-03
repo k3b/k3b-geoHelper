@@ -3,7 +3,7 @@
     package="de.k3b.android.demo_geohelper">
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name">
         <activity android:name=".GeoViewerDemoActivity" android:label="Geo-Viewer-Demo">

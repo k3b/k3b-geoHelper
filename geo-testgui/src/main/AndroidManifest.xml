@@ -21,6 +21,7 @@
  -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="auto"
+    android:allowBackup="false"
     package="de.k3b.android.geo.testgui" >
 
     <application

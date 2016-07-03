@@ -22,8 +22,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    compileSdkVersion 21
-    buildToolsVersion '23.0.2'
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
