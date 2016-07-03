@@ -7,8 +7,12 @@ android:
     - add-on
     - extra
 
+before_install:
+# http://stackoverflow.com/questions/33820638/travis-yml-gradlew-permission-denied
+ - chmod +x gradlew
+ 
 script:
-  - gradle check assemble reports
+  - ./gradlew check assemble reports
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
