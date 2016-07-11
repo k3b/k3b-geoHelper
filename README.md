@@ -51,4 +51,4 @@ Add dependencies to local build.gradle (via jcenter or mavencentral)
 ## References ##
 
 * [Changelog](https://github.com/k3b/k3b-geoHelper/wiki/History)
-* [Other Projects using k3b-geoHelper lib](https://github.com/k3b/k3b-geoHelper/wiki/Projects)
+* [List of Android apps that support geo-uri](https://github.com/k3b/k3b-geoHelper/wiki/Android-Geo-aware-apps)
