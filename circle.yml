@@ -4,7 +4,7 @@ dependencies:
     # http://stackoverflow.com/questions/33820638/travis-yml-gradlew-permission-denied
     # must execute
     # git update-index --chmod=+x gradlew
-	#
+    #
     # - echo y | android update sdk --no-ui --all --filter "package-name"
 
 test:
