@@ -2,4 +2,5 @@
 dependencies:
   pre:
     # http://stackoverflow.com/questions/33820638/travis-yml-gradlew-permission-denied
-    - chmod +x gradlew
+# must execute
+# git update-index --chmod=+x gradlew
