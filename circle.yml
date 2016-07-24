@@ -2,5 +2,14 @@
 dependencies:
   pre:
     # http://stackoverflow.com/questions/33820638/travis-yml-gradlew-permission-denied
-# must execute
-# git update-index --chmod=+x gradlew
+    # must execute
+    # git update-index --chmod=+x gradlew
+	#
+    # - echo y | android update sdk --no-ui --all --filter "package-name"
+
+test:
+  override:
+    - ./gradlew check assemble reports
+    - cp -r k3b-geoHelper/build/reports/jacoco/test/html  $CIRCLE_ARTIFACTS
+    - cp -r k3b-geoHelper/build/reports/tests  $CIRCLE_ARTIFACTS
+    - cp -r k3b-geoHelper/build/docs/javadoc  $CIRCLE_ARTIFACTS
