@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<someRoot 	xmlns:expectedTestResult="uri://some/url" >
+    <!-- This file conatain regression test data for http(s) urls that can be interpreted as
+        geopoint by extracting geo data from uri.
+        "poi" is de.k3b.geo internal format for "points of interest"
+
+        expectedTestResult:id contain the expected parsing result
+        -->
+
+    <!-- not a known geo url -->
+    <poi geoUri="ftp://path/to/somewhere">
+        <expectedTestResult:id>geo:</expectedTestResult:id>
+    </poi>
+    <poi geoUri="https://github.com/k3b/k3b-geoHelper">
+        <expectedTestResult:id>geo:</expectedTestResult:id>
+    </poi>
+
+    <!-- google maps -->
+    <poi geoUri="http://maps.google.com/maps?q=loc:52.1,9.2(theName)">
+        <expectedTestResult:id>geo:52.1,9.2?q=(theName)</expectedTestResult:id>
+    </poi>
+    <poi geoUri="https://maps.google.de/maps?q=loc:52.1,9.2(theName)">
+        <expectedTestResult:id>geo:52.1,9.2?q=(theName)</expectedTestResult:id>
+    </poi>
+</someRoot>

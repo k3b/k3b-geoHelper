@@ -92,6 +92,8 @@ public class GeoUri {
     private static final String DEFAULT_ENCODING = "UTF-8";
     public static final String GEO_SCHEME = "geo:";
     public static final String AREA_SCHEME = "geoarea:";
+    public static final java.lang.String HTTPS_SCHEME = "https:";
+    public static final java.lang.String HTTP_SCHEME = "http:";
 
     /* Regular expressions used by the parser.<br/>
        '(?:"+something+")"' is a non capturing group; "\s" white space */
@@ -134,55 +136,63 @@ public class GeoUri {
     /** Load {@link IGeoPointInfo} from uri-{@link String} into parseResult. */
     public <TGeo extends GeoPointDto>  TGeo fromUri(String uri, TGeo parseResult) {
         if (uri == null) return null;
-        if (!uri.startsWith(GEO_SCHEME)) return null;
 
-        int queryOffset = uri.indexOf("?");
+        if (uri.startsWith(HTTP_SCHEME) || uri.startsWith(HTTPS_SCHEME) || uri.startsWith(GEO_SCHEME)) {
 
-        if (queryOffset >= 0) {
-            String query = uri.substring(queryOffset+1);
-            uri = uri.substring(0, queryOffset);
-            HashMap<String, String> parmLookup = new HashMap<String, String>();
-            String[] params = query.split("&");
-            for (String param : params) {
-                parseAddQueryParamToMap(parmLookup, param);
+            // http://maps.google.com/maps?q=loc:52.1,9.2(theName)
+            // remove "loc:" from google maps url
+            uri = uri.replaceAll("q=loc:", "q=");
+            int queryOffset = uri.indexOf("?");
+
+            if (queryOffset >= 0) {
+                String query = uri.substring(queryOffset + 1);
+                uri = uri.substring(0, queryOffset);
+                HashMap<String, String> parmLookup = new HashMap<String, String>();
+                String[] params = query.split("&");
+                for (String param : params) {
+                    parseAddQueryParamToMap(parmLookup, param);
+                }
+                parseResult.setDescription(parmLookup.get(GeoUriDef.DESCRIPTION));
+                parseResult.setLink(parmLookup.get(GeoUriDef.LINK));
+                parseResult.setSymbol(parmLookup.get(GeoUriDef.SYMBOL));
+                parseResult.setId(parmLookup.get(GeoUriDef.ID));
+                parseResult.setZoomMin(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM)));
+                parseResult.setZoomMax(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM_MAX)));
+                // parameters from standard value and/or infered
+                List<String> whereToSearch = new ArrayList<String>();
+                whereToSearch.add(parmLookup.get(GeoUriDef.QUERY)); // lat lon from q have precedence over url-path
+                whereToSearch.add(uri);
+                whereToSearch.add(parmLookup.get(GeoUriDef.LAT_LON));
+
+                final boolean inferMissing = isSet(GeoUri.OPT_PARSE_INFER_MISSING);
+                if (inferMissing) {
+                    whereToSearch.add(parseResult.getDescription());
+                    whereToSearch.addAll(parmLookup.values());
+                }
+
+                parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));
+                parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), parmLookup.get(GeoUriDef.TIME), whereToSearch));
+
+                parseLatOrLon(parseResult, whereToSearch);
+
+                if (parseResult.getName() == null) {
+                    parseResult.setName(parmLookup.get(GeoUriDef.NAME));
+                }
+                if (inferMissing) {
+                    parseResult.setLink(parseFindFromPattern(patternHref, parseResult.getLink(), whereToSearch));
+                    parseResult.setSymbol(parseFindFromPattern(patternSrc, parseResult.getSymbol(), whereToSearch));
+                }
+            } else {
+                // no query parameter
+                List<String> whereToSearch = new ArrayList<String>();
+                whereToSearch.add(uri);
+                parseLatOrLon(parseResult, whereToSearch);
             }
-            parseResult.setDescription(parmLookup.get(GeoUriDef.DESCRIPTION));
-            parseResult.setLink(parmLookup.get(GeoUriDef.LINK));
-            parseResult.setSymbol(parmLookup.get(GeoUriDef.SYMBOL));
-            parseResult.setId(parmLookup.get(GeoUriDef.ID));
-            parseResult.setZoomMin(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM)));
-            parseResult.setZoomMax(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM_MAX)));
-            // parameters from standard value and/or infered
-            List<String> whereToSearch = new ArrayList<String>();
-            whereToSearch.add(parmLookup.get(GeoUriDef.QUERY)); // lat lon from q have precedence over url-path
-            whereToSearch.add(uri);
-            whereToSearch.add(parmLookup.get(GeoUriDef.LAT_LON));
-
-            final boolean inferMissing = isSet(GeoUri.OPT_PARSE_INFER_MISSING);
-            if (inferMissing) {
-                whereToSearch.add(parseResult.getDescription());
-                whereToSearch.addAll(parmLookup.values());
-            }
-
-            parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));
-            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), parmLookup.get(GeoUriDef.TIME), whereToSearch));
-
-            parseLatOrLon(parseResult, whereToSearch);
-
-            if (parseResult.getName() == null) {
-                parseResult.setName(parmLookup.get(GeoUriDef.NAME));
-            }
-            if (inferMissing) {
-                parseResult.setLink(parseFindFromPattern(patternHref, parseResult.getLink(), whereToSearch));
-                parseResult.setSymbol(parseFindFromPattern(patternSrc, parseResult.getSymbol(), whereToSearch));
-            }
-        } else {
-            // no query parameter
-            List<String> whereToSearch = new ArrayList<String>();
-            whereToSearch.add(uri);
-            parseLatOrLon(parseResult, whereToSearch);
+            return parseResult;
         }
-        return parseResult;
+
+        // unknown format
+        return null;
     }
 
     /** Load {@link GeoPointDto} from uri-{@link String} into parseResult. */
