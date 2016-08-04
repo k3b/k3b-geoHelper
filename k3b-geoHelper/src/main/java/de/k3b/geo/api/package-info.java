@@ -20,11 +20,11 @@
  * This Package defines Android independant api as interfaces to handle geo infos.
  *
  * <ul>
- *     <li>{@link de.k3b.geo.api.GeoPointDto}:
+ *     <li>{@link de.k3b.geo.api.IGeoPointInfo} implemented by {@link de.k3b.geo.api.GeoPointDto}:
  *          a location or trackpoint that can be represented in a gpx file.</li>
  *     <li>{@link de.k3b.geo.io.gpx.GpxFormatter}:
- *          Formats {@link de.k3b.geo.api.GeoPointDto}-s or {@link de.k3b.geo.api.ILocation}-s as geo-xml.</li>
- *     <li>{@link de.k3b.geo.io.gpx.GpxReader}:
+ *          Formats {@link de.k3b.geo.api.ILocation}-s, {@link de.k3b.geo.api.IGeoPointInfo}, {@link de.k3b.geo.api.GeoPointDto}-s or  as geo-xml.</li>
+ *     <li> {@link de.k3b.geo.api.IGeoRepository} implemented as {@link de.k3b.geo.io.gpx.GpxReader}:
  *          reads {@link de.k3b.geo.api.GeoPointDto} from file or stream.</li>
  * </ul>
  *

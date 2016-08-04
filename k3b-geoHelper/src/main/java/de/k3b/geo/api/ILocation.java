@@ -21,9 +21,10 @@ package de.k3b.geo.api;
 import java.util.Date;
 
 /**
- * Represents a geographic location: latitude(in degrees north), longitude(in degrees east)
- * Interface to make the lib independant from Android and other location sources.<br/>
- *  <br/>
+ * Represents a geographic location: latitude(in degrees north), longitude(in degrees east).
+ *
+ * Interface to make the lib independant from Android and other location sources.
+ *
  * Created by k3b on 11.05.2014.
  */
 public interface ILocation {

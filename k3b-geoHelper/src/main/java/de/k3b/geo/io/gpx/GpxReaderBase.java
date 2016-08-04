@@ -41,43 +41,53 @@ import de.k3b.util.IsoDateTimeParser;
 
 /**
  * Parser for xml-geo formats implemented for
- *  - gpx-1.1 http://www.topografix.com/GPX/1/1/ and
- *  - gpx-1.0 http://www.topografix.com/GPX/1/0/ and
- *  - poi (de.k3b.geo internal format compatible with geo-uri format)
- *  - kml-2.2 (a little bit of http://www.opengis.net/kml/2.2).
+ *
+ *  * gpx-1.1 http://www.topografix.com/GPX/1/1/ and
+ *  * gpx-1.0 http://www.topografix.com/GPX/1/0/ and
+ *  * poi (de.k3b.geo internal format compatible with geo-uri format)
+ *  * kml-2.2 (a little bit of http://www.opengis.net/kml/2.2).
  *
  * This parser is not acurate: it might pick elements from wrong namespaces.
  *
  * Note: if you change/add features to this xml parser
- * ...\LocationMapViewer\k3b-geoHelper\src\main\java\de.k3b.geo.io.gpx.GpxReaderBase.java
  * please also update regression test-data and prog at
- * ...\LocationMapViewer\k3b-geoHelper\src\test\resources\de\k3b\geo\io\regressionTests\*.*
- * ...\LocationMapViewer\k3b-geoHelper\src\test\java\de.k3b.geo.io.GeoPointDtoRegressionTests.java
+ *
+ * * ...\LocationMapViewer\k3b-geoHelper\src\test\resources\de\k3b\geo\io\regressionTests\*.*
+ * * ...\LocationMapViewer\k3b-geoHelper\src\test\java\de.k3b.geo.io.GeoPointDtoRegressionTests.java
  *
  * Created by k3b on 20.01.2015.
  */
 public class GpxReaderBase extends DefaultHandler {
     private static final Logger logger = LoggerFactory.getLogger(GpxReaderBase.class);
 
+    /** Callback to process every point received */
     protected IGeoInfoHandler onGotNewWaypoint;
 
-    /** if not null this instance is cleared and then reused for every new gpx found */
+    /** If not null this instance is cleared and then reused for every new gpx found */
     protected final GeoPointDto mReuse;
 
-    /** if not null gpx-v11: "trkpt" parsing is active */
+    /** If not null gpx-v11: "trkpt" parsing is active */
     protected GeoPointDto current;
-	
-    private StringBuffer buf = new StringBuffer();
 
-    // used by <poi geoUri='geo:...' />. created on demand.
+    /** This member will receive value of current xml-element while parsing */
+    private StringBuffer currentXmlElementBufer = new StringBuffer();
+
+    /** Used if xml contains geoUri attribute <poi geoUri='geo:...' /> to parse contained geo-uris..
+     * it is Created on demand. */
     private GeoUri geoUriParser = null;
 
+    /**
+     * Creates a new parser.
+     *
+     * @param onGotNewWaypoint callback to process every point received
+     * @param reuse  if not null this instance is cleared and then reused for every new gpx found. This way the reader can load different implementations of {@link de.k3b.geo.api.IGeoPointInfo}
+     */
     public GpxReaderBase(final IGeoInfoHandler onGotNewWaypoint, final GeoPointDto reuse) {
         this.onGotNewWaypoint = onGotNewWaypoint;
         this.mReuse = reuse;
     }
 
-    /** processes in and calls onGotNewWaypoint for every waypoint found */
+    /** Processes in and calls onGotNewWaypoint for every waypoint found */
     public void parse(InputSource in) throws IOException {
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -95,14 +105,14 @@ public class GpxReaderBase extends DefaultHandler {
         }
     }
 
-    /** returns an instance of an empty {@link de.k3b.geo.api.GeoPointDto} */
+    /** Factory method: Returns an instance of an empty {@link de.k3b.geo.api.GeoPointDto} */
     protected GeoPointDto newInstance() {
         if (mReuse != null) return mReuse.clear();
         return new GeoPointDto();
     }
 
-    /** returns an instance of an empty {@link de.k3b.geo.api.GeoPointDto}
-     * and tries to find non standard attributes */
+    /** Returns an instance of {@link de.k3b.geo.api.GeoPointDto}
+     * and tries to data from the xml-attributes */
     protected GeoPointDto newInstance(Attributes attributes) {
         GeoPointDto result = newInstance();
 
@@ -156,6 +166,7 @@ public class GpxReaderBase extends DefaultHandler {
         return result;
     }
 
+    /** Java sax api implementation: Element name inspection/processig */
     @Override
     public void startElement(String uri, String localName, String qName,
             Attributes attributes) throws SAXException {
@@ -191,10 +202,11 @@ public class GpxReaderBase extends DefaultHandler {
             this.current.setLink(attributes.getValue(GpxDef_11.ATTR_LINK));
         }
 		if (this.current != null) {
-			buf.setLength(0);
+			currentXmlElementBufer.setLength(0);
 		}
     }
 
+    /** Java sax api implementation: Element value and attribut inspection/processig */
     @Override
     public void endElement(String uri, String localName, String qName)
             throws SAXException {
@@ -206,41 +218,44 @@ public class GpxReaderBase extends DefaultHandler {
             this.current = null;
         } else if (this.current != null) {
             if (name.equals(GpxDef_11.NAME)) {
-                this.current.setName(buf.toString());
+                this.current.setName(currentXmlElementBufer.toString());
             } else if (name.equals(GpxDef_11.DESC) || name.equals(KmlDef_22.DESCRIPTION)) {
-                this.current.setDescription(buf.toString());
+                this.current.setDescription(currentXmlElementBufer.toString());
             } else if ((null == this.current.getLink()) && (name.equals(GpxDef_11.LINK) || name.equals(GpxDef_10.URL))) {
-                this.current.setLink(buf.toString());
+                this.current.setLink(currentXmlElementBufer.toString());
             } else if (name.equals(GeoUriDef.ID)) {
-                this.current.setId(buf.toString());
+                this.current.setId(currentXmlElementBufer.toString());
             } else if (name.equals(GpxDef_11.TIME) || name.equals(KmlDef_22.TIMESTAMP_WHEN) || name.equals(KmlDef_22.TIMESPAN_BEGIN)) {
-                final Date dateTime = IsoDateTimeParser.parse(buf.toString());
+                final Date dateTime = IsoDateTimeParser.parse(currentXmlElementBufer.toString());
                 if (dateTime != null) {
                     this.current.setTimeOfMeasurement(dateTime);
                 } else {
                     saxError("/gpx//time or /kml//when or /kml//begin: invalid time "
-                            + name +"=" + buf.toString());
+                            + name +"=" + currentXmlElementBufer.toString());
                 }
 
-            } else if ((name.equals(KmlDef_22.COORDINATES) || name.equals(KmlDef_22.COORDINATES2)) && buf.length() > 0) {
+            } else if ((name.equals(KmlDef_22.COORDINATES) || name.equals(KmlDef_22.COORDINATES2)) && currentXmlElementBufer.length() > 0) {
                 // <coordinates>lon,lat,height blank lon,lat,height ...</coordinates>
                 try {
-                    String parts[] = buf.toString().split("[,\\s]");
+                    String parts[] = currentXmlElementBufer.toString().split("[,\\s]");
                     if ((parts != null) && (parts.length >= 2)) {
                         this.current.setLatitude(Double.parseDouble(parts[1]));
                         this.current.setLongitude(Double.parseDouble(parts[0]));
                     }
                 } catch (NumberFormatException e) {
                     saxError("/kml//Placemark/Point/coordinates>Expected: 'lon,lat,...' but got "
-                            + name +"=" + buf.toString());
+                            + name +"=" + currentXmlElementBufer.toString());
                 }
             }
         }
     }
 
+    /** Called for every xml-sax-parser-error */
     private void saxError(String message) throws SAXException {
         throw new SAXException(message);
     }
+
+    /** Get element-name removing possible namespace prefix */
     private String getElementName(String localName, String qName) {
         if ((localName != null) && (localName.length() > 0))
             return localName;
@@ -252,11 +267,12 @@ public class GpxReaderBase extends DefaultHandler {
         return qName.substring(delim+1);
     }
 
+    /** Java sax api implementation: Collect value while between start-element and end-element */
     @Override
     public void characters(char[] chars, int start, int length)
             throws SAXException {
 		if (this.current != null) {
-			buf.append(chars, start, length);
+			currentXmlElementBufer.append(chars, start, length);
 		}
     }
 }

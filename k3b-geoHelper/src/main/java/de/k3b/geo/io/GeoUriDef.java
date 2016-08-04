@@ -18,7 +18,9 @@
 
 package de.k3b.geo.io;
 
-/** these constants are part of the geo-uri schema geo:lat,lon?q=.... and the poi xml format */
+/** Implementation Detail: Define the string constants that make up geo-uri-parameter.
+ *
+ * They are part of the geo-uri schema geo:lat,lon?q=.... and the poi xml format */
 public class GeoUriDef {
 
     public static final String DESCRIPTION = "d";

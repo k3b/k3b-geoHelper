@@ -17,7 +17,7 @@
  */
 
 /**
- * This Package defines portable, "Android independant" code consumed by LocationMapViewer.
+ * This Package defines portable, "Android independant" code .
  *
  * Thw code can be tested by non-android-Junit tests.
  **/

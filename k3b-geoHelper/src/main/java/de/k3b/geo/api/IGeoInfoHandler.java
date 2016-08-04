@@ -25,6 +25,8 @@ package de.k3b.geo.api;
  */
 public interface IGeoInfoHandler {
     /**
+     * Is called by {@link de.k3b.geo.io.gpx.GpxReaderBase} for every decoded {@link IGeoPointInfo}.
+     *
      * @return true if item has been consumed
      */
     boolean onGeoInfo(IGeoPointInfo geoInfo);

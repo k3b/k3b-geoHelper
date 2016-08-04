@@ -21,34 +21,38 @@ package de.k3b.geo.api;
 import java.util.List;
 
 /**
- * Abstract Repository to load/save List<{@link de.k3b.geo.api.GeoPointDto} > .
+ * Abstract Repository to load/save List<{@link de.k3b.geo.api.IGeoPointInfo} > .
+ *
+ * It can be used for {@link de.k3b.geo.api.GeoPointDto} or
+ * any custom {@link de.k3b.geo.api.IGeoPointInfo} implementation.
  *
  * Created by k3b on 17.03.2015.
  */
 public interface IGeoRepository<R extends IGeoPointInfo> {
 
-    /** (cached) load from repository
+    /** Cached: Load from repository.
      *
      * @return data loaded
      */
     List<R> load();
 
-    /** uncached, fresh load from repository
+    /** Uncached: Fresh load from repository.
      *
      * @return data loaded
      */
     List<R> reload();
 
-    /** save back to repository
+    /** Save back in memory-data back to repository
      *
      * @return false: error.
      */
     boolean save();
 
-    /** generates a new id */
+    /** Generate a new id for {@link IGeoPointInfo#getId()}. */
     String createId();
 
-    /** removes item from repository.
+    /** Removes item from repository.
+     *
      * @return true if successful */
     boolean delete(R item);
 }

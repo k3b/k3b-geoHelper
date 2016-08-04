@@ -28,28 +28,31 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import de.k3b.geo.api.IGeoPointInfo;
-import de.k3b.util.IsoDateTimeParser;
 
 /**
- * converts between string an geo-component-type.
+ * Converts between uri-{@link String} and geo-component-type {@link double}, {@link Date},
+ *    {@link int}.
  *
  * Created by k3b on 25.03.2015.
  */
 public class GeoFormatter {
-    /* converter for Datatypes */
-    private static final DecimalFormat latLonFormatter = new DecimalFormat("#.#######", new DecimalFormatSymbols(Locale.ENGLISH));
-    private static final DateFormat timeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    /* Converter for Datatypes */
+    private static final DecimalFormat latLonFormatter
+            = new DecimalFormat("#.#######", new DecimalFormatSymbols(Locale.ENGLISH));
+    private static final DateFormat timeFormatter
+            = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     static {
         timeFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    /** parsing helper: converts a double value from string to double */
+    /** Parsing helper: Converts a lat or lon value from {@link String} to {@link double}. */
     public static double parseLatOrLon(String val) throws ParseException {
         if ((val == null) || (val.length() == 0)) return IGeoPointInfo.NO_LAT_LON;
         return latLonFormatter.parse(val).doubleValue();
     }
 
+    /** Parsing helper: Converts  a {@link double} lat or lon value to {@link String}. */
     public static String formatLatLon(double latitude) {
         if (latitude != IGeoPointInfo.NO_LAT_LON) {
             return latLonFormatter.format(latitude);
@@ -57,6 +60,7 @@ public class GeoFormatter {
         return "";
     }
 
+    /** Parsing helper: Converts a {@link Date} value to {@link String}. */
     public static String formatDate(Date date) {
         if (date != null) {
             return timeFormatter.format(date);
@@ -64,6 +68,7 @@ public class GeoFormatter {
         return "";
     }
 
+    /** Parsing helper: Converts a zoom {@link int} value to {@link String}. */
     public static String formatZoom(int val) {
         if (val != IGeoPointInfo.NO_ZOOM) {
             return Integer.toString(val);
@@ -71,7 +76,7 @@ public class GeoFormatter {
         return "";
     }
 
-    /** parsing helper: converts value into zoom compatible int */
+    /** Parsing helper: Converts zoom {@link String} value to zoom compatible int. */
     public static int parseZoom(String value) {
         if (value != null) {
             try {

@@ -21,60 +21,46 @@ package de.k3b.geo.api;
 import java.util.Date;
 
 /**
- * A location or trackpoint that can be displayed in a locationmap.<br/>
- * <p/>
+ * A minimal location or trackpoint implementation of {@link ILocation}, {@link IGeoPointInfo}.
+ *
  * Created by k3b on 07.01.2015.
  */
 public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
-    /**
-     * Latitude, in degrees north. NO_LAT_LON if not set
-     */
+    /** Latitude, in degrees north. {@link #NO_LAT_LON} means "not set" */
     private double latitude = NO_LAT_LON;
 
-    /**
-     * Longitude, in degrees east. NO_LAT_LON if not set
-     */
+    /** Longitude, in degrees east. {@link #NO_LAT_LON} means "not set" */
     private double longitude = NO_LAT_LON;
 
-    /**
-     * Date when the measurement was taken. Null if unknown.
-     */
+    /** Date when the measurement was taken. Null if unknown. */
     private Date timeOfMeasurement = null;
 
-    /**
-     * Short non-unique text used as marker label. Null if not set.
-     */
+    /** Short non-unique text used as marker label. Null means "not set". */
     private String name = null;
 
-    /**
-     * Detailed descript of the point displayed in popup on long-click . Null if not set.
-     */
+    /** Detailed descript of the point displayed in popup on long-click . Null means "not set". */
     private String description = null;
 
-    /**
-     * filter: this item is only shown if current zoom-level is >= this value. NO_ZOOM means no lower bound.
-     */
+    /** Filter: This item is only shown if current zoom-level is >= this value.
+     * NO_ZOOM means no lower bound. */
     private int zoomMin = NO_ZOOM;
 
-    /**
-     * filter: this item is only shown if current zoom-level is <= this value. NO_ZOOM means no upper bound.
-     */
+    /** Filter: This item is only shown if current zoom-level is <= this value.
+     * NO_ZOOM means no upper bound. */
     private int zoomMax = NO_ZOOM;
 
-    /**
-     * if not null: a unique id for this item.
-     */
+    /** If not null: A unique id for this item. */
     private String id = null;
 
-    /** Optional: if not null: link-url belonging to this item.<br/>
-     * In show view after clicking on a marker: clock on button ">" opens this url.<br/>
-     * persistet in geo-uri as geo:...&link=https://path/to/file.html
-     * */
+    /** Optional: If not null: Link-url belonging to this item.
+     *
+     * In show view after clicking on ">" in marker: opens this url.
+     *
+     * Persistet in geo-uri as geo:...&link=https://path/to/file.html. */
     private String link = null;
 
-    /** Optional: if not null: url to an icon belonging to this item.<br/>
-     * persistet in geo-uri as geo:...&s=https://path/to/file.html
-     * */
+    /** Optional: If not null: Url to an icon belonging to this item.<br/>
+     * Persistet in geo-uri as geo:...&s=https://path/to/file.html . */
     private String symbol = null;
 
     public GeoPointDto() {
@@ -120,41 +106,41 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         }
     }
 
-    /**
-     * Latitude, in degrees north. NO_LAT_LON if not set
-     */
+    /** Latitude, in degrees north.
+     *
+     * {@link #NO_LAT_LON} means "not set". */
     public GeoPointDto setLatitude(double latitude) {
         this.latitude = latitude;
         return this;
     }
 
-    /**
-     * Latitude, in degrees north. NO_LAT_LON if not set
-     */
+    /** Latitude, in degrees north.
+     *
+     * {@link #NO_LAT_LON} means "not set". */
     @Override
     public double getLatitude() {
         return latitude;
     }
 
-    /**
-     * Longitude, in degrees east. NO_LAT_LON if not set
-     */
+    /** Longitude, in degrees east.
+     *
+     * {@link #NO_LAT_LON} means "not set". */
     public GeoPointDto setLongitude(double longitude) {
         this.longitude = longitude;
         return this;
     }
 
-    /**
-     * Longitude, in degrees east. NO_LAT_LON if not set
-     */
+    /** Longitude, in degrees east.
+     *
+     * {@link #NO_LAT_LON} means "not set". */
     @Override
     public double getLongitude() {
         return longitude;
     }
 
-    /**
-     * Date when the measurement was taken. Null if unknown.
-     */
+    /** Date when the measurement was taken.
+     *
+     * Null means unknown. */
     public GeoPointDto setTimeOfMeasurement(Date timeOfMeasurement) {
         this.timeOfMeasurement = timeOfMeasurement;
         return this;
@@ -169,7 +155,7 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
     }
 
     /**
-     * Short non-unique text used as marker label. Null if not set.
+     * Short non-unique text used as marker label. Null means "not set".
      */
     public GeoPointDto setName(String name) {
         this.name = name;
@@ -177,7 +163,7 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
     }
 
     /**
-     * Short non-unique text used as marker label. Null if not set.
+     * Short non-unique text used as marker label. Null means "not set".
      */
     @Override
     public String getName() {
@@ -185,7 +171,7 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
     }
 
     /**
-     * Detailed descript of the point displayed in popup on long-click . Null if not set.
+     * Detailed descript of the point displayed in popup on long-click . Null means "not set".
      */
     public GeoPointDto setDescription(String description) {
         this.description = description;
@@ -193,7 +179,7 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
     }
 
     /**
-     * Detailed descript of the point displayed in popup on long-click . Null if not set.
+     * Detailed descript of the point displayed in popup on long-click . Null means "not set".
      */
     @Override
     public String getDescription() {
@@ -201,81 +187,93 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
     }
 
     /**
-     * filter: this item is only shown if current zoom-level is >= this value. NO_ZOOM means no lower bound.
+     * Filter: This item is only shown if current zoom-level is >= this value. NO_ZOOM means no lower bound.
      */
     @Override
     public int getZoomMin() {
         return zoomMin;
     }
 
+    /**
+     * Filter: This item is only shown if current zoom-level is >= this value. NO_ZOOM means no lower bound.
+     */
     public GeoPointDto setZoomMin(int zoomMin) {
         this.zoomMin = zoomMin;
         return this;
     }
 
     /**
-     * filter: this item is only shown if current zoom-level is <= this value. NO_ZOOM means no upper bound.
+     * Filter: This item is only shown if current zoom-level is <= this value. NO_ZOOM means no upper bound.
      */
     @Override
     public int getZoomMax() {
         return zoomMax;
     }
 
+    /**
+     * Filter: This item is only shown if current zoom-level is <= this value. NO_ZOOM means no upper bound.
+     */
     public GeoPointDto setZoomMax(int zoomMax) {
         this.zoomMax = zoomMax;
         return this;
     }
 
     /**
-     * if not null: a unique id for this item.
+     * If not null: A unique id for this item.
      */
     @Override
     public String getId() {
         return id;
     }
 
+    /**
+     * If not null: A unique id for this item.
+     */
     public GeoPointDto setId(String id) {
         this.id = id;
         return this;
     }
 
-    /** Optional: if not null: link-url belonging to this item.<br/>
-     * In show view after clicking on a marker: clock on button ">" opens this url.<br/>
-     * persistet in geo-uri as geo:...&link=https://path/to/file.html
-     * */
+    /** Optional: If not null: Link-url belonging to this item.
+     *
+     * After clicking on ">"-button in "show view" of a marker: opens this url.
+     *
+     * Persistet in geo-uri as geo:...&link=https://path/to/file.html. */
     @Override
     public String getLink() {
         return link;
     }
 
-    /** Optional: if not null: link-url belonging to this item.<br/>
-     * In show view after clicking on a marker: clock on button ">" opens this url.<br/>
-     * persistet in geo-uri as geo:...&link=https://path/to/file.html
-     * */
+    /** Optional: If not null: Link-url belonging to this item.
+     *
+     * After clicking on ">"-button in "show view" of a marker: opens this url.
+     *
+     * Persistet in geo-uri as geo:...&link=https://path/to/file.html. */
     public GeoPointDto setLink(String link) {
         this.link = link;
         return this;
     }
 
-    /** Optional: if not null: icon-url belonging to this item.<br/>
-     * persistet in geo-uri as geo:...&s=https://path/to/file.png
-     * */
+    /** Optional: If not null: Icon-url belonging to this item.
+     *
+     * Persistet in geo-uri as geo:...&s=https://path/to/file.png */
     @Override
     public String getSymbol() {
         return symbol;
     }
 
-    /** Optional: if not null: icon-url belonging to this item.<br/>
-     * persistet in geo-uri as geo:...&s=https://path/to/file.png
-     * */
+    /** Optional: If not null: Icon-url belonging to this item.
+     *
+     * Persistet in geo-uri as geo:...&s=https://path/to/file.png */
     public GeoPointDto setSymbol(String symbol) {
         this.symbol = symbol;
         return this;
     }
 
-    /**
-     * sets all members back to defaultvalue to allow reuse of class.
+    /** Sets all members back to defaultvalue to allow reuse of class.
      *
+     * {@link #clone()} and {@link #clear()} are used as factory method when reading a list.
+     * 
      * @return this to to allow chains
      */
     public GeoPointDto clear() {
@@ -292,6 +290,10 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         return this;
     }
 
+    /** Create a copy.
+     *
+     * {@link #clone()} and {@link #clear()} are used as factory method when reading a list. */
+    @Override
     public GeoPointDto clone() {
         try {
             return (GeoPointDto) super.clone();
@@ -301,6 +303,8 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         }
     }
 
+    /** For display/debugging: Either the {@link #getName()}
+     * or #{@link #getId()}. */
     @Override
     public String toString() {
         if (this.name != null) return this.name;
@@ -308,6 +312,7 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         return super.toString();
     }
 
+    /** return true if either lat or lon is not set (NaN) or if both are 0. */
     public static boolean isEmpty(ILocation point) {
         if (point != null) {
             return (isEmpty(point.getLatitude(), point.getLongitude()));
@@ -315,9 +320,7 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         return true;
     }
 
-    /**
-     * @return true if either lat or lon is not set (NaN) or if both are 0
-     */
+    /** return true if either lat or lon is not set (NaN) or if both are 0. */
     public static boolean isEmpty(double latitude, double longitude) {
         if (Double.isNaN(latitude) || Double.isNaN(longitude)) return true;
         if ((latitude == NO_LAT_LON) || (longitude == NO_LAT_LON)) return true;

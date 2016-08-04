@@ -26,7 +26,8 @@ import java.util.TimeZone;
 import de.k3b.geo.api.ILocation;
 
 /**
- * Formats {@link de.k3b.geo.api.GeoPointDto}-s or {@link de.k3b.geo.api.ILocation}-s as gpx-xml.<br/>
+ * Formats {@link de.k3b.geo.api.GeoPointDto}-s or {@link de.k3b.geo.api.ILocation}-s as
+ * gpx-xml-fragment without the xml-root element and with no xml-namespace.<br/>
  *
  * Created by k3b on 07.01.2015.
  */
@@ -37,12 +38,15 @@ public class GpxFormatter {
     static {
         TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
+
+    /** Add gpx-xml-fragments to result */
     public static StringBuffer toGpx(StringBuffer result, ILocation location,
                                      String description, String link) {
         return toGpx(result, location.getLatitude(), location.getLongitude(),
                 location.getTimeOfMeasurement(), location.toString(),description, link);
     }
 
+    /** Add gpx-xml-fragments to result */
     private static StringBuffer toGpx(StringBuffer result, double latitude, double longitude,
                                       Date timeOfMeasurement, String name,
                                       String description, String link) {

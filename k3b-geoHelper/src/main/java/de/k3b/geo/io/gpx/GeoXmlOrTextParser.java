@@ -32,22 +32,25 @@ import de.k3b.geo.io.GeoFileRepository;
 import de.k3b.geo.io.GeoUri;
 
 /**
- * gets geoItems from text.
+ * Parser to extract {@link IGeoPointInfo} items from {@link String}.
+ *
  * Created by k3b on 20.04.2015.
  */
 public class GeoXmlOrTextParser<T extends IGeoPointInfo> {
-    public List<T> get(GeoPointDto baseItem, String src) {
-        if (src == null) return null;
 
-        if (src.startsWith(GeoFileRepository.COMMENT) || src.startsWith(GeoUri.GEO_SCHEME)) {
+    /** Get {@link IGeoPointInfo} items from cr/lf delimited Text lines or from xml. */
+    public List<T> get(GeoPointDto geoPointDtoFactoryItem, String textLinesOrXml) {
+        if (textLinesOrXml == null) return null;
+
+        if (textLinesOrXml.startsWith(GeoFileRepository.COMMENT) || textLinesOrXml.startsWith(GeoUri.GEO_SCHEME)) {
             // lines of comments "#.." or geo-uris seperated by cr/lf
-            GeoFileRepository<T> parser = new GeoFileRepository<T>(null, baseItem) {
+            GeoFileRepository<T> parser = new GeoFileRepository<T>(null, geoPointDtoFactoryItem) {
                 @Override
                 protected boolean isValid(IGeoPointInfo geo) {
                     return true;
                 }
             };
-            StringReader rd = new StringReader(src);
+            StringReader rd = new StringReader(textLinesOrXml);
             ArrayList<T> result = new ArrayList<T>();
 
             try {
@@ -58,12 +61,12 @@ public class GeoXmlOrTextParser<T extends IGeoPointInfo> {
             }
             return result;
         } else {
-            if (!src.startsWith("<?xml")) {
+            if (!textLinesOrXml.startsWith("<?xml")) {
                 // to allow xml-fragments without xml-root element
-                src = "<xml>" + src + "</xml>";
+                textLinesOrXml = "<xml>" + textLinesOrXml + "</xml>";
             }
-            GpxReader<T> parser = new GpxReader<T>(baseItem);
-            StringReader rd = new StringReader(src);
+            GpxReader<T> parser = new GpxReader<T>(geoPointDtoFactoryItem);
+            StringReader rd = new StringReader(textLinesOrXml);
             List<T> result = null;
 
             try {

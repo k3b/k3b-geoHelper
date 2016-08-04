@@ -28,29 +28,32 @@ import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
 
 /**
- * Reads {@link de.k3b.geo.api.GeoPointDto} from gpx file or stream.<br/>
+ * Class to read {@link List} of {@link de.k3b.geo.api.IGeoPointInfo} points from gpx/kml/xml/... file or stream.
  *
- * inspired by http://stackoverflow.com/questions/672454/how-to-parse-gpx-files-with-saxreader
+ * Inspired by http://stackoverflow.com/questions/672454/how-to-parse-gpx-files-with-saxreader
  */
 public class GpxReader<T extends IGeoPointInfo> extends GpxReaderBase implements IGeoInfoHandler {
+    /** Used to collect the reived points */
     private List<T> track;
 
     /**
-     * Creates a new GpxReader
-     * @param reuse if not null this instance is cleared and then reused for every new gpx found
+     * Creates a new GpxReader.
+     *
+     * @param reuse if not null this instance is cleared and then reused for every new gpx found. This way the reader can load different implementations of {@link de.k3b.geo.api.IGeoPointInfo}
      */
     public GpxReader(final GeoPointDto reuse) {
         super(null,reuse);
         this.onGotNewWaypoint = this; // cannot do this in constructor
     }
 
+    /** Call the parser and return the points contained in the stream */
     public List<T> getTracks(InputSource in) throws IOException {
         track = new ArrayList<T>();
         parse(in);
         return track;
     }
 
-    /** is called for every completed gpx-trackpoint */
+    /** Is called for every completed gpx-trackpoint to collect the received tracks. */
     @Override
     public boolean onGeoInfo(IGeoPointInfo geoInfo) {
         if (mReuse != null) {
@@ -60,5 +63,4 @@ public class GpxReader<T extends IGeoPointInfo> extends GpxReaderBase implements
         }
         return true;
     }
-
 }

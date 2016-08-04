@@ -24,46 +24,57 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Engine that replaces all occurences of ${name} with corresponding values from callback.<br/>
- * new StringTemplate(valueResolver).format("hello ${first.name}!") will produce
- * "hello world!" if valueResolver.get("first","name") returns "world"
- * becomes "hello world!"
+ * Engine that replaces all occurences of ${name} with corresponding values from callback defined in {@link IValueResolver}.<br/>
+ *
+ * <code>
+ * new StringTemplate(valueResolver).format("hello ${first.name}!")
+ * </code>
+ *
+ * will produce "hello world!" if <code>valueResolver.get("first","name") returns "world"</code>
  *
  * Created by k3b on 01.04.2015.
  */
 public class StringTemplateEngine {
+    /**
+     * callback for {@link StringTemplateEngine} to resolve the values for names.
+     *
+     * <code>
+     * new StringTemplate(valueResolver).format("hello ${first.name}!")
+     * </code>
+     *
+     * will produce "hello world!" if <code>valueResolver.get("first","name") returns "world"</code>
+     *
+     * Created by k3b on 01.04.2015.
+     */
+    public interface IValueResolver {
+        String get(String className, String propertyName, String templateParameter);
+    }
+
+    /** used to convert ${name} to corresponding value */
     protected IValueResolver valueResolver = null;
+
+    /** if {@link StringTemplateEngine#sedDebugEnabled(boolean)} is set to true.
+     * this stack will contain debugbessages as callstack */
     protected Stack<String> debugStack = null; // new Stack<String>();
+
+    /** contain last processing error or null if there is no (new) error */
     private StringBuilder errors = null;
 
 
-    // ${a.b}
+    // matches ${a.b}
     private static final Pattern pattern = Pattern.compile("\\$\\{([^ \\.\\}]+)\\.([^ }]+)\\}");
+
+    /** creates the engine with {@link IValueResolver}. */
+    public StringTemplateEngine(IValueResolver valueResolver) {
+        this.valueResolver = valueResolver;
+    }
 
     /** return strue, if value contains tempate parameters */
     protected boolean hasParameters(String value) {
         return ((value != null) && (value.contains("${")));
     }
 
-    public StringTemplateEngine sedDebugEnabled(boolean enabled) {
-        if (enabled) {
-            this.debugStack = new Stack<String>();
-            errors = new StringBuilder();
-        } else {
-            this.debugStack = null;
-            errors = null;
-        }
-        return this;
-    }
-
-    public interface IValueResolver {
-        String get(String className, String propertyName, String templateParameter);
-    }
-
-    public StringTemplateEngine(IValueResolver valueResolver) {
-        this.valueResolver = valueResolver;
-    }
-
+    /** translates tmeplate to string. */
     public String format(String template) {
         if (template == null) {
             return null;
@@ -89,6 +100,7 @@ public class StringTemplateEngine {
         return buffer.toString();
     }
 
+    /** called for every parameter match. Is used to collect debug infos. */
     protected String onResolverResult(String templateParameter, String resolverResult) {
         // log error if resolve failed
         if ((errors != null) && (resolverResult == null)) {
@@ -102,6 +114,19 @@ public class StringTemplateEngine {
         return resolverResult;
     }
 
+    /** en- or disables debugging mode. */
+    public StringTemplateEngine sedDebugEnabled(boolean enabled) {
+        if (enabled) {
+            this.debugStack = new Stack<String>();
+            errors = new StringBuilder();
+        } else {
+            this.debugStack = null;
+            errors = null;
+        }
+        return this;
+    }
+
+    /** debug implementation: push to stack.  */
     protected void debugPush(String parameter) {
         if (debugStack != null) {
             if (debugStack.contains(parameter)) {
@@ -119,12 +144,14 @@ public class StringTemplateEngine {
         }
     }
 
+    /** debug implementation: pop from stack: forget last {@link #debugPush(String)}.  */
     protected void debugPop() {
         if (debugStack != null) {
             debugStack.pop();
         }
     }
 
+    /** show debug stacktrace, if {@link StringTemplateEngine#sedDebugEnabled(boolean)} is set to true.  */
     protected String getDebugStackTrace() {
         StringBuilder result = new StringBuilder();
         if (debugStack != null) {
@@ -136,6 +163,7 @@ public class StringTemplateEngine {
         return result.toString();
     }
 
+    /** get last error message. Error is cleared after reading message. */
     public String getErrors() {
         if (errors == null) return null;
 

@@ -4,6 +4,11 @@ apply plugin: 'jacoco'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+// markdown in javadoc
+// https://github.com/Abnaxos/pegdown-doclet
+apply plugin: 'ch.raffael.pegdown-doclet'
+
+
 // vvv maven upload stuff
 ext {
 	mavenUpload_archivesBaseName = 'k3b-geoHelper'

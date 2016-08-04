@@ -25,12 +25,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Class to parse iso 8601 dateTime.<br/>
+ * Class to parse iso 8601 dateTime.
+ *
+ * Can handle optonal second, millisec, timezone.
  *
  * Created by k3b on 12.02.2015.
  */
 public class IsoDateTimeParser {
     // "(?:" start of non capturing group
+    /** Pattern to parse iso date with optional millisec/timezone.
+     * public to be used in GeoUri */
     public static final Pattern ISO8601_FRACTIONAL_PATTERN
             = Pattern.compile("((\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(?:[\\.,](\\d{1,3}))?(Z|[\\+-]\\d{2}(?::?\\d{2})?Z?)?)");
     //                            year     month     day T  hour    minute    sec             millisec   Z or +/-  hours  :   minutes
@@ -90,6 +94,7 @@ public class IsoDateTimeParser {
 
     }
 
+    /** Convert params year, month, ... to a {@link Date} */
     public static Date toDate(int year, int month, int day, int hour, int minute, int second, int millisec, TimeZone timeZone) {
         Calendar cal = Calendar.getInstance();
 
@@ -105,6 +110,7 @@ public class IsoDateTimeParser {
         return new Date(cal.getTimeInMillis());
     }
 
+    /** Get (optional) milliseconds from dateFragments */
     private static int getFraction(String[] dateFragments) {
         String inFraction = get(dateFragments, FRACTIONAL_SECONDS, null);
         int millis = 0;
@@ -118,14 +124,14 @@ public class IsoDateTimeParser {
         return millis;
     }
 
-    /** returns values[paramNo] or notFoundValue if result is empty or if values is too short */
+    /** Returns values[paramNo] or notFoundValue if result is empty or if values is too short */
     private static String get(String[] values, int paramNo, String notFoundValue) {
         if (paramNo >= values.length) return notFoundValue;
         String strValue = values[paramNo];
         return ((strValue != null) && (strValue.length() > 0)) ? strValue : null;
     }
 
-    /** returns int of values[paramNo] or notFoundValue if result is empty or if values is too short */
+    /** Returns int of values[paramNo] or notFoundValue if result is empty or if values is too short */
     private static int get(String[] values, int paramNo, int notFoundValue) throws NumberFormatException {
         String strValue = get(values, paramNo, null);
         if (strValue != null) {
@@ -134,6 +140,7 @@ public class IsoDateTimeParser {
         return notFoundValue;
     }
 
+    /** Get non mandatory {@link TimeZone} from dateFragments */
     private static TimeZone getTimeZone(String[] values) {
         String inTimezone = get(values, TIMEZONE, null);
         if (inTimezone == null) {

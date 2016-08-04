@@ -37,73 +37,83 @@ import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.api.IGeoRepository;
 
 /**
- * Repository to load/save List< {@link de.k3b.geo.api.GeoPointDto} > in a file.
+ * Repository to load/save List< {@link de.k3b.geo.api.GeoPointDto} > via a file.
+ *
+ * It can be used for {@link de.k3b.geo.api.GeoPointDto} or
+ * any custom {@link de.k3b.geo.api.IGeoPointInfo} implementation.
  *
  * Created by k3b on 17.03.2015.
  */
 public class GeoFileRepository<T extends IGeoPointInfo> implements IGeoRepository<T> {
     private static final Logger logger = LoggerFactory.getLogger(GeoFileRepository.class);
 
-    /** used to translate between {@link de.k3b.geo.api.IGeoPointInfo} and geo-uri string */
-    private static final GeoUri converter = new GeoUri(GeoUri.OPT_DEFAULT);
+    /** Lines starting with char are comments. These lines are not interpreted */
     public static final java.lang.String COMMENT = "#";
 
-    /** where data is loaded from/saved to */
+    /** Used to translate between {@link de.k3b.geo.api.IGeoPointInfo} and geo-uri string */
+    private static final GeoUri converter = new GeoUri(GeoUri.OPT_DEFAULT);
+
+
+    /** Where data is loaded from/saved to */
     private final File mFile;
+
+    /** Used to granslate geo uri-s */
     private final GeoPointDto mFactory;
 
-    /** the content of the repository */
-    protected List<T> mData = null;
+    /** The {@link de.k3b.geo.api.IGeoPointInfo} points contained in this repository */
+    protected List<T> mGeoPointList = null;
 
-    /** connect repository to file */
+    /** Connect repository to a {@link File}.
+     * @param factory get-s cloned for every new point read from file. Workaround since java generics do not support construction of generic parameters. */
     public GeoFileRepository(File file, GeoPointDto factory) {
         this.mFile = file;
         this.mFactory = factory;
     }
 
-    /** load from repository
+    /** Load from repository-file to memory.
      *
      * @return data loaded
      */
     public List<T> load() {
-        if (mData == null) {
-            mData = new ArrayList<>();
+        if (mGeoPointList == null) {
+            mGeoPointList = new ArrayList<>();
             if (this.mFile.exists()) {
                 try {
-                    load(mData, new FileReader(this.mFile));
+                    load(mGeoPointList, new FileReader(this.mFile));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
             if (logger.isDebugEnabled()) {
-                logger.debug("load(): " + mData.size() + " items from " + this.mFile);
+                logger.debug("load(): " + mGeoPointList.size() + " items from " + this.mFile);
             }
         } else if (logger.isDebugEnabled()) {
-            logger.debug("load() cached value : " + mData.size() + " items from " + this.mFile);
+            logger.debug("load() cached value : " + mGeoPointList.size() + " items from " + this.mFile);
         }
-        return mData;
+        return mGeoPointList;
     }
 
     /**
-     * uncached, fresh load from repository
+     * Uncached, fresh load from repository-file to memory.
      *
      * @return data loaded
      */
     @Override
     public List<T> reload() {
-        this.mData = null;
+        this.mGeoPointList = null;
         return load();
     }
 
-    /** generate a new id */
+    /** Generate a new id for {@link IGeoPointInfo#getId()}. */
     public String createId() {
         return UUID.randomUUID().toString();
     }
 
     /**
-     * removes item from repository.
+     * Removes item from repository-momory and file.
      *
      * @param item that should be removed
+     *
      * @return true if successful
      */
     @Override
@@ -116,20 +126,20 @@ public class GeoFileRepository<T extends IGeoPointInfo> implements IGeoRepositor
         return false;
     }
 
-    /** save to repository
+    /** Save from meomory to repositoryfile.
      *
      * @return false: error.
      */
     public boolean save() {
         try {
-            if ((mData != null) && (mData.size() > 0)) {
+            if ((mGeoPointList != null) && (mGeoPointList.size() > 0)) {
                 if (!this.mFile.exists()) {
                     this.mFile.getParentFile().mkdirs();
                 }
                 if (logger.isDebugEnabled()) {
-                    logger.debug("save(): " + mData.size() + " items to " + this.mFile);
+                    logger.debug("save(): " + mGeoPointList.size() + " items to " + this.mFile);
                 }
-                save(mData, new FileWriter(this.mFile, false));
+                save(mGeoPointList, new FileWriter(this.mFile, false));
             }
             return true;
         } catch (IOException e) {
@@ -141,8 +151,8 @@ public class GeoFileRepository<T extends IGeoPointInfo> implements IGeoRepositor
         return false;
     }
 
-    // load(new InputStreamReader(inputStream, "UTF-8"))
-    /** load points from reader */
+    // Load(new InputStreamReader(inputStream, "UTF-8"))
+    /** Load points from reader */
     public void load(List<T> result, Reader reader) throws IOException {
         String line;
         BufferedReader br = new BufferedReader(reader);
@@ -161,15 +171,21 @@ public class GeoFileRepository<T extends IGeoPointInfo> implements IGeoRepositor
         br.close();
     }
 
+    /** Implementation detail: Load point from file line. */
     protected GeoPointDto loadItem(String line) {
         return converter.fromUri(line, create());
     }
 
+    /** Factory method to generate a new empy point while reading a {@link IGeoPointInfo}.
+     *
+     * The method can be overwritten to create custom {@link IGeoPointInfo} point types.
+     *
+     * The default implementation uses {@link GeoPointDto#clone()} to generate the point. */
     protected GeoPointDto create() {
         return (GeoPointDto) mFactory.clone().clear();
     }
 
-    /** save points to writer */
+    /** Save source-points to writer */
     void save(List<T> source, Writer writer) throws IOException {
         for (T geo : source) {
             saveItem(writer, geo);
@@ -177,6 +193,7 @@ public class GeoFileRepository<T extends IGeoPointInfo> implements IGeoRepositor
         writer.close();
     }
 
+    /** Saves one point to writer */
     protected boolean saveItem(Writer writer, T geo) throws IOException {
         final boolean valid = isValid(geo);
 
@@ -191,12 +208,12 @@ public class GeoFileRepository<T extends IGeoPointInfo> implements IGeoRepositor
         return valid;
     }
 
-    /** returns true if geo should be loaded from / saved to repository */
+    /** Returns true if geo should be loaded from / saved to repository */
     protected boolean isValid(IGeoPointInfo geo) {
         return ((geo != null) && (isValidId(geo.getId())));
     }
 
-    /** returns true if geo.id should be loaded from / saved to repository */
+    /** Returns true if geo.id should be loaded from / saved to repository */
     private boolean isValidId(String id) {
         return ((id != null) && (!id.startsWith("#")));
     }
