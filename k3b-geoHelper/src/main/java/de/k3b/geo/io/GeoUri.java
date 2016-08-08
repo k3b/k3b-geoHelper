@@ -37,13 +37,23 @@ import de.k3b.util.IsoDateTimeParser;
 /**
  * Converts between a {@link IGeoPointInfo} and a uri {@link String}.
  *
+ * ---
+ *
+ * ![GeoUri-fromUri](GeoUri-fromUri.png)
+ *
+ * ---
+ *
+ * ![GeoUri-toUriString](GeoUri-toUriString.png)
+ *
+ * ---
+ *
  * Format:
  *
  * * geo:{lat}{,lon{,hight_ignore}}}{?q={lat}{,lon}{,hight_ignore}{(name)}}{&uri=uri}{&id=id}{&d=description}{&z=zmin{&z2=zmax}}{&t=timeOfMeasurement}
  *
  * Example (with {@link de.k3b.geo.io.GeoUri#OPT_FORMAT_REDUNDANT_LAT_LON} set):
  *
- * * geo:12.345,-56.7890123?q=12.345,-56.7890123(name)&z=5&z2=7&uri=uri&d=description&id=id&t=1991-03-03T04:05:06Z
+ * * geo:52.1,9.2?q=52.1,9.2(name)&z=5&z2=7&uri=uri&d=description&id=id&t=1991-03-03T04:05:06Z
  *
  * This should be compatible with standard http://tools.ietf.org/html/draft-mayrhofer-geo-uri-00
  * and with googlemap for android.
@@ -99,7 +109,8 @@ public class GeoUri {
        '(?:"+something+")"' is a non capturing group; "\s" white space */
     private final static String regexpName = "(?:\\s*\\(([^\\(\\)]+)\\))"; // i.e. " (hallo world)"
     private final static Pattern patternName = Pattern.compile(regexpName);
-    private final static String regexpDouble = "([+\\-]?[0-9\\.]+)"; // i.e. "-123.456"
+    private final static String regexpDouble = "([+\\-" + GeoFormatter.LatLonPrefix +
+            "]?[0-9\\.]+)"; // i.e. "-123.456" or "S123.456"
     private final static String regexpDoubleOptional = regexpDouble + "?";
     private final static String regexpCommaDouble = "(?:\\s*,\\s*" + regexpDouble + ")"; // i.e. " , +123.456"
     private final static String regexpCommaDoubleOptional = regexpCommaDouble + "?";
@@ -128,7 +139,25 @@ public class GeoUri {
         this.options = options;
     }
 
-    /** Load {@link IGeoPointInfo} from uri-{@link String} */
+    /**
+     * Load {@link IGeoPointInfo} from uri-{@link String}
+     *
+     * ![GeoUri-fromUri](GeoUri-fromUri.png)
+     *
+     * @startuml GeoUri-fromUri.png
+     * title Convert uri string to geo-point 
+     * interface IGeoPointInfo
+     *
+     * class GeoUri
+     * GeoUri : fromUri
+     *
+     * GeoUri -> IGeoPointInfo
+     * String -> GeoUri : "geo:52.1,9.2?..."
+     * String -> GeoUri : "http://maps.google..."
+     * @enduml
+     *
+     * 
+     */
     public IGeoPointInfo fromUri(String uri) {
         return fromUri(uri, new GeoPointDto());
     }
@@ -137,62 +166,172 @@ public class GeoUri {
     public <TGeo extends GeoPointDto>  TGeo fromUri(String uri, TGeo parseResult) {
         if (uri == null) return null;
 
+        if (uri.startsWith(HTTP_SCHEME) || uri.startsWith(HTTPS_SCHEME)) {
+            String uriLowercase = uri.toLowerCase();
+            if (uriLowercase.indexOf("yandex.") >= 0) return getYandexUri(uri, parseResult);
+            if (uriLowercase.indexOf("openstreetmap.") >= 0) return getOpenstreetmapUri(uri, parseResult);
+            if (uriLowercase.indexOf(".here.") >= 0) return getHereUri(uri, parseResult);
+            if (uriLowercase.indexOf(".google.") >= 0) return getGoogleUri(uri, parseResult);
+
+            // unknown. try default
+            return uriParamParse(uri, parseResult);
+
+        }
         if (uri.startsWith(HTTP_SCHEME) || uri.startsWith(HTTPS_SCHEME) || uri.startsWith(GEO_SCHEME)) {
-
-            // http://maps.google.com/maps?q=loc:52.1,9.2(theName)
-            // remove "loc:" from google maps url
-            uri = uri.replaceAll("q=loc:", "q=");
-            int queryOffset = uri.indexOf("?");
-
-            if (queryOffset >= 0) {
-                String query = uri.substring(queryOffset + 1);
-                uri = uri.substring(0, queryOffset);
-                HashMap<String, String> parmLookup = new HashMap<String, String>();
-                String[] params = query.split("&");
-                for (String param : params) {
-                    parseAddQueryParamToMap(parmLookup, param);
-                }
-                parseResult.setDescription(parmLookup.get(GeoUriDef.DESCRIPTION));
-                parseResult.setLink(parmLookup.get(GeoUriDef.LINK));
-                parseResult.setSymbol(parmLookup.get(GeoUriDef.SYMBOL));
-                parseResult.setId(parmLookup.get(GeoUriDef.ID));
-                parseResult.setZoomMin(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM)));
-                parseResult.setZoomMax(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM_MAX)));
-                // parameters from standard value and/or infered
-                List<String> whereToSearch = new ArrayList<String>();
-                whereToSearch.add(parmLookup.get(GeoUriDef.QUERY)); // lat lon from q have precedence over url-path
-                whereToSearch.add(uri);
-                whereToSearch.add(parmLookup.get(GeoUriDef.LAT_LON));
-
-                final boolean inferMissing = isSet(GeoUri.OPT_PARSE_INFER_MISSING);
-                if (inferMissing) {
-                    whereToSearch.add(parseResult.getDescription());
-                    whereToSearch.addAll(parmLookup.values());
-                }
-
-                parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));
-                parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), parmLookup.get(GeoUriDef.TIME), whereToSearch));
-
-                parseLatOrLon(parseResult, whereToSearch);
-
-                if (parseResult.getName() == null) {
-                    parseResult.setName(parmLookup.get(GeoUriDef.NAME));
-                }
-                if (inferMissing) {
-                    parseResult.setLink(parseFindFromPattern(patternHref, parseResult.getLink(), whereToSearch));
-                    parseResult.setSymbol(parseFindFromPattern(patternSrc, parseResult.getSymbol(), whereToSearch));
-                }
-            } else {
-                // no query parameter
-                List<String> whereToSearch = new ArrayList<String>();
-                whereToSearch.add(uri);
-                parseLatOrLon(parseResult, whereToSearch);
-            }
-            return parseResult;
+            return uriParamParse(uri, parseResult);
         }
 
         // unknown format
         return null;
+    }
+
+    private <TGeo extends GeoPointDto> TGeo getYandexUri(String uri, TGeo parseResult) {
+        // https://www.yandex.com/maps/?ll=9.2,52.1&z=14
+        String search = "map=";
+
+        // special ll= handling lat / lon are spwapped
+        int dataStart = contentIndexBehind(uri, "ll=");
+        String[] parts = getParts(uri, dataStart, "[,?&]", 2);
+        if (parts != null) {
+            setLatLonZoom(parseResult, parts[1], parts[0], null);
+        }
+        return uriParamParse(uri, parseResult);
+    }
+
+    private static void setLatLonZoom(GeoPointDto parseResult, String latString, String lonString, String zoom) {
+        if ((parseResult.getZoomMin() == GeoPointDto.NO_ZOOM) && (zoom != null)) {
+            parseResult.setZoomMin(GeoFormatter.parseZoom(zoom));
+        }
+
+        try {
+            // !!! isNaN does not work
+            if ((latString != null) && GeoPointDto.isEmpty(parseResult.getLatitude())) parseResult.setLatitude(GeoFormatter.parseLatOrLon(latString));
+            if ((lonString != null) && GeoPointDto.isEmpty(parseResult.getLongitude()))  parseResult.setLongitude(GeoFormatter.parseLatOrLon(lonString));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private <TGeo extends GeoPointDto> TGeo getOpenstreetmapUri(String uri, TGeo parseResult) {
+        // https://www.openstreetmap.org/?#map=14/52.1/9.2">
+        // https://www.openstreetmap.org/#map=14/52.1/9.2">
+        // https://www.openstreetmap.org/#14/52.1/9.2">
+        int dataStart = contentIndexBehind(uri, "#map=");
+        if (dataStart < 0) dataStart = contentIndexBehind(uri, "/#");
+        String[] parts = getParts(uri, dataStart, "[/?&]", 3);
+        if (parts != null) {
+            setLatLonZoom(parseResult, parts[1], parts[2], parts[0]);
+        }
+        return uriParamParse(uri, parseResult);
+    }
+
+    private String[] getParts(String stringToParse, int dataStart, String delimiter, int minPartCount) {
+        if (dataStart >= 1) {
+            String[] parts = stringToParse.substring(dataStart).split(delimiter);
+            if ((parts != null) && (parts.length >= minPartCount)) return parts;
+        }
+        return null;
+    }
+
+    private <TGeo extends GeoPointDto> TGeo getHereUri(String uri, TGeo parseResult) {
+        // https://wego.here.com/?map=52.1,9.2,14
+        // https://share.here.com/52.1,9.2,14
+        int dataStart = contentIndexBehind(uri, "map=");
+        if (dataStart < 0) dataStart=uri.lastIndexOf("/") + 1;
+        String[] parts = getParts(uri, dataStart, "[,&?]", 2);
+        if (parts != null) {
+            String zoom = (parts.length <= 2) ? null : parts[2];
+            setLatLonZoom(parseResult, parts[0], parts[1], zoom);
+        }
+        return uriParamParse(uri, parseResult);
+    }
+
+    private int contentIndexBehind(String uri, String search) {
+        int result = uri.indexOf(search);
+        if (result >= 0) return result + search.length();
+        return result;
+    }
+
+    private <TGeo extends GeoPointDto> TGeo getGoogleUri(String uri, TGeo parseResult) {
+        uri = uri.replaceAll("q=loc:", "q=");
+
+        // https://www.google.com/maps/@52.1,9.2,14z"
+        int dataStart = contentIndexBehind(uri, "/@");
+        String[] parts = getParts(uri, dataStart, "[,?&(]", 2);
+        if (parts != null) {
+            String zoom = (parts.length <= 2) ? null : parts[2];
+            if ((zoom != null) && (zoom.toLowerCase().endsWith("z"))) {
+                setLatLonZoom(parseResult, null, null, zoom.substring(0, zoom.length()-1));
+                // parseResult.setZoomMin(GeoFormatter.parseZoom(zoom.substring(0, zoom.length()-1)));
+            } else {
+                zoom = null;
+            }
+            setLatLonZoom(parseResult, parts[0], parts[1], zoom);
+        }
+        return uriParamParse(uri, parseResult);
+    }
+
+    private <TGeo extends GeoPointDto> TGeo uriParamParse(String uri, TGeo parseResult) {
+        int queryOffset = uri.indexOf("?");
+
+        if (queryOffset >= 0) {
+            String query = uri.substring(queryOffset + 1);
+            uri = uri.substring(0, queryOffset);
+            HashMap<String, String> parmLookup = new HashMap<String, String>();
+            String[] params = query.split("&");
+            for (String param : params) {
+                parseAddQueryParamToMap(parmLookup, param);
+            }
+            parseResult.setDescription(getParam(parmLookup, GeoUriDef.DESCRIPTION, parseResult.getDescription()));
+            parseResult.setLink(getParam(parmLookup, GeoUriDef.LINK, parseResult.getLink()));
+            parseResult.setSymbol(getParam(parmLookup, GeoUriDef.SYMBOL, parseResult.getSymbol()));
+            parseResult.setId(getParam(parmLookup, GeoUriDef.ID, parseResult.getId()));
+
+            if (parseResult.getZoomMin() == GeoPointDto.NO_ZOOM) {
+                setLatLonZoom(parseResult, null, null, getParam(parmLookup, GeoUriDef.ZOOM, null));
+            }
+            if (parseResult.getZoomMax() == GeoPointDto.NO_ZOOM) {
+                parseResult.setZoomMax(GeoFormatter.parseZoom(getParam(parmLookup, GeoUriDef.ZOOM_MAX, null)));
+            }
+
+            // parameters from standard value and/or infered
+            List<String> whereToSearch = new ArrayList<String>();
+            whereToSearch.add(getParam(parmLookup, GeoUriDef.QUERY, null)); // lat lon from q have precedence over url-path
+            whereToSearch.add(uri);
+            whereToSearch.add(getParam(parmLookup, GeoUriDef.LAT_LON, null));
+
+            final boolean inferMissing = isSet(GeoUri.OPT_PARSE_INFER_MISSING);
+            if (inferMissing) {
+                whereToSearch.add(parseResult.getDescription());
+                whereToSearch.addAll(parmLookup.values());
+            }
+
+            parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));
+            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), getParam(parmLookup, GeoUriDef.TIME, null), whereToSearch));
+
+            parseLatOrLon(parseResult, whereToSearch);
+
+            if (parseResult.getName() == null) {
+                parseResult.setName(getParam(parmLookup, GeoUriDef.NAME, null));
+            }
+            if (inferMissing) {
+                parseResult.setLink(parseFindFromPattern(patternHref, parseResult.getLink(), whereToSearch));
+                parseResult.setSymbol(parseFindFromPattern(patternSrc, parseResult.getSymbol(), whereToSearch));
+            }
+        } else {
+            // no query parameter
+            List<String> whereToSearch = new ArrayList<String>();
+            whereToSearch.add(uri);
+            parseLatOrLon(parseResult, whereToSearch);
+        }
+        return parseResult;
+    }
+
+    private String getParam(HashMap<String, String> parmLookup, String paramId, String currentValue) {
+        if ((currentValue == null) || (currentValue.length() == 0)) {
+            return parmLookup.get(paramId);
+        }
+        return currentValue;
     }
 
     /** Load {@link GeoPointDto} from uri-{@link String} into parseResult. */
@@ -245,15 +384,7 @@ public class GeoUri {
         Matcher m = parseFindWithPattern(patternLatLonAlt, whereToSearch);
 
         if (m != null) {
-            try {
-                final String val = m.group(1);
-                double lat = GeoFormatter.parseLatOrLon(val);
-                double lon = GeoFormatter.parseLatOrLon(m.group(2));
-
-                parseResult.setLatitude(lat).setLongitude(lon);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+           setLatLonZoom(parseResult, m.group(1), m.group(2), null);
         }
     }
 
@@ -320,6 +451,8 @@ public class GeoUri {
     /**
      * Converts lat lon} into uri {@link String} representatino.
      *
+     * ![GeoUri-toUriString](GeoUri-toUriString.png)
+     *
      * For details see {@link #toUriString(IGeoPointInfo)}
      */
     public String toUriString(double latitude, double longitude, int zoomLevel) {
@@ -332,6 +465,22 @@ public class GeoUri {
      * Format
      *
      * geo:{lat{,lon{,hight_ignore}}}{?q={lat}{,lon}{,hight_ignore}{(name)}}{&uri=uri}{&id=id}{&d=description}{&z=zmin{&z2=zmax}}{&t=timeOfMeasurement}
+     *
+     * ![GeoUri-toUriString](GeoUri-toUriString.png)
+     *
+     * @startuml GeoUri-toUriString.png
+     * title Convert geo-point to uri string
+     * interface IGeoPointInfo
+     * class GeoPointDto
+     *
+     * class GeoUri
+     * GeoUri : toUriString
+     * IGeoPointInfo <|-- GeoPointDto
+     *
+     * IGeoPointInfo -> GeoUri
+     * GeoUri -> String : "geo:52.1,9.2?..."
+     * @enduml
+     *
      */
     public String toUriString(IGeoPointInfo geoPoint) {
         StringBuffer result = new StringBuffer();

@@ -45,13 +45,14 @@ public class GeoPointDtoRegressionTests {
 
     private String currentResourceName = null;
     private StringBuffer checkResultMessage = null;
+    private String lastUri = null;
 
     @Test
     public void regressionTest() {
         check("0|empty.xml", "1|gpx11.gpx", "1|gpx10.gpx"
                 , "3|kml22.kml", "2|gpx-similar.gpx", "9|poi.xml"
                 , "1|wikimedia.poi"
-                , "4|https-mapservice-urls.xml"
+                , "15|https-mapservice-urls.xml"
         );
         Assert.assertNull("" + this.checkResultMessage, this.checkResultMessage);
     }
@@ -99,7 +100,19 @@ public class GeoPointDtoRegressionTests {
 
     private void checkStream(Integer expectedNumberOfPois, InputStream xmlStream, String resourceName) {
         try {
-            GpxReader<IGeoPointInfo> parser = new GpxReader<IGeoPointInfo>(null);
+            GpxReader<IGeoPointInfo> parser = new GpxReader<IGeoPointInfo>(null) {
+                @Override
+                protected GeoUri createGeoUriParser(int modes) {
+                    lastUri = null;
+                    return new GeoUri(modes) {
+                        @Override
+                        public <TGeo extends GeoPointDto>  TGeo fromUri(String uri, TGeo parseResult) {
+                            lastUri = uri;
+                            return super.fromUri(uri, parseResult);
+                        }
+                    };
+                }
+            };
             List<IGeoPointInfo> pois = parser.getTracks(new InputSource(xmlStream));
             if (expectedNumberOfPois != pois.size()) {
                 addError("Expected " + expectedNumberOfPois +" but got " + pois.size());
@@ -124,7 +137,8 @@ public class GeoPointDtoRegressionTests {
         String actual= formatter.toUriString(new GeoPointDto(poi).setId(null));
 
         if ((expected != null) && (0 != expected.compareTo(actual))) {
-            addError("#" + index + " failed: expected '" + expected + "' but got '" + actual + "'");
+            addError("#" + index + " failed: expected '" + expected + "' but got '" + actual + "'. lastUri='" +
+                    lastUri + "'" );
         }
     }
 

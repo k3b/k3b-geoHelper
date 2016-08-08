@@ -41,7 +41,7 @@ buildscript {
 		
 		// markdown in javadoc
 		// https://github.com/Abnaxos/pegdown-doclet
-		classpath 'ch.raffael.pegdown-doclet:pegdown-doclet:1.3'
+        classpath 'ch.raffael.pegdown-doclet:pegdown-doclet:1.3'
     }
 }
 

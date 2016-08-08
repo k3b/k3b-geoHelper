@@ -130,7 +130,7 @@ public class GpxReaderBase extends DefaultHandler {
                         modes |= GeoUri.OPT_PARSE_INFER_MISSING;
                     }
                 }
-                this.geoUriParser = new GeoUri(modes);
+                this.geoUriParser = createGeoUriParser(modes);
             }
             geoUriParser.fromUri(geoUri, result);
         }
@@ -164,6 +164,10 @@ public class GpxReaderBase extends DefaultHandler {
         if (value != null) result.setTimeOfMeasurement(IsoDateTimeParser.parse(value));
 
         return result;
+    }
+
+    protected GeoUri createGeoUriParser(int modes) {
+        return new GeoUri(modes);
     }
 
     /** Java sax api implementation: Element name inspection/processig */

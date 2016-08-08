@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <someRoot 	xmlns:expectedTestResult="uri://some/url" >
-    <!-- This file conatain regression test data for http(s) urls that can be interpreted as
+    <!--
+		k3b-geoHelper/k3b-geoHelper/src/test/resources/de/k3b/geo/io/regressionTests/https-mapservice-urls.xml
+		This file conatain regression test data for http(s) urls that can be interpreted as
         geopoint by extracting geo data from uri.
         "poi" is de.k3b.geo internal format for "points of interest"
 
@@ -22,4 +24,43 @@
     <poi geoUri="https://maps.google.de/maps?q=loc:52.1,9.2(theName)">
         <expectedTestResult:id>geo:52.1,9.2?q=(theName)</expectedTestResult:id>
     </poi>
+    <poi geoUri="https://maps.google.com/?ll=52.1,9.2&amp;z=14">
+        <!-- http://stackoverflow.com/questions/2660201/what-parameters-should-i-use-in-a-google-maps-url-to-go-to-a-lat-lon -->
+        <expectedTestResult:id>geo:52.1,9.2?z=14</expectedTestResult:id>
+    </poi>
+    <poi geoUri="https://www.google.com/maps/@52.1,9.2,14z">
+        <expectedTestResult:id>geo:52.1,9.2?z=14</expectedTestResult:id>
+    </poi>
+    <poi geoUri="http://maps.google.com/maps?q=N52.1,E9.2">
+        <expectedTestResult:id>geo:52.1,9.2</expectedTestResult:id>
+    </poi>
+
+    <poi geoUri="https://www.openstreetmap.org/?#map=14/52.1/9.2">
+        <expectedTestResult:id>geo:52.1,9.2?z=14</expectedTestResult:id>
+    </poi>
+    <poi geoUri="https://www.openstreetmap.org/#map=14/52.1/9.2">
+        <expectedTestResult:id>geo:52.1,9.2?z=14</expectedTestResult:id>
+    </poi>
+    <poi geoUri="https://www.openstreetmap.org/#14/52.1/9.2">
+        <expectedTestResult:id>geo:52.1,9.2?z=14</expectedTestResult:id>
+    </poi>
+
+    <poi geoUri="https://wego.here.com/?map=52.1,9.2,14">
+        <expectedTestResult:id>geo:52.1,9.2?z=14</expectedTestResult:id>
+    </poi>
+    <poi geoUri="https://www.here.com/?map=52.1,9.2,14">
+        <expectedTestResult:id>geo:52.1,9.2?z=14</expectedTestResult:id>
+    </poi>
+    <poi geoUri="https://share.here.com/52.1,9.2,14">
+        <expectedTestResult:id>geo:52.1,9.2?z=14</expectedTestResult:id>
+    </poi>
+
+    <poi geoUri="https://www.yandex.com/maps/?ll=9.2,52.1&amp;z=14">
+        <expectedTestResult:id>geo:52.1,9.2?z=14</expectedTestResult:id>
+    </poi>
+    <poi geoUri="https://www.yandex.ru/maps/?ll=9.2,52.1&amp;z=14">
+        <expectedTestResult:id>geo:52.1,9.2?z=14</expectedTestResult:id>
+    </poi>
+
+
 </someRoot>
