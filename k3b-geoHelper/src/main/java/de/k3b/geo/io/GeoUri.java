@@ -41,9 +41,26 @@ import de.k3b.util.IsoDateTimeParser;
  *
  * ![GeoUri-fromUri](GeoUri-fromUri.png)
  *
+ * ```java
+ * GeoUri parser = new GeoUri(GeoUri.OPT_DEFAULT);
+ *
+ * IGeoPointInfo geo = parser.fromUri("geo:52.1,9.2?z=14");
+ *
+ * System.out.print(String.format("got lat=%f lon=%f", geo.getLatitude(),geo.getLongitude()));
+ * ```
+ *
  * ---
  *
  * ![GeoUri-toUriString](GeoUri-toUriString.png)
+ *
+ * ```java
+ * GeoUri formater = new GeoUri(GeoUri.OPT_DEFAULT);
+ * GeoPointDto geo = new GeoPointDto()
+ *      .setLatitude(52.1)
+ *      .setLongitude(9.2)
+ *      .setZoomMin(14);
+ * String geoUri = formater.toUriString(geo);
+ * ```
  *
  * ---
  *
@@ -59,6 +76,9 @@ import de.k3b.util.IsoDateTimeParser;
  * and with googlemap for android.
  *
  * This implementation has aditional non-standard parameters for LocationViewer clients.
+ * 
+ * For details see [supported geo uri formats](https://github.com/k3b/k3b-geoHelper/wiki/data#geo)
+ *
  *
  * Created by k3b on 13.01.2015.
  */
@@ -144,6 +164,8 @@ public class GeoUri {
      *
      * ![GeoUri-fromUri](GeoUri-fromUri.png)
      *
+	 * For details see [supported geo uri formats](https://github.com/k3b/k3b-geoHelper/wiki/data#geo)
+	 *
      * @startuml GeoUri-fromUri.png
      * title Convert uri string to geo-point 
      * interface IGeoPointInfo
@@ -162,7 +184,12 @@ public class GeoUri {
         return fromUri(uri, new GeoPointDto());
     }
 
-    /** Load {@link IGeoPointInfo} from uri-{@link String} into parseResult. */
+    /** Load {@link IGeoPointInfo} from uri-{@link String} into parseResult. 
+     *
+     * ![GeoUri-fromUri](GeoUri-fromUri.png)
+	 *
+	 * For details see [supported geo uri formats](https://github.com/k3b/k3b-geoHelper/wiki/data#geo)
+	 */
     public <TGeo extends GeoPointDto>  TGeo fromUri(String uri, TGeo parseResult) {
         if (uri == null) return null;
 
@@ -334,7 +361,7 @@ public class GeoUri {
         return currentValue;
     }
 
-    /** Load {@link GeoPointDto} from uri-{@link String} into parseResult. */
+    /** Load {@link GeoPointDto}[2] from area-uri-{@link String} into parseResult. */
     public <TGeo extends GeoPointDto>  TGeo[] fromUri(String uri, TGeo[] parseResult) {
         if ((uri == null) || (parseResult == null) || (parseResult.length < 2)) return null;
         if (!uri.startsWith(AREA_SCHEME)) return null;
@@ -454,6 +481,7 @@ public class GeoUri {
      * ![GeoUri-toUriString](GeoUri-toUriString.png)
      *
      * For details see {@link #toUriString(IGeoPointInfo)}
+     * and [supported geo uri formats](https://github.com/k3b/k3b-geoHelper/wiki/data#geo)
      */
     public String toUriString(double latitude, double longitude, int zoomLevel) {
         return toUriString(new GeoPointDto(latitude, longitude, zoomLevel));
@@ -467,6 +495,8 @@ public class GeoUri {
      * geo:{lat{,lon{,hight_ignore}}}{?q={lat}{,lon}{,hight_ignore}{(name)}}{&uri=uri}{&id=id}{&d=description}{&z=zmin{&z2=zmax}}{&t=timeOfMeasurement}
      *
      * ![GeoUri-toUriString](GeoUri-toUriString.png)
+     *
+	 * For details see [supported geo uri formats](https://github.com/k3b/k3b-geoHelper/wiki/data#geo)
      *
      * @startuml GeoUri-toUriString.png
      * title Convert geo-point to uri string
@@ -503,7 +533,7 @@ public class GeoUri {
     }
 
 
-    /** Creates area uri {@link String} from two bounding {@link IGeoPointInfo}-d */
+    /** Creates area-uri-{@link String} from two bounding {@link IGeoPointInfo}-s  */
     public String toUriString(IGeoPointInfo northEast, IGeoPointInfo southWest) {
         StringBuffer result = new StringBuffer();
         result.append(AREA_SCHEME);

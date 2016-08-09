@@ -28,6 +28,7 @@ import java.io.StringReader;
 import java.util.List;
 
 import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
 
 /**
@@ -54,7 +55,7 @@ public class GpxReaderTest {
     public void parseFormatGpx11ShortTest() throws IOException {
         GpxReader<IGeoPointInfo> reader = new GpxReader<IGeoPointInfo>(null);
         IGeoPointInfo location = reader.getTracks(new InputSource(new StringReader(xmlMinimal_gpx_v11))).get(0);
-        String formatted = GpxFormatter.toGpx(new StringBuffer(), location, location.getDescription(), location.getLink()).toString();
+        String formatted = GpxFormatter.toGpx(new StringBuffer(), location).toString();
 
         Assert.assertEquals(xmlMinimal_gpx_v11, formatted);
     }

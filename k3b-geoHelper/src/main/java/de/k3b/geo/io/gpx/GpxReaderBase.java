@@ -40,12 +40,30 @@ import de.k3b.geo.io.GeoUriDef;
 import de.k3b.util.IsoDateTimeParser;
 
 /**
- * Parser for xml-geo formats implemented for
+ * A parser for xml-geo formats.
  *
- *  * gpx-1.1 http://www.topografix.com/GPX/1/1/ and
- *  * gpx-1.0 http://www.topografix.com/GPX/1/0/ and
- *  * poi (de.k3b.geo internal format compatible with geo-uri format)
- *  * kml-2.2 (a little bit of http://www.opengis.net/kml/2.2).
+ * ![GpxReaderBase-parse](GpxReaderBase-parse.png)
+ *
+ * ```java
+ *    GpxReaderBase parser = new GpxReaderBase(new IGeoInfoHandler() {
+ *         public boolean onGeoInfo(IGeoPointInfo geo) {
+ *           System.out.print(String.format("got lat=%f lon=%f\n", geo.getLatitude(),geo.getLongitude()));
+ *           return true;
+ *         }
+ *      });
+ *
+ *    parser.parse(new InputSource(new FileReader( "test.gpx")));
+ *
+ * ```
+ *
+ * ---
+ *
+ * Supported formats:
+ *
+ * * [gpx-1.0](https://github.com/k3b/androFotoFinder/wiki/data#gpx10) and [gpx-1.1](https://github.com/k3b/androFotoFinder/wiki/data#gpx) files
+ * * [kml-2.2](https://github.com/k3b/androFotoFinder/wiki/data#kml) files used by google
+ * * [wikimedia](https://github.com/k3b/androFotoFinder/wiki/data#wikimedia) that is used by web-apis of wikipedia and wikivoyage
+ * * [poi](https://github.com/k3b/androFotoFinder/wiki/data#poi) files, k3b-s internal xml format
  *
  * This parser is not acurate: it might pick elements from wrong namespaces.
  *
@@ -80,6 +98,14 @@ public class GpxReaderBase extends DefaultHandler {
      * Creates a new parser.
      *
      * @param onGotNewWaypoint callback to process every point received
+     */
+    public GpxReaderBase(final IGeoInfoHandler onGotNewWaypoint) {
+        this(onGotNewWaypoint, new GeoPointDto());
+    }
+    /**
+     * Creates a new parser.
+     *
+     * @param onGotNewWaypoint callback to process every point received
      * @param reuse  if not null this instance is cleared and then reused for every new gpx found. This way the reader can load different implementations of {@link de.k3b.geo.api.IGeoPointInfo}
      */
     public GpxReaderBase(final IGeoInfoHandler onGotNewWaypoint, final GeoPointDto reuse) {
@@ -87,7 +113,30 @@ public class GpxReaderBase extends DefaultHandler {
         this.mReuse = reuse;
     }
 
-    /** Processes in and calls onGotNewWaypoint for every waypoint found */
+    /**
+     * Processes gpx/kml/poi/xml data and calls [@link IGeoInfoHandler#onGeoInfo} for every
+     * {@link de.k3b.geo.api.IGeoPointInfo} found.
+     *
+     * ![GpxReaderBase-parse](GpxReaderBase-parse.png)
+     *
+     * @startuml GpxReaderBase-parse.png
+     * title process gpx/kml/poi/xml data
+     * interface IGeoInfoHandler
+     * IGeoInfoHandler : onGeoInfo(IGeoPointInfo)
+     * IGeoInfoHandler <|-- GeoInfoHandlerImpl
+     * GeoInfoHandlerImpl : onGeoInfo(IGeoPointInfo)
+     *
+     * class GpxReaderBase
+     * GpxReaderBase : parse
+     *
+     * GpxReaderBase -> IGeoInfoHandler
+     * InputSource -> GpxReaderBase : "file:points.gpx"
+     * InputSource -> GpxReaderBase : "file:points.kml"
+     * InputSource -> GpxReaderBase : "file:points.poi"
+     * InputSource -> GpxReaderBase : "https://de.wikivoyage.org/w/api.php?..."
+     * @enduml
+     *
+     */
     public void parse(InputSource in) throws IOException {
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();

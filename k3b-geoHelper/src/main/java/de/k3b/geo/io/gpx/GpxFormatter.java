@@ -23,12 +23,28 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.api.ILocation;
 
 /**
  * Formats {@link de.k3b.geo.api.GeoPointDto}-s or {@link de.k3b.geo.api.ILocation}-s as
  * gpx-xml-fragment without the xml-root element and with no xml-namespace.<br/>
  *
+ * ```java
+ *  StringBuffer xmlString = new StringBuffer()
+ *       .append("<gpx version='1.0' xmlns='http://www.topografix.com/GPX/1/0' >\n");
+ *
+ *  GeoPointDto geo = new GeoPointDto()
+ *       .setLatitude(52.1)
+ *       .setLongitude(9.2)
+ *       .setZoomMin(14);
+ *  GpxFormatter.toGpx(xmlString, geo);
+ *
+ *  xmlString.append("\n</gpx>\n");
+ *
+ *  System.out.print(xmlString);
+ *
+ * ```
  * Created by k3b on 07.01.2015.
  */
 public class GpxFormatter {
@@ -37,6 +53,12 @@ public class GpxFormatter {
 
     static {
         TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
+    /** Add gpx-xml-fragments to result */
+    public static StringBuffer toGpx(StringBuffer result, IGeoPointInfo location) {
+        return toGpx(result, location.getLatitude(), location.getLongitude(),
+                location.getTimeOfMeasurement(), location.toString(),location.getDescription(), location.getLink());
     }
 
     /** Add gpx-xml-fragments to result */
