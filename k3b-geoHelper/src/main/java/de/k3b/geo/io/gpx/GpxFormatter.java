@@ -32,12 +32,11 @@ import de.k3b.geo.api.ILocation;
  *
  * ```java
  *  StringBuffer xmlString = new StringBuffer()
- *       .append("<gpx version='1.0' xmlns='http://www.topografix.com/GPX/1/0' >\n");
+ *       .append("<gpx>\n");
  *
  *  GeoPointDto geo = new GeoPointDto()
  *       .setLatitude(52.1)
- *       .setLongitude(9.2)
- *       .setZoomMin(14);
+ *       .setLongitude(9.2);
  *  GpxFormatter.toGpx(xmlString, geo);
  *
  *  xmlString.append("\n</gpx>\n");
@@ -48,6 +47,7 @@ import de.k3b.geo.api.ILocation;
  * Created by k3b on 07.01.2015.
  */
 public class GpxFormatter {
+	private static final String TEMP_AMP = "##!!##!!";
     static final DateFormat TIME_FORMAT
             = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -97,7 +97,7 @@ public class GpxFormatter {
                 " " +
                 GpxDef_11.ATTR_LINK +
                 "='")
-                .append(link)
+                .append(escapeAttribute(link))
                 .append("' />");
 
         result.append("</" +
@@ -106,7 +106,34 @@ public class GpxFormatter {
         return result;
     }
 
+    /** add (name>value(/name> to result */
     private static void addElement(StringBuffer result, String name, String value) {
-        result.append("<").append(name).append(">").append(value).append("</").append(name).append(">");
+        result.append("<").append(name).append(">").append(escapeElement(value)).append("</").append(name).append(">");
     }
+
+    /** replace chars that are illegal for xml elements */
+    private static String escapeElement(String value) {
+        if (value != null) {
+            return value
+                    .replaceAll("&",TEMP_AMP)
+                    .replaceAll("<","&lt;")
+                    .replaceAll(">","&gt;")
+                    .replaceAll(TEMP_AMP,"&amp;") // to prevent "&lt;", "&gt;" from being escaped
+                    ;
+        }
+        return null;
+    }
+
+    /** q&d: replace chars that are illegal for xml attributes */
+    private static String escapeAttribute(String value) {
+        if (value != null) {
+            return escapeElement(value
+                    .replace('\n',' ')
+                    .replace('\r',' ')
+                    .replace('\'','"')
+            ).replaceAll("  ", " ");
+        }
+        return null;
+    }
+
 }

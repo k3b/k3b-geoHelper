@@ -38,7 +38,12 @@ import de.k3b.geo.io.GeoUri;
  */
 public class GeoXmlOrTextParser<T extends IGeoPointInfo> {
 
-    /** Get {@link IGeoPointInfo} items from cr/lf delimited Text lines or from xml. */
+    /** Get {@link IGeoPointInfo} items from cr/lf delimited Text lines or from xml fragments. */
+    public List<T> get(String textLinesOrXml) {
+        return get(new GeoPointDto(), textLinesOrXml);
+    }
+
+    /** Get {@link IGeoPointInfo} items from cr/lf delimited Text lines or from xml fragments. */
     public List<T> get(GeoPointDto geoPointDtoFactoryItem, String textLinesOrXml) {
         if (textLinesOrXml == null) return null;
 
