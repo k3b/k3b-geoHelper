@@ -42,6 +42,17 @@ import de.k3b.geo.api.IGeoRepository;
  * It can be used for {@link de.k3b.geo.api.GeoPointDto} or
  * any custom {@link de.k3b.geo.api.IGeoPointInfo} implementation.
  *
+ * **Example**
+ *
+ * ```java
+ * GeoFileRepository<GeoPointDto> repository
+ *             = new GeoFileRepository<>(new File("/path/to/repository.txt"));
+ * List<GeoPointDto> items = repository.load();
+ * items.add(new GeoPointDto().setLatitude(1).setLongitude(2)
+ *             .setId("#4711").setName("my test point"));
+ * repository.save();
+ * ```
+ *
  * Created by k3b on 17.03.2015.
  */
 public class GeoFileRepository<T extends IGeoPointInfo> implements IGeoRepository<T> {
@@ -62,6 +73,11 @@ public class GeoFileRepository<T extends IGeoPointInfo> implements IGeoRepositor
 
     /** The {@link de.k3b.geo.api.IGeoPointInfo} points contained in this repository */
     protected List<T> mGeoPointList = null;
+
+    /** Connect repository to a {@link File}. */
+    public GeoFileRepository(File file) {
+        this(file, new GeoPointDto());
+    }
 
     /** Connect repository to a {@link File}.
      * @param factory get-s cloned for every new point read from file. Workaround since java generics do not support construction of generic parameters. */
@@ -117,20 +133,19 @@ public class GeoFileRepository<T extends IGeoPointInfo> implements IGeoRepositor
      * @return true if successful
      */
     @Override
-    public boolean delete(T item) {
+    public IGeoRepository<T> delete(T item) {
         if ((item != null) && load().remove(item)) {
             save();
-            return true;
         }
 
-        return false;
+        return this;
     }
 
     /** Save from meomory to repositoryfile.
      *
      * @return false: error.
      */
-    public boolean save() {
+    public IGeoRepository<T> save() {
         try {
             if ((mGeoPointList != null) && (mGeoPointList.size() > 0)) {
                 if (!this.mFile.exists()) {
@@ -141,14 +156,13 @@ public class GeoFileRepository<T extends IGeoPointInfo> implements IGeoRepositor
                 }
                 save(mGeoPointList, new FileWriter(this.mFile, false));
             }
-            return true;
         } catch (IOException e) {
             e.printStackTrace();
         }
         if (logger.isDebugEnabled()) {
             logger.debug("save(): no items for " + this.mFile);
         }
-        return false;
+        return this;
     }
 
     // Load(new InputStreamReader(inputStream, "UTF-8"))

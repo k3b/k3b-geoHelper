@@ -30,7 +30,7 @@ import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoPointInfo;
 
 /**
- * Created by EVE on 20.04.2015.
+ * Created by k3b on 20.04.2015.
  */
 public class GeoXmlOrTextParserTests {
     @Test
@@ -57,6 +57,33 @@ public class GeoXmlOrTextParserTests {
             "geo:52.2,9.2\n";
 
         List<IGeoPointInfo> result = new GeoXmlOrTextParser<IGeoPointInfo>().get(new GeoPointDto(), data);
+        Assert.assertEquals(2, result.size());
+    }
+
+
+    @Test
+    public void shouldParseXmlFragments() throws IOException {
+        GeoPointDto geo = new GeoPointDto()
+                .setLongitude(1).setLongitude(1)
+                ;
+
+        StringBuffer xmlFragments = new StringBuffer();
+        GpxFormatter.toGpx(xmlFragments, geo);
+        GpxFormatter.toGpx(xmlFragments, geo);
+
+        GeoXmlOrTextParser<IGeoPointInfo> parser = new GeoXmlOrTextParser<>();
+        List<IGeoPointInfo> result = parser.get(xmlFragments.toString());
+
+        Assert.assertEquals(2, result.size());
+    }
+
+    @Test
+    public void shouldParseUriLines() throws IOException {
+        String uri = "geo:1,2\n";
+
+        GeoXmlOrTextParser<IGeoPointInfo> parser = new GeoXmlOrTextParser<>();
+        List<IGeoPointInfo> result = parser.get(uri + uri);
+
         Assert.assertEquals(2, result.size());
     }
 

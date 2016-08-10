@@ -331,4 +331,19 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         if (isEmpty(latitude) || isEmpty(longitude)) return true;
         return ((latitude == 0.0f) && (longitude == 0.0f));
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if ((other == null) || !(other instanceof IGeoPointInfo)) return false;
+        return equals(this, (IGeoPointInfo) other);
+    }
+
+    public static boolean equals(IGeoPointInfo lhs, IGeoPointInfo rhs) {
+        if ((lhs == null) && (rhs == null)) return true;
+        if ((lhs == null) || (rhs == null)) return false;
+
+        if (lhs.getId() != null) return lhs.getId().compareTo(rhs.getId()) == 0;
+
+        return (lhs.getLatitude() == rhs.getLatitude()) && (lhs.getLongitude() == rhs.getLongitude());
+    }
 }

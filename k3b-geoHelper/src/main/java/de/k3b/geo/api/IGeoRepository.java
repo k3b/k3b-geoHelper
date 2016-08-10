@@ -46,13 +46,11 @@ public interface IGeoRepository<R extends IGeoPointInfo> {
      *
      * @return false: error.
      */
-    boolean save();
+    IGeoRepository<R> save();
 
     /** Generate a new id for {@link IGeoPointInfo#getId()}. */
     String createId();
 
-    /** Removes item from repository.
-     *
-     * @return true if successful */
-    boolean delete(R item);
+    /** Removes item from repository. */
+    IGeoRepository<R> delete(R item);
 }

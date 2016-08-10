@@ -141,35 +141,6 @@ public class GpxReaderTest {
 		
 		// space/cr/lf my change so test without them
         Assert.assertEquals("item[0].Description", forbidden1, result.get(0).getDescription());
-		
-		
     }
-
-    @Test
-    public void shouldParseXmlFragments() throws IOException {
-        GeoPointDto geo = new GeoPointDto()
-                .setLongitude(1).setLongitude(1)
-                ;
-
-        StringBuffer xmlFragments = new StringBuffer();
-        GpxFormatter.toGpx(xmlFragments, geo);
-        GpxFormatter.toGpx(xmlFragments, geo);
-
-        GeoXmlOrTextParser<IGeoPointInfo> parser = new GeoXmlOrTextParser<>();
-        List<IGeoPointInfo> result = parser.get(xmlFragments.toString());
-
-        Assert.assertEquals(2, result.size());
-    }
-
-    @Test
-    public void shouldParseUriLines() throws IOException {
-        String uri = "geo:1,2\n";
-
-        GeoXmlOrTextParser<IGeoPointInfo> parser = new GeoXmlOrTextParser<>();
-        List<IGeoPointInfo> result = parser.get(uri + uri);
-
-        Assert.assertEquals(2, result.size());
-    }
-
 
 }

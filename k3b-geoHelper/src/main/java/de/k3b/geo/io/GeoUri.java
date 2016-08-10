@@ -88,7 +88,7 @@ public class GeoUri {
     /** Option for {@link GeoUri#GeoUri(int)}: */
     public static final int OPT_DEFAULT = 0;
 
-    /** Option for {@link GeoUri#GeoUri(int)} to influence {@link #toUriString}: Add lat/long twice.
+    /** Option for {@link GeoUri#GeoUri(int)} to influence {@link #toUriString(IGeoPointInfo)}: Add lat/long twice.
      *
      * Example with opton set (and understood by google):
      *
@@ -476,18 +476,6 @@ public class GeoUri {
     }
 
     /**
-     * Converts lat lon} into uri {@link String} representatino.
-     *
-     * ![GeoUri-toUriString](GeoUri-toUriString.png)
-     *
-     * For details see {@link #toUriString(IGeoPointInfo)}
-     * and [supported geo uri formats](https://github.com/k3b/k3b-geoHelper/wiki/data#geo)
-     */
-    public String toUriString(double latitude, double longitude, int zoomLevel) {
-        return toUriString(new GeoPointDto(latitude, longitude, zoomLevel));
-    }
-
-    /**
      * Converts a {@link IGeoPointInfo} into uri {@link String} representatino.<br/>
      * <br/>
      * Format
@@ -519,8 +507,8 @@ public class GeoUri {
 
         delim = "?";
         appendQueryParameter(result, GeoUriDef.QUERY, formatQuery(geoPoint), false);
-        appendQueryParameter(result, GeoUriDef.ZOOM, geoPoint.getZoomMin());
-        appendQueryParameter(result, GeoUriDef.ZOOM_MAX, geoPoint.getZoomMax());
+        appendQueryParameter(result, GeoUriDef.ZOOM, GeoFormatter.formatZoom(geoPoint.getZoomMin()), false);
+        appendQueryParameter(result, GeoUriDef.ZOOM_MAX, GeoFormatter.formatZoom(geoPoint.getZoomMax()), false);
         appendQueryParameter(result, GeoUriDef.LINK, geoPoint.getLink(), true);
         appendQueryParameter(result, GeoUriDef.SYMBOL, geoPoint.getSymbol(), true);
         appendQueryParameter(result, GeoUriDef.DESCRIPTION, geoPoint.getDescription(), true);
@@ -545,16 +533,9 @@ public class GeoUri {
         return result.toString();
     }
 
-    /** Formatting helper: Adds name value to result. */
-    private void appendQueryParameter(StringBuffer result, String paramName, int paramValue) {
-        if (paramValue != IGeoPointInfo.NO_ZOOM) {
-            appendQueryParameter(result, paramName, Integer.toString(paramValue), true);
-        }
-    }
-
     /** Formatting helper: Adds name value to result with optional encoding. */
     private void appendQueryParameter(StringBuffer result, String paramName, String paramValue, boolean urlEncode) {
-        if (paramValue != null) {
+        if ((paramValue != null) && (paramValue.length() > 0)) {
             try {
                 result.append(delim).append(paramName).append("=");
                 if (urlEncode) {
