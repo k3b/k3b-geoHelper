@@ -160,7 +160,7 @@ public class GeoUri {
     }
 
     /**
-     * Load {@link IGeoPointInfo} from uri-{@link String}
+     * Load {@link IGeoPointInfo} from uri-{@link String}.<br/>
      *
      * ![GeoUri-fromUri](GeoUri-fromUri.png)
      *
@@ -521,7 +521,7 @@ public class GeoUri {
     }
 
 
-    /** Creates area-uri-{@link String} from two bounding {@link IGeoPointInfo}-s  */
+    /** Creates area-uri-{@link String} from two bounding {@link IGeoPointInfo}-s.  */
     public String toUriString(IGeoPointInfo northEast, IGeoPointInfo southWest) {
         StringBuffer result = new StringBuffer();
         result.append(AREA_SCHEME);
