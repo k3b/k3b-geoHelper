@@ -2,8 +2,8 @@
 ext {
 	// global project specific properties
 	github_repository='k3b-geoHelper'
+    // project_version='1.1.5' released 12.8.2016
 	project_version='1.1.6-SNAPSHOT'
-	// project_version='1.1.5'
 	project_licence_name='The Apache License, Version 2.0'
 
 	// default for global project specific properties from file gradle.properties

@@ -20,10 +20,8 @@ package de.k3b.geo.io.gpx;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xml.sax.InputSource;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.List;
 
 import de.k3b.geo.api.GeoPointDto;

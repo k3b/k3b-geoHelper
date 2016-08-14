@@ -49,13 +49,14 @@ public class GeoFormatter {
     }
 
     /** Parsing helper: Converts a lat or lon value from {@link String} to {@link double}. */
-    public static double parseLatOrLon(String val) throws ParseException {
-        if ((val == null) || (val.length() < 1)) return IGeoPointInfo.NO_LAT_LON;
-        char latLonPrefix = val.charAt(0);
+    public static double parseLatOrLon(String oldVal) throws ParseException {
+        String newVal = oldVal;
+        if ((newVal == null) || (newVal.length() < 1)) return IGeoPointInfo.NO_LAT_LON;
+        char latLonPrefix = newVal.charAt(0);
         if (LatLonPrefix.indexOf(latLonPrefix) >= 0) {
-            val = val.substring(1,val.length());
+            newVal = newVal.substring(1,newVal.length());
         }
-        double doubleValue = latLonFormatter.parse(val).doubleValue();
+        double doubleValue = latLonFormatter.parse(newVal).doubleValue();
         if (LatLonNegativPrefix.indexOf(latLonPrefix) >= 0) doubleValue *= -1;
         return doubleValue;
     }

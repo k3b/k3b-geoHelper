@@ -66,12 +66,13 @@ public class GeoXmlOrTextParser<T extends IGeoPointInfo> {
             }
             return result;
         } else {
+            String textXml = textLinesOrXml;
             if (!textLinesOrXml.startsWith("<?xml")) {
                 // to allow xml-fragments without xml-root element
-                textLinesOrXml = "<xml>" + textLinesOrXml + "</xml>";
+                textXml = "<xml>" + textLinesOrXml + "</xml>";
             }
             GpxReader<T> parser = new GpxReader<T>(geoPointDtoFactoryItem);
-            StringReader rd = new StringReader(textLinesOrXml);
+            StringReader rd = new StringReader(textXml);
             List<T> result = null;
 
             try {

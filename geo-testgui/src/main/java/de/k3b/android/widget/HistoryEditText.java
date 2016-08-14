@@ -95,13 +95,20 @@ public class HistoryEditText {
                 case R.id.action_history:
                     showHistory();
                     return true;
+                default: break;
             }
             return false;
         }
 
+        /**
+         * ActionMode.Callback
+         * Called when an action mode is about to be exited and destroyed.
+         *
+         * @param mode The current ActionMode being destroyed
+         */
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-
+            // not used
         }
 
         protected void showHistory() {
@@ -136,7 +143,7 @@ public class HistoryEditText {
             return asList(history);
         }
 
-        void saveHistory(SharedPreferences sharedPref, SharedPreferences.Editor edit) {
+        private void saveHistory(SharedPreferences sharedPref, SharedPreferences.Editor edit) {
             List<String> history = getHistory(sharedPref);
             history = include(history, mEditor.getText().toString().trim());
             String result = toString(history);
@@ -163,21 +170,21 @@ public class HistoryEditText {
             return result.toString();
         }
 
-        private List<String>  include(List<String>  history, String newValue) {
-            history = new ArrayList<String>(history);
+        private List<String>  include(List<String>  oldhistory, String newValue) {
+            ArrayList<String> newHistory = new ArrayList<String>(oldhistory);
             if ((newValue != null) && (newValue.length() > 0)) {
-                history.remove(newValue);
-                history.add(0, newValue);
+                newHistory.remove(newValue);
+                newHistory.add(0, newValue);
             }
 
-            int len = history.size();
+            int len = newHistory.size();
 
             // forget oldest entries if maxHisotrySize is reached
             while (len > mMaxHisotrySize) {
                 len--;
-                history.remove(len);
+                newHistory.remove(len);
             }
-            return history;
+            return newHistory;
         }
 
         @Override

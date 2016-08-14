@@ -280,11 +280,11 @@ public class GeoUri {
     }
 
     private <TGeo extends GeoPointDto> TGeo getGoogleUri(String uri, TGeo parseResult) {
-        uri = uri.replaceAll("q=loc:", "q=");
+        String newUri = uri.replaceAll("q=loc:", "q=");
 
         // https://www.google.com/maps/@52.1,9.2,14z"
-        int dataStart = contentIndexBehind(uri, "/@");
-        String[] parts = getParts(uri, dataStart, "[,?&(]", 2);
+        int dataStart = contentIndexBehind(newUri, "/@");
+        String[] parts = getParts(newUri, dataStart, "[,?&(]", 2);
         if (parts != null) {
             String zoom = (parts.length <= 2) ? null : parts[2];
             if ((zoom != null) && (zoom.toLowerCase().endsWith("z"))) {
@@ -295,7 +295,7 @@ public class GeoUri {
             }
             setLatLonZoom(parseResult, parts[0], parts[1], zoom);
         }
-        return uriParamParse(uri, parseResult);
+        return uriParamParse(newUri, parseResult);
     }
 
     private <TGeo extends GeoPointDto> TGeo uriParamParse(String uri, TGeo parseResult) {
@@ -303,7 +303,7 @@ public class GeoUri {
 
         if (queryOffset >= 0) {
             String query = uri.substring(queryOffset + 1);
-            uri = uri.substring(0, queryOffset);
+            String newUri = uri.substring(0, queryOffset);
             HashMap<String, String> parmLookup = new HashMap<String, String>();
             String[] params = query.split("&");
             for (String param : params) {
@@ -324,7 +324,7 @@ public class GeoUri {
             // parameters from standard value and/or infered
             List<String> whereToSearch = new ArrayList<String>();
             whereToSearch.add(getParam(parmLookup, GeoUriDef.QUERY, null)); // lat lon from q have precedence over url-path
-            whereToSearch.add(uri);
+            whereToSearch.add(newUri);
             whereToSearch.add(getParam(parmLookup, GeoUriDef.LAT_LON, null));
 
             final boolean inferMissing = isSet(GeoUri.OPT_PARSE_INFER_MISSING);
@@ -539,9 +539,10 @@ public class GeoUri {
             try {
                 result.append(delim).append(paramName).append("=");
                 if (urlEncode) {
-                    paramValue = encode(paramValue);
+                    result.append(encode(paramValue));
+                } else {
+                    result.append(paramValue);
                 }
-                result.append(paramValue);
                 delim = "&";
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
