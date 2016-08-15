@@ -200,7 +200,7 @@ public class GeoFileRepository<T extends IGeoPointInfo> implements IGeoRepositor
     }
 
     /** Save source-points to writer */
-    void save(List<T> source, Writer writer) throws IOException {
+   protected void save(List<T> source, Writer writer) throws IOException {
         for (T geo : source) {
             saveItem(writer, geo);
         }
