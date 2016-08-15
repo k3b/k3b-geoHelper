@@ -5,16 +5,16 @@ A j2se geo support library that is compatible with Android
 ## Status
 
 * Current Release 
-  * [![GitHub release](https://img.shields.io/github/release/k3b/k3b-geoHelper.svg?maxAge=2592000)](https://github.com/k3b/k3b-geoHelper/wiki/History)
+  * [![GitHub release](https://img.shields.io/github/release/k3b/k3b-geoHelper.svg?maxAge=3600)](https://github.com/k3b/k3b-geoHelper/wiki/History)
 * Sourcecode 
   * https://github.com/k3b/k3b-geoHelper/
 * Last Release build 
   * [![Build Status](https://travis-ci.org/k3b/k3b-geoHelper.svg?branch=master)](https://travis-ci.org/k3b/k3b-geoHelper)
+  * Automated Tests Code Coverage: [![codecov](https://codecov.io/gh/k3b/k3b-geoHelper/branch/master/graph/badge.svg)](https://codecov.io/gh/k3b/k3b-geoHelper)
+  * Code quality [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0d3f1717026c429bb02c04ad8b7ed76d)](https://www.codacy.com/app/klaus3b-github/k3b-geoHelper?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=k3b/k3b-geoHelper&amp;utm_campaign=Badge_Grade)
   * [![Maven Central](https://img.shields.io/maven-central/v/com.github.k3b/k3b-geoHelper.svg)](http://search.maven.org/#search|ga|1|k3b-geoHelper)
   * [JCenter/bintray](https://bintray.com/k3b/maven/k3b-geoHelper/view)
-
-* Automated Tests Code Coverage 
-  * [![codecov](https://codecov.io/gh/k3b/k3b-geoHelper/branch/master/graph/badge.svg)](https://codecov.io/gh/k3b/k3b-geoHelper)
+  
 * Licence
   * [<img src="https://img.shields.io/github/license/k3b/k3b-geoHelper.svg"></img>](https://github.com/k3b/k3b-geoHelper/blob/master/LICENSE)
 

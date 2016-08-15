@@ -226,33 +226,33 @@ public class GpxReaderBase extends DefaultHandler {
         String name = getElementName(localName, qName);
         
         logger.debug("startElement {}-{}", localName, qName);
-        if (name.equals(GpxDef_11.TRKPT) || name.equals(GpxDef_10.WPT)) {
+        if (name.equals(XmlDefinitions.GpxDef_11.TRKPT) || name.equals(XmlDefinitions.GpxDef_10.WPT)) {
             this.current = this.newInstance(attributes);
-            final String lat = attributes.getValue(GpxDef_11.ATTR_LAT);
+            final String lat = attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LAT);
             if (lat != null) this.current.setLatitude(Double.parseDouble(lat));
-            final String lon = attributes.getValue(GpxDef_11.ATTR_LON);
+            final String lon = attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LON);
             if (lon != null) this.current.setLongitude(Double.parseDouble(lon));
-        } else if (name.equals(WikimediaDef.COORDINATE)) {
-            final String lat = attributes.getValue(GpxDef_11.ATTR_LAT);
+        } else if (name.equals(XmlDefinitions.WikimediaDef.COORDINATE)) {
+            final String lat = attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LAT);
             if (lat != null) this.current.setLatitude(Double.parseDouble(lat));
-            final String lon = attributes.getValue(GpxDef_11.ATTR_LON);
+            final String lon = attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LON);
             if (lon != null) this.current.setLongitude(Double.parseDouble(lon));
-        } else if (name.equals(WikimediaDef.IMAGE)) {
-            final String symbol = attributes.getValue(WikimediaDef.ATTR_IMAGE);
+        } else if (name.equals(XmlDefinitions.WikimediaDef.IMAGE)) {
+            final String symbol = attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_IMAGE);
             if (symbol != null) this.current.setSymbol(symbol);
-        } else if ((name.equals(KmlDef_22.PLACEMARK)) || (name.equals(GeoUriDef.XML_ELEMENT_POI))) {
+        } else if ((name.equals(XmlDefinitions.KmlDef_22.PLACEMARK)) || (name.equals(GeoUriDef.XML_ELEMENT_POI))) {
             this.current = this.newInstance(attributes);
-        } else if (name.equals(WikimediaDef.PAGE)) {
+        } else if (name.equals(XmlDefinitions.WikimediaDef.PAGE)) {
             this.current = this.newInstance(attributes);
-            this.current.setId(attributes.getValue(WikimediaDef.ATTR_ID));
-            this.current.setName(attributes.getValue(WikimediaDef.ATTR_TITLE));
-            this.current.setLink(attributes.getValue(WikimediaDef.ATTR_LINK));
-            final Date dateTime = IsoDateTimeParser.parse(attributes.getValue(WikimediaDef.ATTR_TIME));
+            this.current.setId(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_ID));
+            this.current.setName(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_TITLE));
+            this.current.setLink(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_LINK));
+            final Date dateTime = IsoDateTimeParser.parse(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_TIME));
             if (dateTime != null) {
                 this.current.setTimeOfMeasurement(dateTime);
             }
-        } else if ((this.current != null) && (name.equals(GpxDef_11.LINK) || name.equals(GpxDef_10.URL))) {
-            this.current.setLink(attributes.getValue(GpxDef_11.ATTR_LINK));
+        } else if ((this.current != null) && (name.equals(XmlDefinitions.GpxDef_11.LINK) || name.equals(XmlDefinitions.GpxDef_10.URL))) {
+            this.current.setLink(attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LINK));
         }
 		if (this.current != null) {
 			currentXmlElementBufer.setLength(0);
@@ -265,20 +265,20 @@ public class GpxReaderBase extends DefaultHandler {
             throws SAXException {
         String name = getElementName(localName, qName);
         logger.debug("endElement {} {}", localName, qName);
-        if (name.equals(GpxDef_11.TRKPT) || name.equals(GpxDef_10.WPT) || name.equals(KmlDef_22.PLACEMARK) || name.equals(GeoUriDef.XML_ELEMENT_POI) || name.equals(WikimediaDef.PAGE)) {
+        if (name.equals(XmlDefinitions.GpxDef_11.TRKPT) || name.equals(XmlDefinitions.GpxDef_10.WPT) || name.equals(XmlDefinitions.KmlDef_22.PLACEMARK) || name.equals(GeoUriDef.XML_ELEMENT_POI) || name.equals(XmlDefinitions.WikimediaDef.PAGE)) {
             GeoUri.inferMissing(this.current, this.current.getDescription());
             this.onGotNewWaypoint.onGeoInfo(this.current);
             this.current = null;
         } else if (this.current != null) {
-            if (name.equals(GpxDef_11.NAME)) {
+            if (name.equals(XmlDefinitions.GpxDef_11.NAME)) {
                 this.current.setName(currentXmlElementBufer.toString());
-            } else if (name.equals(GpxDef_11.DESC) || name.equals(KmlDef_22.DESCRIPTION)) {
+            } else if (name.equals(XmlDefinitions.GpxDef_11.DESC) || name.equals(XmlDefinitions.KmlDef_22.DESCRIPTION)) {
                 this.current.setDescription(currentXmlElementBufer.toString());
-            } else if ((null == this.current.getLink()) && (name.equals(GpxDef_11.LINK) || name.equals(GpxDef_10.URL))) {
+            } else if ((null == this.current.getLink()) && (name.equals(XmlDefinitions.GpxDef_11.LINK) || name.equals(XmlDefinitions.GpxDef_10.URL))) {
                 this.current.setLink(currentXmlElementBufer.toString());
             } else if (name.equals(GeoUriDef.ID)) {
                 this.current.setId(currentXmlElementBufer.toString());
-            } else if (name.equals(GpxDef_11.TIME) || name.equals(KmlDef_22.TIMESTAMP_WHEN) || name.equals(KmlDef_22.TIMESPAN_BEGIN)) {
+            } else if (name.equals(XmlDefinitions.GpxDef_11.TIME) || name.equals(XmlDefinitions.KmlDef_22.TIMESTAMP_WHEN) || name.equals(XmlDefinitions.KmlDef_22.TIMESPAN_BEGIN)) {
                 final Date dateTime = IsoDateTimeParser.parse(currentXmlElementBufer.toString());
                 if (dateTime != null) {
                     this.current.setTimeOfMeasurement(dateTime);
@@ -287,7 +287,7 @@ public class GpxReaderBase extends DefaultHandler {
                             + name +"=" + currentXmlElementBufer.toString());
                 }
 
-            } else if ((name.equals(KmlDef_22.COORDINATES) || name.equals(KmlDef_22.COORDINATES2)) && currentXmlElementBufer.length() > 0) {
+            } else if ((name.equals(XmlDefinitions.KmlDef_22.COORDINATES) || name.equals(XmlDefinitions.KmlDef_22.COORDINATES2)) && currentXmlElementBufer.length() > 0) {
                 // <coordinates>lon,lat,height blank lon,lat,height ...</coordinates>
                 try {
                     String parts[] = currentXmlElementBufer.toString().split("[,\\s]");

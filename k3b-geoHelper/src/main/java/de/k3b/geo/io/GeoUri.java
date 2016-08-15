@@ -131,7 +131,7 @@ public class GeoUri {
     private final static Pattern patternName = Pattern.compile(regexpName);
     private final static String regexpDouble = "([+\\-" + GeoFormatter.LatLonPrefix +
             "]?[0-9\\.]+)"; // i.e. "-123.456" or "S123.456"
-    private final static String regexpDoubleOptional = regexpDouble + "?";
+    // private final static String regexpDoubleOptional = regexpDouble + "?";
     private final static String regexpCommaDouble = "(?:\\s*,\\s*" + regexpDouble + ")"; // i.e. " , +123.456"
     private final static String regexpCommaDoubleOptional = regexpCommaDouble + "?";
     private final static String regexpLatLonAlt = regexpDouble + regexpCommaDouble + regexpCommaDoubleOptional;

@@ -73,35 +73,35 @@ public class GpxFormatter {
                                       Date timeOfMeasurement, String name,
                                       String description, String link) {
         result.append("<" +
-                GpxDef_11.TRKPT +
+                XmlDefinitions.GpxDef_11.TRKPT +
                 " " +
-                GpxDef_11.ATTR_LAT +
+                XmlDefinitions.GpxDef_11.ATTR_LAT +
                 "='")
                 .append(latitude)
                 .append("' " +
-                        GpxDef_11.ATTR_LON +
+                        XmlDefinitions.GpxDef_11.ATTR_LON +
                         "='")
                 .append(longitude)
                 .append("'>");
         if (timeOfMeasurement != null) {
-            addElement(result, GpxDef_11.TIME, TIME_FORMAT.format(timeOfMeasurement).toString());
+            addElement(result, XmlDefinitions.GpxDef_11.TIME, TIME_FORMAT.format(timeOfMeasurement).toString());
         }
         if (name != null) {
-            addElement(result, GpxDef_11.NAME, name);
+            addElement(result, XmlDefinitions.GpxDef_11.NAME, name);
         }
         if (description != null) {
-            addElement(result, GpxDef_11.DESC, description);
+            addElement(result, XmlDefinitions.GpxDef_11.DESC, description);
         }
         result.append("<" +
-                GpxDef_11.LINK +
+                XmlDefinitions.GpxDef_11.LINK +
                 " " +
-                GpxDef_11.ATTR_LINK +
+                XmlDefinitions.GpxDef_11.ATTR_LINK +
                 "='")
                 .append(escapeAttribute(link))
                 .append("' />");
 
         result.append("</" +
-                GpxDef_11.TRKPT +
+                XmlDefinitions.GpxDef_11.TRKPT +
                 ">\n");
         return result;
     }

@@ -21,7 +21,6 @@ package de.k3b.geo.io.gpx;
 import org.xml.sax.InputSource;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;

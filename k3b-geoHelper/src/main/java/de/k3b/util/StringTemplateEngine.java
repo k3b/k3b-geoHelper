@@ -35,6 +35,20 @@ import java.util.regex.Pattern;
  * Created by k3b on 01.04.2015.
  */
 public class StringTemplateEngine {
+    /** used to convert ${name} to corresponding value */
+    protected IValueResolver valueResolver = null;
+
+    /** if {@link StringTemplateEngine#sedDebugEnabled(boolean)} is set to true.
+     * this stack will contain debugbessages as callstack */
+    protected Stack<String> debugStack = null; // new Stack<String>();
+
+    /** contain last processing error or null if there is no (new) error */
+    private StringBuilder errors = null;
+
+
+    // matches ${a.b}
+    private static final Pattern pattern = Pattern.compile("\\$\\{([^ \\.\\}]+)\\.([^ }]+)\\}");
+
     /**
      * callback for {@link StringTemplateEngine} to resolve the values for names.
      *
@@ -49,20 +63,6 @@ public class StringTemplateEngine {
     public interface IValueResolver {
         String get(String className, String propertyName, String templateParameter);
     }
-
-    /** used to convert ${name} to corresponding value */
-    protected IValueResolver valueResolver = null;
-
-    /** if {@link StringTemplateEngine#sedDebugEnabled(boolean)} is set to true.
-     * this stack will contain debugbessages as callstack */
-    protected Stack<String> debugStack = null; // new Stack<String>();
-
-    /** contain last processing error or null if there is no (new) error */
-    private StringBuilder errors = null;
-
-
-    // matches ${a.b}
-    private static final Pattern pattern = Pattern.compile("\\$\\{([^ \\.\\}]+)\\.([^ }]+)\\}");
 
     /** creates the engine with {@link IValueResolver}. */
     public StringTemplateEngine(IValueResolver valueResolver) {

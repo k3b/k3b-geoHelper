@@ -10,7 +10,6 @@ import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.GeoUri;
 
 public class GeoViewerDemoActivity extends Activity {
-    private static final String NL = "\n";
     private final GeoUri parser = new GeoUri(GeoUri.OPT_FORMAT_REDUNDANT_LAT_LON | GeoUri.OPT_PARSE_INFER_MISSING);
 
     @Override

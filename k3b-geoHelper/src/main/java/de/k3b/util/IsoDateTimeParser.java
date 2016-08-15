@@ -146,7 +146,7 @@ public class IsoDateTimeParser {
         if (inTimezone == null) {
             // No timezone : use local
             return TimeZone.getDefault();
-        } else if (inTimezone.equals("Z")) {
+        } else if ("Z".equals(inTimezone)) {
             // timezone "Z" : use zulu
             return TimeZone.getTimeZone("GMT");
         } else {
