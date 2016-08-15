@@ -138,7 +138,7 @@ public class GeoUri {
     private final static String regexpLatLonLatLon = regexpDouble + regexpCommaDouble + regexpCommaDouble + regexpCommaDouble;
     private final static Pattern patternLatLonAlt = Pattern.compile(regexpLatLonAlt);
     private final static Pattern patternLatLonLatLon = Pattern.compile(regexpLatLonLatLon);
-    private final static Pattern patternTime = Pattern.compile("([12]\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ)");
+    // private final static Pattern patternTime = Pattern.compile("([12]\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ)");
 
     private final static String regexpHref = "(?:\\s*href\\s?\\=\\s?['\"]([^'\"]*)['\"])"; // i.e. href='hallo'
     private final static Pattern patternHref = Pattern.compile(regexpHref);
@@ -214,8 +214,6 @@ public class GeoUri {
 
     private <TGeo extends GeoPointDto> TGeo getYandexUri(String uri, TGeo parseResult) {
         // https://www.yandex.com/maps/?ll=9.2,52.1&z=14
-        String search = "map=";
-
         // special ll= handling lat / lon are spwapped
         int dataStart = contentIndexBehind(uri, "ll=");
         String[] parts = getParts(uri, dataStart, "[,?&]", 2);
@@ -453,7 +451,7 @@ public class GeoUri {
     private static Matcher parseFindWithPattern(Pattern pattern, String candidate) {
         if (candidate != null) {
             Matcher m = pattern.matcher(candidate);
-            while (m.find() && (m.groupCount() > 0)) {
+            if (m.find() && (m.groupCount() > 0)) {
                 return m;
             }
         }

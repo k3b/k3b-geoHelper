@@ -24,10 +24,10 @@ import org.junit.*;
  * Created by k3b on 01.04.2015.
  */
 public class StringTemplateTests {
-    StringTemplateEngine sut = null;
+    private StringTemplateEngine sut = null;
 
     @Before
-    public void setup() {
+    public void setUp() {
         sut = new StringTemplateEngine(new StringTemplateEngine.IValueResolver() {
             @Override
             public String get(String className, String propertyName, String templateParameter) {

@@ -22,7 +22,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -38,7 +37,7 @@ public class IsoDateTimeParserTests {
     private static Date EXPECTED_WITHOUT_MILLISECS = IsoDateTimeParser.toDate(2001,12,24,12,34,56,0, TimeZone.getTimeZone("GMT"));
 
     @BeforeClass
-    public static void setup() {
+    public static void setUp() {
         ISO_FULL.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 

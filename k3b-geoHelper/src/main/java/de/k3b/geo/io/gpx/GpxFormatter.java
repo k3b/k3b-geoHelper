@@ -48,7 +48,7 @@ import de.k3b.geo.api.ILocation;
  */
 public class GpxFormatter {
 	private static final String TEMP_AMP = "##!!##!!";
-    static final DateFormat TIME_FORMAT
+    public static final DateFormat TIME_FORMAT
             = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     static {
