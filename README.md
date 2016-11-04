@@ -41,7 +41,7 @@ For more details see [supported data formats](https://github.com/k3b/k3b-geoHelp
 Add dependencies to local build.gradle (via jcenter or mavencentral)
 
 	dependencies {
-		compile 'com.github.k3b:k3b-geoHelper:v1.1.4'
+		compile 'com.github.k3b:k3b-geoHelper:v1.1.5'
 	}
 
 ##Dependencies##
