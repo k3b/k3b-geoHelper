@@ -31,5 +31,6 @@ script:
   - ./gradlew check assemble reports
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - ls -al
+  - bash <(curl -s https://codecov.io/bash) -d
   
