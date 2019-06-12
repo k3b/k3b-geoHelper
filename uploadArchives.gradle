@@ -57,7 +57,7 @@ uploadArchives {
 				url "https://github.com/${github_userId}/${github_repository}"
 
 				scm {
-					url 				"http://www.github.com/${github_userId}/${github_repository}"
+					url 				"https://www.github.com/${github_userId}/${github_repository}"
 					connection 			"scm:git://github.com/${github_userId}/${github_repository}.git"
 					developerConnection	"scm:git://github.com/${github_userId}/${github_repository}.git"
 				}
