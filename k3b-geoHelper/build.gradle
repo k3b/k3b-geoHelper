@@ -28,10 +28,10 @@ jacocoTestReport {
 
 dependencies {
     // compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.11'
-    testCompile 'org.slf4j:slf4j-simple:1.7.7@jar'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.slf4j:slf4j-simple:1.7.7@jar'
     // testCompile fileTree(dir: 'resources', include: ['*.*'])
-    compile 'org.slf4j:slf4j-api:1.7.7@jar'
+    implementation 'org.slf4j:slf4j-api:1.7.7@jar'
     //  compile 'org.slf4j:slf4j-api:1.7.6@jar'
     // compile 'com.darwinsys:hirondelle-date4j:1.5.1'
     // compile 'joda-time:joda-time:2.7'
@@ -39,8 +39,8 @@ dependencies {
 
 task testZip(type: Zip, dependsOn: [test, jacocoTestReport]) {
     group = 'Distribution'
-    classifier = 'tests'
-    description = "Builds -${classifier} archive containing testresults and codecoverage ."
+    archiveClassifier = 'tests'
+    description = "Builds -${archiveClassifier} archive containing testresults and codecoverage ."
 
     from('src/dist') {
         // include 'changelog.txt'
@@ -57,12 +57,9 @@ task testZip(type: Zip, dependsOn: [test, jacocoTestReport]) {
 
 task reports (dependsOn: [test, jacocoTestReport, javadoc])
 
-// workaround because android-studio does not make the test resources available
-// see https://code.google.com/p/android/issues/detail?id=64887#c13
-task copyTestResources(type: Copy) {
-    from sourceSets.test.resources
-    into sourceSets.test.output.classesDir
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
-processTestResources.dependsOn copyTestResources
 
-apply from: '../uploadArchives.gradle'
+// apply from: '../uploadArchives.gradle'
