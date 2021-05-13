@@ -40,7 +40,7 @@ public class GeoFormatter {
     private static final DecimalFormat latLonFormatter
             = new DecimalFormat("#.#######", new DecimalFormatSymbols(Locale.ENGLISH));
     private static final DateFormat timeFormatter
-            = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
     public static final String LatLonNegativPrefix = "sSwW";
     public static final String LatLonPrefix = "nNeE" + LatLonNegativPrefix;
 
@@ -48,13 +48,15 @@ public class GeoFormatter {
         timeFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
+    private GeoFormatter() {}
+
     /** Parsing helper: Converts a lat or lon value from {@link String} to {@link double}. */
     public static double parseLatOrLon(String oldVal) throws ParseException {
         String newVal = oldVal;
         if ((newVal == null) || (newVal.length() < 1)) return IGeoPointInfo.NO_LAT_LON;
         char latLonPrefix = newVal.charAt(0);
         if (LatLonPrefix.indexOf(latLonPrefix) >= 0) {
-            newVal = newVal.substring(1,newVal.length());
+            newVal = newVal.substring(1);
         }
         double doubleValue = latLonFormatter.parse(newVal).doubleValue();
         if (LatLonNegativPrefix.indexOf(latLonPrefix) >= 0) doubleValue *= -1;
@@ -94,6 +96,7 @@ public class GeoFormatter {
                     return result;
                 }
             } catch (Exception ignore) {
+                // silent fail
             }
         }
         return IGeoPointInfo.NO_ZOOM;

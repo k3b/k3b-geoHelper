@@ -90,12 +90,9 @@ public class HistoryEditText {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch(item.getItemId()) {
-
-                case R.id.action_history:
-                    showHistory();
-                    return true;
-                default: break;
+            if (item.getItemId() == R.id.action_history) {
+                showHistory();
+                return true;
             }
             return false;
         }
@@ -171,7 +168,7 @@ public class HistoryEditText {
         }
 
         private List<String>  include(List<String>  oldhistory, String newValue) {
-            ArrayList<String> newHistory = new ArrayList<String>(oldhistory);
+            ArrayList<String> newHistory = new ArrayList<>(oldhistory);
             if ((newValue != null) && (newValue.length() > 0)) {
                 newHistory.remove(newValue);
                 newHistory.add(0, newValue);
@@ -238,7 +235,7 @@ public class HistoryEditText {
         for (EditorHandler instance: mEditorHandlers) {
             instance.saveHistory(sharedPref, edit);
         }
-        edit.commit();
+        edit.apply();
     }
 
     @Override

@@ -21,6 +21,7 @@
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import de.k3b.geo.api.IGeoPointInfo;
@@ -49,11 +50,13 @@ import de.k3b.geo.api.ILocation;
 public class GpxFormatter {
 	private static final String TEMP_AMP = "##!!##!!";
     public static final DateFormat TIME_FORMAT
-            = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
     static {
         TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
+
+    private GpxFormatter() {}
 
     /** Add gpx-xml-fragments to result */
     public static StringBuffer toGpx(StringBuffer result, IGeoPointInfo location) {
@@ -84,7 +87,7 @@ public class GpxFormatter {
                 .append(longitude)
                 .append("'>");
         if (timeOfMeasurement != null) {
-            addElement(result, XmlDefinitions.GpxDef_11.TIME, TIME_FORMAT.format(timeOfMeasurement).toString());
+            addElement(result, XmlDefinitions.GpxDef_11.TIME, TIME_FORMAT.format(timeOfMeasurement));
         }
         if (name != null) {
             addElement(result, XmlDefinitions.GpxDef_11.NAME, name);
@@ -115,10 +118,10 @@ public class GpxFormatter {
     private static String escapeElement(String value) {
         if (value != null) {
             return value
-                    .replaceAll("&",TEMP_AMP)
-                    .replaceAll("<","&lt;")
-                    .replaceAll(">","&gt;")
-                    .replaceAll(TEMP_AMP,"&amp;") // to prevent "&lt;", "&gt;" from being escaped
+                    .replace("&",TEMP_AMP)
+                    .replace("<","&lt;")
+                    .replace(">","&gt;")
+                    .replace(TEMP_AMP,"&amp;") // to prevent "&lt;", "&gt;" from being escaped
                     ;
         }
         return null;
@@ -131,7 +134,7 @@ public class GpxFormatter {
                     .replace('\n',' ')
                     .replace('\r',' ')
                     .replace('\'','"')
-            ).replaceAll("  ", " ");
+            ).replace("  ", " ");
         }
         return null;
     }
