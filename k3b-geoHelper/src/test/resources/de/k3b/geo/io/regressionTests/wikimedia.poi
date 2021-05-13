@@ -1,6 +1,6 @@
 <api batchcomplete="" xmlns:expectedTestResult="uri://some/url">
     <!-- read via wikimedia api from
-            https://de.wikivoyage.org/w/api.php?action=query&format=xml&prop=coordinates|info|pageimages&inprop=url&piprop=thumbnail&generator=geosearch&ggscoord=28.12722|-15.43139&ggsradius=10000&ggslimit=5&pilimit=5
+            https://en.wikipedia.org/w/api.php?action=query&format=xml&prop=coordinates|info|pageimages|extracts&inprop=url&piprop=thumbnail&generator=geosearch&ggscoord=28.12722|-15.43139&ggsradius=10000&ggslimit=5&pilimit=5&exsentences=2&explaintext&exintro
 
             LocationMapViewer can find this type of content in files *.poi (or *.gpx, *.kml)
         -->
@@ -13,11 +13,12 @@
                 <!-- this is what i assume to be valid wikimedia xml content
                     except that there is no id element that is used for regression-testing
                     -->
-                <expectedTestResult:id>geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;t=2015-02-10T08:04:45Z</expectedTestResult:id>
+                <expectedTestResult:id>geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z</expectedTestResult:id>
                 <coordinates>
                     <co lat="52" lon="9" primary="" globe="earth"/>
                 </coordinates>
                 <thumbnail source="theIconUrl" width="50" height="38"/>
+                <extract xml:space="preserve">theDesc</extract>
             </page>
 
             <!--

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 by k3b.
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of k3b-geoHelper library.
  *
@@ -272,8 +272,8 @@ public class GpxReaderBase extends DefaultHandler {
         } else if (this.current != null) {
             if (name.equals(XmlDefinitions.GpxDef_11.NAME)) {
                 this.current.setName(currentXmlElementBufer.toString());
-            } else if (name.equals(XmlDefinitions.GpxDef_11.DESC) || name.equals(XmlDefinitions.KmlDef_22.DESCRIPTION)) {
-                this.current.setDescription(currentXmlElementBufer.toString());
+            } else if (name.equals(XmlDefinitions.GpxDef_11.DESC) || name.equals(XmlDefinitions.KmlDef_22.DESCRIPTION) || name.equals(XmlDefinitions.WikimediaDef.DESCRIPTION)) {
+                this.current.setDescription(currentXmlElementBufer.toString().trim());
             } else if ((null == this.current.getLink()) && (name.equals(XmlDefinitions.GpxDef_11.LINK) || name.equals(XmlDefinitions.GpxDef_10.URL))) {
                 this.current.setLink(currentXmlElementBufer.toString());
             } else if (name.equals(GeoUriDef.ID)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 by k3b.
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of k3b-geoHelper library.
  *
@@ -48,6 +48,8 @@ public class XmlDefinitions {
 
         public static final String IMAGE = "thumbnail";
         public static final String ATTR_IMAGE = "source";
+
+        public static final String DESCRIPTION = "extract";
     }
 
     /** xml-elements for gpx version 1.1 */
