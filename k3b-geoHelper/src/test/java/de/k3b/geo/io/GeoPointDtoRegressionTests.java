@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 by k3b.
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of k3b-geoHelper library.
  *
@@ -20,6 +20,7 @@ package de.k3b.geo.io;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.xml.sax.InputSource;
 
 import java.io.File;
@@ -31,45 +32,72 @@ import java.util.List;
 import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.gpx.GpxReader;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 
 /**
  * Regressionstests: load *.kml/*.gpx/*.poi file from resources
  * and make shure that for every parsed GeoPointDto in the result is identical to id of poi.<br/>
  *
  * Created by k3b on 19.04.2015.
+ *
+ * Parameter Tests see See https://github.com/Pragmatists/JUnitParams
  */
+@RunWith(JUnitParamsRunner.class)
 public class GeoPointDtoRegressionTests {
+
     private static final String REGRESSION_ROOT = "/de/k3b/geo/io/regressionTests/";
     private static final GeoUri formatter = new GeoUri(GeoUri.OPT_DEFAULT);
 
     private String currentResourceName = null;
-    private StringBuilder checkResultMessage = null;
     private String lastUri = null;
 
     @Test
-    public void regressionTest() {
-        check("0|empty.xml", "1|gpx11.gpx", "1|gpx10.gpx"
-                , "3|kml22.kml", "2|gpx-similar.gpx", "9|poi.xml"
-                , "1|wikimedia.poi"
-                , "15|https-mapservice-urls.xml"
-        );
-        Assert.assertNull("" + this.checkResultMessage, this.checkResultMessage);
-    }
-
-    private void check(String... streamNames) {
-        checkResultMessage = null;
-        for (String streamName : streamNames) {
-            final String[] testCase = streamName.split("\\|");
-            checkStream(testCase[0], REGRESSION_ROOT + testCase[1]);
+    @Parameters({
+            "0, empty.xml",
+            "1, gpx11.gpx",
+            "1, gpx10.gpx",
+            "3, kml22.kml",
+            "2, gpx-similar.gpx",
+            "9, poi.xml",
+            "1, wikimedia.poi",
+            "15, https-mapservice-urls.xml"})
+    public void checkPoiResource(int expectedNumberOfPois, String resourceName)  {
+        List<IGeoPointInfo> pois = getiGeoPointInfos(resourceName);
+        Assert.assertEquals("expectedNumberOfPois", expectedNumberOfPois, pois.size());
+        int index = 1;
+        for (IGeoPointInfo poi : pois) {
+            checkPoi(index++, poi, poi.getId());
         }
     }
 
-    private void checkStream(String expectedNumberOfPois, String resourceName) {
-        checkStream(Integer.valueOf(expectedNumberOfPois), getStream(resourceName), resourceName);
+    private List<IGeoPointInfo> getiGeoPointInfos(String resourceName) {
+        List<IGeoPointInfo> pois = null;
+        try (InputStream xmlStream = getStream(resourceName)) {
+            GpxReader<IGeoPointInfo> parser = new GpxReader<IGeoPointInfo>(null) {
+                @Override
+                protected GeoUri createGeoUriParser(int modes) {
+                    lastUri = null;
+                    return new GeoUri(modes) {
+                        @Override
+                        public <TGeo extends GeoPointDto>  TGeo fromUri(String uri, TGeo parseResult) {
+                            lastUri = uri;
+                            return super.fromUri(uri, parseResult);
+                        }
+                    };
+                }
+            };
+            pois = parser.getTracks(new InputSource(xmlStream));
+        } catch (Exception e) {
+            Assert.fail("cannot load  " +
+                    resourceName + ": " + e.getMessage() + "\n" + e.getStackTrace());
+            e.printStackTrace();
+        }
+        return pois;
     }
 
     private InputStream getStream(String _resourceName) {
-        this.currentResourceName = _resourceName;
+        this.currentResourceName = REGRESSION_ROOT + _resourceName;
 
         // this does not work with test-resources :-(
         // or i donot know how to do it with AndroidStudio-1.02/gradle-2.2
@@ -97,55 +125,10 @@ public class GeoPointDtoRegressionTests {
         return result;
     }
 
-    private void checkStream(Integer expectedNumberOfPois, InputStream xmlStream, String resourceName) {
-        try {
-            GpxReader<IGeoPointInfo> parser = new GpxReader<IGeoPointInfo>(null) {
-                @Override
-                protected GeoUri createGeoUriParser(int modes) {
-                    lastUri = null;
-                    return new GeoUri(modes) {
-                        @Override
-                        public <TGeo extends GeoPointDto>  TGeo fromUri(String uri, TGeo parseResult) {
-                            lastUri = uri;
-                            return super.fromUri(uri, parseResult);
-                        }
-                    };
-                }
-            };
-            List<IGeoPointInfo> pois = parser.getTracks(new InputSource(xmlStream));
-            if (expectedNumberOfPois != pois.size()) {
-                addError("Expected " + expectedNumberOfPois +" but got " + pois.size());
-            }
-            checkPois(pois);
-            xmlStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            addError("cannot load  " +
-                    resourceName + ": " + e.getMessage() + "\n" + e.getStackTrace());
-        }
-    }
-
-    private void checkPois(List<IGeoPointInfo> pois) {
-        int index = 0;
-        for (IGeoPointInfo poi : pois) {
-            checkPoi(index++, poi, poi.getId());
-        }
-    }
-
     private void checkPoi(int index, IGeoPointInfo poi, String expected) {
         String actual= formatter.toUriString(new GeoPointDto(poi).setId(null));
 
-        if ((expected != null) && (0 != expected.compareTo(actual))) {
-            addError("#" + index + " failed: expected '" + expected + "' but got '" + actual + "'. lastUri='" +
-                    lastUri + "'" );
-        }
-    }
-
-    private void addError(String message) {
-        if (this.checkResultMessage == null) {
-            this.checkResultMessage = new StringBuilder();
-        }
-
-        this.checkResultMessage.append(this.currentResourceName).append(": ").append(message).append("\n");
+        Assert.assertEquals(this.currentResourceName + "[" + index +
+                "]: ", expected, actual);
     }
 }
