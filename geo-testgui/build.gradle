@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion = 23
+    compileSdkVersion = 28
     defaultConfig {
         applicationId "de.k3b.android.geo.testgui"
         minSdkVersion 14

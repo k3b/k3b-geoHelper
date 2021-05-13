@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 28
 
     defaultConfig {
         applicationId "de.k3b.android.demo_geohelper"
@@ -24,7 +24,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':k3b-geoHelper')
-    // compile 'com.github.k3b:k3b-geoHelper:1.1.4'
     implementation project(path: ':k3b-geoHelper')
+    // compile 'com.github.k3b:k3b-geoHelper:1.1.4'
 }
