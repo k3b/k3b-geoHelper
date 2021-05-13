@@ -153,7 +153,7 @@ public class HistoryEditText {
         }
 
         private String toString(List<String> list) {
-            StringBuffer result = new StringBuffer();
+            StringBuilder result = new StringBuilder();
             String nextDelim = "";
             for (String instance : list) {
                 if (instance != null) {
@@ -241,7 +241,7 @@ public class HistoryEditText {
     @Override
     public String toString() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (EditorHandler instance: mEditorHandlers) {
             result.append(instance.toString(sharedPref)).append("\n");
         }

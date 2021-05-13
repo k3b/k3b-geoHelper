@@ -65,7 +65,7 @@ public class GeoXmlOrTextParserTests {
                 .setLongitude(1).setLongitude(1)
                 ;
 
-        StringBuffer xmlFragments = new StringBuffer();
+        StringBuilder xmlFragments = new StringBuilder();
         GpxFormatter.toGpx(xmlFragments, geo);
         GpxFormatter.toGpx(xmlFragments, geo);
 

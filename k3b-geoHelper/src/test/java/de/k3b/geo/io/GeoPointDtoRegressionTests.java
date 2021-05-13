@@ -43,7 +43,7 @@ public class GeoPointDtoRegressionTests {
     private static final GeoUri formatter = new GeoUri(GeoUri.OPT_DEFAULT);
 
     private String currentResourceName = null;
-    private StringBuffer checkResultMessage = null;
+    private StringBuilder checkResultMessage = null;
     private String lastUri = null;
 
     @Test
@@ -143,7 +143,7 @@ public class GeoPointDtoRegressionTests {
 
     private void addError(String message) {
         if (this.checkResultMessage == null) {
-            this.checkResultMessage = new StringBuffer();
+            this.checkResultMessage = new StringBuilder();
         }
 
         this.checkResultMessage.append(this.currentResourceName).append(": ").append(message).append("\n");

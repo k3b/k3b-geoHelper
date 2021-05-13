@@ -88,7 +88,7 @@ public class GpxReaderBase extends DefaultHandler {
     protected GeoPointDto current;
 
     /** This member will receive value of current xml-element while parsing */
-    private StringBuffer currentXmlElementBufer = new StringBuffer();
+    private StringBuilder currentXmlElementBufer = new StringBuilder();
 
     /** Used if xml contains geoUri attribute <poi geoUri='geo:...' /> to parse contained geo-uris..
      * it is Created on demand. */

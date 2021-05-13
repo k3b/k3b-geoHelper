@@ -32,7 +32,7 @@ import de.k3b.geo.api.ILocation;
  * gpx-xml-fragment without the xml-root element and with no xml-namespace.<br/>
  *
  * ```java
- *  StringBuffer xmlString = new StringBuffer()
+ *  StringBuilder xmlString = new StringBuilder()
  *       .append("<gpx>\n");
  *
  *  GeoPointDto geo = new GeoPointDto()
@@ -59,20 +59,20 @@ public class GpxFormatter {
     private GpxFormatter() {}
 
     /** Add gpx-xml-fragments to result */
-    public static StringBuffer toGpx(StringBuffer result, IGeoPointInfo location) {
+    public static StringBuilder toGpx(StringBuilder result, IGeoPointInfo location) {
         return toGpx(result, location.getLatitude(), location.getLongitude(),
                 location.getTimeOfMeasurement(), location.toString(),location.getDescription(), location.getLink());
     }
 
     /** Add gpx-xml-fragments to result */
-    public static StringBuffer toGpx(StringBuffer result, ILocation location,
+    public static StringBuilder toGpx(StringBuilder result, ILocation location,
                                      String description, String link) {
         return toGpx(result, location.getLatitude(), location.getLongitude(),
                 location.getTimeOfMeasurement(), location.toString(),description, link);
     }
 
     /** Add gpx-xml-fragments to result */
-    private static StringBuffer toGpx(StringBuffer result, double latitude, double longitude,
+    private static StringBuilder toGpx(StringBuilder result, double latitude, double longitude,
                                       Date timeOfMeasurement, String name,
                                       String description, String link) {
         result.append("<" +
@@ -110,7 +110,7 @@ public class GpxFormatter {
     }
 
     /** add (name>value(/name> to result */
-    private static void addElement(StringBuffer result, String name, String value) {
+    private static void addElement(StringBuilder result, String name, String value) {
         result.append("<").append(name).append(">").append(escapeElement(value)).append("</").append(name).append(">");
     }
 

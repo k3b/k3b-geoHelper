@@ -499,7 +499,7 @@ public class GeoUri {
      *
      */
     public String toUriString(IGeoPointInfo geoPoint) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         result.append(GEO_SCHEME);
         formatLatLon(result, geoPoint);
 
@@ -521,7 +521,7 @@ public class GeoUri {
 
     /** Creates area-uri-{@link String} from two bounding {@link IGeoPointInfo}-s.  */
     public String toUriString(IGeoPointInfo northEast, IGeoPointInfo southWest) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         result.append(AREA_SCHEME);
         result.append(GeoFormatter.formatLatLon(northEast.getLatitude())).append(",");
         result.append(GeoFormatter.formatLatLon(northEast.getLongitude())).append(",");
@@ -532,7 +532,7 @@ public class GeoUri {
     }
 
     /** Formatting helper: Adds name value to result with optional encoding. */
-    private void appendQueryParameter(StringBuffer result, String paramName, String paramValue, boolean urlEncode) {
+    private void appendQueryParameter(StringBuilder result, String paramName, String paramValue, boolean urlEncode) {
         if ((paramValue != null) && (paramValue.length() > 0)) {
             try {
                 result.append(delim).append(paramName).append("=");
@@ -549,7 +549,7 @@ public class GeoUri {
     }
 
     /** Formatting helper: Adds lat/lon to result. */
-    private void formatLatLon(StringBuffer result, IGeoPointInfo geoPoint) {
+    private void formatLatLon(StringBuilder result, IGeoPointInfo geoPoint) {
         if (geoPoint != null) {
             result.append(GeoFormatter.formatLatLon(geoPoint.getLatitude()));
 
@@ -564,7 +564,7 @@ public class GeoUri {
     /** Formatting helper: Adds {@link IGeoPointInfo} fields to result. */
     private String formatQuery(IGeoPointInfo geoPoint) {
         // {lat{,lon{,hight_ignore}}}{(name)}{|uri{|id}|}{description}
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         if (isSet(OPT_FORMAT_REDUNDANT_LAT_LON)) {
             formatLatLon(result, geoPoint);

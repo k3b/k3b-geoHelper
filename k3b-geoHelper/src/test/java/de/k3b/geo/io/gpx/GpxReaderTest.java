@@ -55,7 +55,7 @@ public class GpxReaderTest {
     public void parseFormatGpx11ShortTest() throws IOException {
         GpxReader<IGeoPointInfo> reader = new GpxReader<IGeoPointInfo>(null);
         IGeoPointInfo location = reader.getTracks(new InputSource(new StringReader(xmlMinimal_gpx_v11))).get(0);
-        String formatted = GpxFormatter.toGpx(new StringBuffer(), location).toString();
+        String formatted = GpxFormatter.toGpx(new StringBuilder(), location).toString();
 
         Assert.assertEquals(xmlMinimal_gpx_v11, formatted);
     }
@@ -64,7 +64,7 @@ public class GpxReaderTest {
     public void parseFormatGpx11FullTest() throws IOException {
         GpxReader<IGeoPointInfo> reader = new GpxReader<IGeoPointInfo>(null);
         IGeoPointInfo location = reader.getTracks(new InputSource(new StringReader(xmlFull_gpx_v11))).get(0);
-        String formatted = GpxFormatter.toGpx(new StringBuffer(), location, location.getDescription(), location.getLink()).toString();
+        String formatted = GpxFormatter.toGpx(new StringBuilder(), location, location.getDescription(), location.getLink()).toString();
 
         Assert.assertEquals(xmlMinimal_gpx_v11, formatted);
     }
@@ -73,7 +73,7 @@ public class GpxReaderTest {
     public void parseFormatGpx11WithNamespaceTest() throws IOException {
         GpxReader<IGeoPointInfo> reader = new GpxReader<IGeoPointInfo>(null);
         IGeoPointInfo location = reader.getTracks(new InputSource(new StringReader(xmlFull_gpx_v11withNS))).get(0);
-        String formatted = GpxFormatter.toGpx(new StringBuffer(), location, location.getDescription(), location.getLink()).toString();
+        String formatted = GpxFormatter.toGpx(new StringBuilder(), location, location.getDescription(), location.getLink()).toString();
 
         Assert.assertEquals(xmlMinimal_gpx_v11, formatted);
     }
@@ -82,7 +82,7 @@ public class GpxReaderTest {
     public void parseFormatGpx10ShortTest() throws IOException {
         GpxReader<IGeoPointInfo> reader = new GpxReader<IGeoPointInfo>(null);
         IGeoPointInfo location = reader.getTracks(new InputSource(new StringReader(xmlMinimal_gpx_v10))).get(0);
-        String formatted = GpxFormatter.toGpx(new StringBuffer(), location, location.getDescription(), location.getLink()).toString();
+        String formatted = GpxFormatter.toGpx(new StringBuilder(), location, location.getDescription(), location.getLink()).toString();
 
         Assert.assertEquals(xmlMinimal_gpx_v11, formatted);
     }
@@ -95,7 +95,7 @@ public class GpxReaderTest {
         // uri not supported by kml
         location.setLink("geo:0,0?q=12.34,56.78(name)");
 
-        String formatted = GpxFormatter.toGpx(new StringBuffer(), location, location.getDescription(), location.getLink()).toString();
+        String formatted = GpxFormatter.toGpx(new StringBuilder(), location, location.getDescription(), location.getLink()).toString();
 
         Assert.assertEquals(xmlMinimal_gpx_v11, formatted);
     }
@@ -111,7 +111,7 @@ public class GpxReaderTest {
 
             List<IGeoPointInfo> locations = reader.getTracks(new InputSource(new FileReader(fullPathToParserInputFile)));
 
-            final StringBuffer result = new StringBuffer();
+            final StringBuilder result = new StringBuilder();
             for (IGeoPointInfo location : locations) {
                 GpxFormatter.toGpx(result, location, location.getDescription(), location.getLink());
             }
@@ -133,7 +133,7 @@ public class GpxReaderTest {
                 .setLink(forbidden)
                 ;
 
-        String xmlFragment = GpxFormatter.toGpx(new StringBuffer(), geo).toString();
+        String xmlFragment = GpxFormatter.toGpx(new StringBuilder(), geo).toString();
 
         GeoXmlOrTextParser<IGeoPointInfo> parser = new GeoXmlOrTextParser<>();
         List<IGeoPointInfo> result = parser.get(xmlFragment);

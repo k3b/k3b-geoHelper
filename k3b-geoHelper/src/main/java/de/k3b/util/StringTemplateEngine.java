@@ -80,7 +80,7 @@ public class StringTemplateEngine {
             return null;
         }
 
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder buffer = new StringBuilder();
         final Matcher match = pattern.matcher(template);
         while (match.find()) {
             final String templateParameter = match.group(0);
