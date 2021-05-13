@@ -62,6 +62,7 @@ public class XmlDefinitions {
         public static final String TIME = "time";
         public static final String LINK = "link"; // <link href=.. /> also used by atom
         public static final String ATTR_LINK = "href";
+        public static final String IMAGE = "sym";
     }
 }
 

@@ -276,6 +276,8 @@ public class GpxReaderBase extends DefaultHandler {
                 this.current.setDescription(currentXmlElementBufer.toString().trim());
             } else if ((null == this.current.getLink()) && (name.equals(XmlDefinitions.GpxDef_11.LINK) || name.equals(XmlDefinitions.GpxDef_10.URL))) {
                 this.current.setLink(currentXmlElementBufer.toString());
+            } else if (name.equals(XmlDefinitions.GpxDef_11.IMAGE)) {
+                this.current.setSymbol(currentXmlElementBufer.toString());
             } else if (name.equals(GeoUriDef.ID)) {
                 this.current.setId(currentXmlElementBufer.toString());
             } else if (name.equals(XmlDefinitions.GpxDef_11.TIME) || name.equals(XmlDefinitions.KmlDef_22.TIMESTAMP_WHEN) || name.equals(XmlDefinitions.KmlDef_22.TIMESPAN_BEGIN)) {
