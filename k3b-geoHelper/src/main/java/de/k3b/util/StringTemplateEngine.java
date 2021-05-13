@@ -80,7 +80,7 @@ public class StringTemplateEngine {
             return null;
         }
 
-        final StringBuilder buffer = new StringBuilder();
+        final StringBuffer stringBuffer = new StringBuffer();
         final Matcher match = pattern.matcher(template);
         while (match.find()) {
             final String templateParameter = match.group(0);
@@ -90,14 +90,14 @@ public class StringTemplateEngine {
             String resolverResult = valueResolver.get(className, propertyName, templateParameter);
             resolverResult = onResolverResult(templateParameter, resolverResult);
             if (resolverResult != null) {
-                match.appendReplacement(buffer, resolverResult);
+                match.appendReplacement(stringBuffer, resolverResult);
             } else {
-                match.appendReplacement(buffer, "");
+                match.appendReplacement(stringBuffer, "");
             }
             debugPop();
         }
-        match.appendTail(buffer);
-        return buffer.toString();
+        match.appendTail(stringBuffer);
+        return stringBuffer.toString();
     }
 
     /** called for every parameter match. Is used to collect debug infos. */
