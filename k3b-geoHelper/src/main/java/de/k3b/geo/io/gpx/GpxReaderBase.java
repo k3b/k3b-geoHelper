@@ -27,6 +27,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -84,8 +86,8 @@ public class GpxReaderBase extends DefaultHandler {
     /** If not null this instance is cleared and then reused for every new gpx found */
     protected final GeoPointDto mReuse;
 
-    /** If not null gpx-v11: "trkpt" parsing is active */
-    protected GeoPointDto current;
+    /** If not null geo-parsing parsing is active */
+    protected GeoPointDto currentGeoPoint;
 
     /** This member will receive value of current xml-element while parsing */
     private StringBuilder currentXmlElementBufer = new StringBuilder();
@@ -93,6 +95,12 @@ public class GpxReaderBase extends DefaultHandler {
     /** Used if xml contains geoUri attribute <poi geoUri='geo:...' /> to parse contained geo-uris..
      * it is Created on demand. */
     private GeoUri geoUriParser = null;
+
+    /** for seperate kml-symbol processing : current symbol id */
+    private String currentIconDefinitionId;
+
+    /** for seperate kml-symbol processing : all known symbols: id to url */
+    private Map<String,String> id2Symbol = new HashMap<>();
 
     /**
      * Creates a new parser.
@@ -227,34 +235,38 @@ public class GpxReaderBase extends DefaultHandler {
         
         logger.debug("startElement {}-{}", localName, qName);
         if (name.equals(XmlDefinitions.GpxDef_11.TRKPT) || name.equals(XmlDefinitions.GpxDef_10.WPT)) {
-            this.current = this.newInstance(attributes);
+            this.currentGeoPoint = this.newInstance(attributes);
             final String lat = attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LAT);
-            if (lat != null) this.current.setLatitude(Double.parseDouble(lat));
+            if (lat != null) this.currentGeoPoint.setLatitude(Double.parseDouble(lat));
             final String lon = attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LON);
-            if (lon != null) this.current.setLongitude(Double.parseDouble(lon));
+            if (lon != null) this.currentGeoPoint.setLongitude(Double.parseDouble(lon));
         } else if (name.equals(XmlDefinitions.WikimediaDef.COORDINATE)) {
             final String lat = attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LAT);
-            if (lat != null) this.current.setLatitude(Double.parseDouble(lat));
+            if (lat != null) this.currentGeoPoint.setLatitude(Double.parseDouble(lat));
             final String lon = attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LON);
-            if (lon != null) this.current.setLongitude(Double.parseDouble(lon));
+            if (lon != null) this.currentGeoPoint.setLongitude(Double.parseDouble(lon));
         } else if (name.equals(XmlDefinitions.WikimediaDef.IMAGE)) {
             final String symbol = attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_IMAGE);
-            if (symbol != null) this.current.setSymbol(symbol);
+            if (symbol != null) this.currentGeoPoint.setSymbol(symbol);
+        } else if (name.equals(XmlDefinitions.KmlDef_22.ICON_DEFINITION)) {
+            currentIconDefinitionId = attributes.getValue(XmlDefinitions.KmlDef_22.ATTR_DEFINITION_ID);
         } else if ((name.equals(XmlDefinitions.KmlDef_22.PLACEMARK)) || (name.equals(GeoUriDef.XML_ELEMENT_POI))) {
-            this.current = this.newInstance(attributes);
+            // start a new kml geo-item
+            this.currentGeoPoint = this.newInstance(attributes);
         } else if (name.equals(XmlDefinitions.WikimediaDef.PAGE)) {
-            this.current = this.newInstance(attributes);
-            this.current.setId(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_ID));
-            this.current.setName(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_TITLE));
-            this.current.setLink(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_LINK));
+            // start a new wikipedia geo-item
+            this.currentGeoPoint = this.newInstance(attributes);
+            this.currentGeoPoint.setId(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_ID));
+            this.currentGeoPoint.setName(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_TITLE));
+            this.currentGeoPoint.setLink(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_LINK));
             final Date dateTime = IsoDateTimeParser.parse(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_TIME));
             if (dateTime != null) {
-                this.current.setTimeOfMeasurement(dateTime);
+                this.currentGeoPoint.setTimeOfMeasurement(dateTime);
             }
-        } else if ((this.current != null) && (name.equals(XmlDefinitions.GpxDef_11.LINK) || name.equals(XmlDefinitions.GpxDef_10.URL))) {
-            this.current.setLink(attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LINK));
+        } else if ((this.currentGeoPoint != null) && (name.equals(XmlDefinitions.GpxDef_11.LINK) || name.equals(XmlDefinitions.GpxDef_10.URL))) {
+            this.currentGeoPoint.setLink(attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LINK));
         }
-		if (this.current != null) {
+		if (this.currentGeoPoint != null) {
 			currentXmlElementBufer.setLength(0);
 		}
     }
@@ -264,42 +276,65 @@ public class GpxReaderBase extends DefaultHandler {
     public void endElement(String uri, String localName, String qName)
             throws SAXException {
         String name = getElementName(localName, qName);
-        logger.debug("endElement {} {}", localName, qName);
-        if (name.equals(XmlDefinitions.GpxDef_11.TRKPT) || name.equals(XmlDefinitions.GpxDef_10.WPT) || name.equals(XmlDefinitions.KmlDef_22.PLACEMARK) || name.equals(GeoUriDef.XML_ELEMENT_POI) || name.equals(XmlDefinitions.WikimediaDef.PAGE)) {
-            GeoUri.inferMissing(this.current, this.current.getDescription());
-            this.onGotNewWaypoint.onGeoInfo(this.current);
-            this.current = null;
-        } else if (this.current != null) {
+        String currentXmlElementContent = currentXmlElementBufer.toString();
+
+        logger.debug("endElement {} {} {}", localName, qName, currentXmlElementContent);
+        if (name.equals(XmlDefinitions.GpxDef_11.TRKPT)
+                || name.equals(XmlDefinitions.GpxDef_10.WPT)
+                || name.equals(XmlDefinitions.KmlDef_22.PLACEMARK)
+                || name.equals(GeoUriDef.XML_ELEMENT_POI)
+                || name.equals(XmlDefinitions.WikimediaDef.PAGE)) {
+            // end of new geo point
+            GeoUri.inferMissing(this.currentGeoPoint, this.currentGeoPoint.getDescription());
+            this.onGotNewWaypoint.onGeoInfo(this.currentGeoPoint);
+            this.currentGeoPoint = null;
+        } else if (name.equals(XmlDefinitions.KmlDef_22.ICON_DEFINITION)) {
+            // now outside of kml icon definition
+            currentIconDefinitionId = null;
+        } else if (currentIconDefinitionId != null && (name.equals(XmlDefinitions.KmlDef_22.ICON_DEFINITION_URL))) {
+                // // icon url inside kml icon definition
+            id2Symbol.put("#" + currentIconDefinitionId, currentXmlElementContent.trim() );
+        } else if (this.currentGeoPoint != null) {
             if (name.equals(XmlDefinitions.GpxDef_11.NAME)) {
-                this.current.setName(currentXmlElementBufer.toString());
+                this.currentGeoPoint.setName(currentXmlElementContent);
             } else if (name.equals(XmlDefinitions.GpxDef_11.DESC) || name.equals(XmlDefinitions.KmlDef_22.DESCRIPTION) || name.equals(XmlDefinitions.WikimediaDef.DESCRIPTION)) {
-                this.current.setDescription(currentXmlElementBufer.toString().trim());
-            } else if ((null == this.current.getLink()) && (name.equals(XmlDefinitions.GpxDef_11.LINK) || name.equals(XmlDefinitions.GpxDef_10.URL))) {
-                this.current.setLink(currentXmlElementBufer.toString());
+                this.currentGeoPoint.setDescription(currentXmlElementContent.trim());
+            } else if ((null == this.currentGeoPoint.getLink()) && (name.equals(XmlDefinitions.GpxDef_11.LINK) || name.equals(XmlDefinitions.GpxDef_10.URL))) {
+                this.currentGeoPoint.setLink(currentXmlElementContent);
             } else if (name.equals(XmlDefinitions.GpxDef_11.IMAGE)) {
-                this.current.setSymbol(currentXmlElementBufer.toString());
+                this.currentGeoPoint.setSymbol(currentXmlElementContent);
+            } else if (name.equals(XmlDefinitions.KmlDef_22.ICON_REFERENCE_ID)) {
+                // kml icon reference
+                String symbol = id2Symbol.get(currentXmlElementContent);
+                if (symbol == null && !currentXmlElementContent.startsWith("#")) {
+                    // no predefined symbol found: assume the referencce is the symbol
+                    symbol = currentXmlElementContent;
+                }
+                if (symbol != null) {
+                    this.currentGeoPoint.setSymbol(symbol);
+                }
             } else if (name.equals(GeoUriDef.ID)) {
-                this.current.setId(currentXmlElementBufer.toString());
+                this.currentGeoPoint.setId(currentXmlElementContent);
             } else if (name.equals(XmlDefinitions.GpxDef_11.TIME) || name.equals(XmlDefinitions.KmlDef_22.TIMESTAMP_WHEN) || name.equals(XmlDefinitions.KmlDef_22.TIMESPAN_BEGIN)) {
-                final Date dateTime = IsoDateTimeParser.parse(currentXmlElementBufer.toString());
+                final Date dateTime = IsoDateTimeParser.parse(currentXmlElementContent);
                 if (dateTime != null) {
-                    this.current.setTimeOfMeasurement(dateTime);
+                    this.currentGeoPoint.setTimeOfMeasurement(dateTime);
                 } else {
                     saxError("/gpx//time or /kml//when or /kml//begin: invalid time "
-                            + name +"=" + currentXmlElementBufer.toString());
+                            + name +"=" + currentXmlElementContent);
                 }
 
-            } else if ((name.equals(XmlDefinitions.KmlDef_22.COORDINATES) || name.equals(XmlDefinitions.KmlDef_22.COORDINATES2)) && currentXmlElementBufer.length() > 0) {
+            } else if ((name.equals(XmlDefinitions.KmlDef_22.COORDINATES) || name.equals(XmlDefinitions.KmlDef_22.COORDINATES2)) && currentXmlElementContent.length() > 0) {
                 // <coordinates>lon,lat,height blank lon,lat,height ...</coordinates>
                 try {
-                    String parts[] = currentXmlElementBufer.toString().split("[,\\s]");
+                    String parts[] = currentXmlElementContent.split("[,\\s]");
                     if ((parts != null) && (parts.length >= 2)) {
-                        this.current.setLatitude(Double.parseDouble(parts[1]));
-                        this.current.setLongitude(Double.parseDouble(parts[0]));
+                        this.currentGeoPoint.setLatitude(Double.parseDouble(parts[1]));
+                        this.currentGeoPoint.setLongitude(Double.parseDouble(parts[0]));
                     }
                 } catch (NumberFormatException e) {
                     saxError("/kml//Placemark/Point/coordinates>Expected: 'lon,lat,...' but got "
-                            + name +"=" + currentXmlElementBufer.toString());
+                            + name +"=" + currentXmlElementContent);
                 }
             }
         }
@@ -326,7 +361,7 @@ public class GpxReaderBase extends DefaultHandler {
     @Override
     public void characters(char[] chars, int start, int length)
             throws SAXException {
-		if (this.current != null) {
+		if (this.currentGeoPoint != null || currentIconDefinitionId != null) {
 			currentXmlElementBufer.append(chars, start, length);
 		}
     }

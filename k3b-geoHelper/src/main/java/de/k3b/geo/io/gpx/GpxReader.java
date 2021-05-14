@@ -106,7 +106,7 @@ public class GpxReader<T extends IGeoPointInfo> extends GpxReaderBase implements
         if (mReuse != null) {
             track.add((T) mReuse.clone());
         } else {
-            track.add((T) this.current);
+            track.add((T) this.currentGeoPoint);
         }
         return true;
     }

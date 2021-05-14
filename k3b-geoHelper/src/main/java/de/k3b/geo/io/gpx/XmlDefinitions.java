@@ -34,6 +34,12 @@ public class XmlDefinitions {
         public static final String COORDINATES2 = "coord";
         public static final String TIMESTAMP_WHEN = "when";
         public static final String TIMESPAN_BEGIN = "begin";
+
+        // kml-symbols: icons are defined seperatly from icon use
+        public static final String ICON_DEFINITION = "IconStyle";
+        public static final String ATTR_DEFINITION_ID = "id";
+        public static final String ICON_DEFINITION_URL = "href";
+        public static final String ICON_REFERENCE_ID = "styleUrl";
     }
 
     /** xml-elements for wikimedia (i.e. wikipedia or wikivoyage) */
