@@ -37,9 +37,23 @@ public abstract class DownloadSymbolsBaseService implements IGeoInfoConverter<IG
 
     protected final String userAgent;
     protected URLConnection lastConnection = null;
+    protected ITranslateSymbolUri translateSymbolUri = null;
 
+    /**
+     * @param userAgent a string identifying the calling app.
+     *                  i.e. "MyHelloWikipediaApp/1.0 (https://github.com/MyName/MyHelloWikipediaApp)"
+     *                  see https://meta.wikimedia.org/wiki/Special:MyLanguage/User-Agent_policy
+     */
     public DownloadSymbolsBaseService(String userAgent) {
         this.userAgent = userAgent;
+    }
+
+    /**
+     * @param translateSymbolUri Under Android you can use this to translate File-Uris to Android-Content-uris
+     */
+    public DownloadSymbolsBaseService translateSymbolUri(ITranslateSymbolUri translateSymbolUri) {
+        this.translateSymbolUri = translateSymbolUri;
+        return this;
     }
 
     @Override
@@ -55,7 +69,7 @@ public abstract class DownloadSymbolsBaseService implements IGeoInfoConverter<IG
         return points;
     }
 
-    public void downloadSymbols(List<IGeoPointInfo> points) throws IOException {
+    protected void downloadSymbols(List<IGeoPointInfo> points) throws IOException {
         for (IGeoPointInfo geo : points) {
             String icon = geo.getSymbol();
             if (icon != null && icon.contains(".") && icon.toLowerCase().startsWith("http")) {
@@ -102,7 +116,16 @@ public abstract class DownloadSymbolsBaseService implements IGeoInfoConverter<IG
         return lastConnection.getInputStream();
     }
 
-    protected abstract String createSymbolUri(String iconName);
+    protected String createSymbolUri(String iconName) {
+        if (translateSymbolUri != null) {
+            return translateSymbolUri.translate(iconName);
+        }
+        return iconName;
+    }
 
     protected abstract OutputStream createOutputStream(String iconName) throws IOException;
+
+    public interface ITranslateSymbolUri {
+        String translate(String symbolUri);
+    }
 }

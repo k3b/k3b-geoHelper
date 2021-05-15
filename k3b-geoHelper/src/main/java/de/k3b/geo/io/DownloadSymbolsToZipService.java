@@ -22,14 +22,21 @@ import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/** Dowloads Symbols in List<IGeoPointInfo> points and saves them to local Zip/kmz file */
 public class DownloadSymbolsToZipService extends DownloadSymbolsBaseService {
     private ZipOutputStream zipOutputStream = null;
     private String imageDirName = "";
 
+    /**
+     * @param userAgent a string identifying the calling app.
+     *                  i.e. "MyHelloWikipediaApp/1.0 (https://github.com/MyName/MyHelloWikipediaApp)"
+     *                  see https://meta.wikimedia.org/wiki/Special:MyLanguage/User-Agent_policy
+     */
     public DownloadSymbolsToZipService(String userAgent) {
         super(userAgent);
     }
 
+    /** define tze zip file where the symbols go to */
     public DownloadSymbolsToZipService zipOutputStream(ZipOutputStream zipOutputStream, String imageDirName) {
         this.zipOutputStream = zipOutputStream;
 
@@ -43,7 +50,7 @@ public class DownloadSymbolsToZipService extends DownloadSymbolsBaseService {
 
     @Override
     protected String createSymbolUri(String iconName) {
-        return this.imageDirName + iconName;
+        return super.createSymbolUri(this.imageDirName + iconName);
     }
 
     @Override

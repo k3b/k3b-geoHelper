@@ -22,21 +22,31 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/** Dowloads Symbols in List<IGeoPointInfo> points and saves them to local file */
 public class DownloadSymbolsToDirService extends DownloadSymbolsBaseService {
     private File dir = null;
 
+    /**
+     * @param userAgent a string identifying the calling app.
+     *                  i.e. "MyHelloWikipediaApp/1.0 (https://github.com/MyName/MyHelloWikipediaApp)"
+     *                  see https://meta.wikimedia.org/wiki/Special:MyLanguage/User-Agent_policy
+     */
     public DownloadSymbolsToDirService(String userAgent) {
         super(userAgent);
     }
 
+    /**
+     * define the dir where the symbols are stored to
+     */
     public DownloadSymbolsToDirService dir(File dir) {
         this.dir = dir;
         return this;
     }
 
+    /** symbol url is based on file directory */
     @Override
     protected String createSymbolUri(String iconName) {
-        return dir.getParentFile().getName() + "/" + iconName;
+        return super.createSymbolUri(dir.getParentFile().getName() + "/" + iconName);
     }
 
     @Override

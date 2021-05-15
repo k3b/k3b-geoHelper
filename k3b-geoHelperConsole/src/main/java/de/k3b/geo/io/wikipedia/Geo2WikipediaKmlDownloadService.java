@@ -19,6 +19,7 @@ package de.k3b.geo.io.wikipedia;
 
 import org.xml.sax.InputSource;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -27,23 +28,34 @@ import java.util.List;
 
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.gpx.GpxReader;
+import de.k3b.geo.io.kml.KmlDownloadService;
+import de.k3b.geo.io.DownloadSymbolsBaseService.ITranslateSymbolUri;
 
-public class DownloadService {
+/**
+ * Translates geo / gps location to local kml/kmz file with nearby wikipedia articles.
+ */
+public class Geo2WikipediaKmlDownloadService extends KmlDownloadService {
     private static final int THUMBSIZE = 50;
 
     private final String serviceName;
-    private final String userAgent;
 
-    public DownloadService(String serviceName, String userAgent) {
+    /**
+     * @param serviceName where the data comes from. i.e.  "en.wikipedia.org" or "de.wikivoyage.org"
+     * @param userAgent a string identifying the calling app.
+     *                  i.e. "MyHelloWikipediaApp/1.0 (https://github.com/MyName/MyHelloWikipediaApp)"
+     *                  see https://meta.wikimedia.org/wiki/Special:MyLanguage/User-Agent_policy
+     * @param translateSymbolUri Under Android you can use this to translate File-Uris to Android-Content-uris
+     */
+    public Geo2WikipediaKmlDownloadService(String serviceName, String userAgent, ITranslateSymbolUri translateSymbolUri) {
+        super(userAgent, translateSymbolUri);
         this.serviceName = serviceName;
-        this.userAgent = userAgent;
     }
 
-    public InputStream getInputStream(String urlString) throws IOException {
+    private InputStream getInputStream(String urlString) throws IOException {
         return getInputStream(new URL(urlString));
     }
 
-    public InputStream getInputStream(URL url) throws IOException {
+    private InputStream getInputStream(URL url) throws IOException {
         URLConnection hc = url.openConnection();
 
         // see https://meta.wikimedia.org/wiki/Special:MyLanguage/User-Agent_policy
@@ -52,10 +64,10 @@ public class DownloadService {
         return hc.getInputStream();
     }
 
-    public List<IGeoPointInfo> getGeoPointInfos(String lat, String lon) throws IOException {
+    private List<IGeoPointInfo> getGeoPointInfos(String lat, String lon) throws IOException {
         int radius = 10000;
         int maxcount = 5;
-        String urlString = this.getUrlString(lat, lon, radius, maxcount);
+        String urlString = this.getQueryGeoUrlString(lat, lon, radius, maxcount);
         InputStream inputStream = this.getInputStream(urlString);
         GpxReader<IGeoPointInfo> parser = new GpxReader<>();
 
@@ -63,7 +75,14 @@ public class DownloadService {
         return points;
     }
 
-    public String getUrlString(String lat, String lon, int radius, int maxcount) {
+    public List<IGeoPointInfo> saveAs(String lat, String lon, File out) throws IOException {
+        List<IGeoPointInfo> points = getGeoPointInfos(lat, lon);
+        saveAs(points, out);
+        return points;
+    }
+
+    /** api creates url that encodes what we want to get from wikipedia  */
+    private String getQueryGeoUrlString(String lat, String lon, int radius, int maxcount) {
         // see https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page
         String urlString = "https://" +
                 serviceName +

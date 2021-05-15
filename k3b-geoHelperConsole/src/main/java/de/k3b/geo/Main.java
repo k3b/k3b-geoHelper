@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2021 by k3b.
+ * Copyright (c) 2021 by k3b.
  *
  * This file is part of k3b-geoHelper library.
  *
@@ -17,22 +17,16 @@
  */
 package de.k3b.geo;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
 import java.util.List;
-import java.util.zip.ZipOutputStream;
 
 import de.k3b.geo.api.IGeoPointInfo;
-import de.k3b.geo.io.DownloadSymbolsToDirService;
-import de.k3b.geo.io.DownloadSymbolsToZipService;
-import de.k3b.geo.io.kml.KmlFormatter;
-import de.k3b.geo.io.wikipedia.DownloadService;
+import de.k3b.geo.io.wikipedia.Geo2WikipediaKmlDownloadService;
 
+/** tiny j2se console program to test the lib on a pc without Android */
 public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
@@ -40,41 +34,22 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        DownloadService service = new DownloadService("en.wikipedia.org", USER_AGENT);
+        Geo2WikipediaKmlDownloadService service = new Geo2WikipediaKmlDownloadService("en.wikipedia.org", USER_AGENT, null);
 
         String lat = "28.12722";
         String lon = "-15.43139";
 
-        List<IGeoPointInfo> points = service.getGeoPointInfos(lat, lon);
-
+        List<IGeoPointInfo> points = null;
         File outFile = null;
-        if (false) {
-            outFile = new File("./test/testgeo.kml").getAbsoluteFile();
-            DownloadSymbolsToDirService downloadSymbolsToDirService = new DownloadSymbolsToDirService(USER_AGENT);
-            String baseName = FilenameUtils.getBaseName(outFile.getPath());
-            File dir = new File(outFile.getParentFile(), baseName);
-            dir.mkdirs();
 
-            points = downloadSymbolsToDirService.dir(dir).convert(points);
-            KmlFormatter.export(points, new PrintWriter(new FileOutputStream(outFile)));
-        } else {
-            outFile = new File("./testgeo.kml.zip").getAbsoluteFile();
-
-            DownloadSymbolsToZipService downloadSymbolsToZipService = new DownloadSymbolsToZipService(USER_AGENT);
-            ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(outFile));
-
-            points = downloadSymbolsToZipService.zipOutputStream(zip, "symbols").convert(points);
-
-            KmlFormatter.export(points, new PrintWriter(downloadSymbolsToZipService.createOutputStream("test.kml", null, 0)));
-            zip.close();
-        }
-
+        points = service.saveAs(lat, lon,outFile =  new File("./test2/test2geo.kml.zip"));
         for (IGeoPointInfo geo : points) {
             System.out.print(String.format("got lat=%f lon=%f\n", geo.getLatitude(),geo.getLongitude()));
         }
         LOGGER.info("Exported to " + outFile +
                 " with " + points.size() +
                 " elements");
+
     }
 
 }
