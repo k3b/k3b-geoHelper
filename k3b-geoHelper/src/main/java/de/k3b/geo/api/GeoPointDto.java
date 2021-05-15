@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 by k3b.
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of k3b-geoHelper library.
  *
@@ -79,8 +79,7 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
                        String name, String link, String symbol,
                        String id,
                        String description, int zoomMin, int zoomMax, Date timeOfMeasurement) {
-        this.latitude = latitude;
-        this.longitude = longitude;
+        setLatLon(latitude, longitude);
         this.name = name;
         this.link = link;
         this.symbol = symbol;
@@ -91,10 +90,15 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         this.timeOfMeasurement = timeOfMeasurement;
     }
 
+    public GeoPointDto setLatLon(double latitude, double longitude) {
+        setLatitude(latitude);
+        setLongitude(longitude);
+        return this;
+    }
+
     public GeoPointDto(IGeoPointInfo src) {
         if (src != null) {
-            this.latitude = src.getLatitude();
-            this.longitude = src.getLongitude();
+            setLatLon(src.getLatitude(), src.getLongitude());
             this.name = src.getName();
             this.link = src.getLink();
             this.symbol = src.getSymbol();
@@ -277,8 +281,7 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
      * @return this to to allow chains
      */
     public GeoPointDto clear() {
-        this.latitude = GeoPointDto.NO_LAT_LON;
-        this.longitude = GeoPointDto.NO_LAT_LON;
+        setLatLon(GeoPointDto.NO_LAT_LON, GeoPointDto.NO_LAT_LON);
         this.name = null;
         this.link = null;
         this.symbol = null;

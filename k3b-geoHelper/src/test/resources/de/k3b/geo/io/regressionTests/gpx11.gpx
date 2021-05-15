@@ -1,22 +1,27 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<gpx
-		version="1.1"
-		xmlns="http://www.topografix.com/GPX/1/1"
-		xmlns:topografix="http://www.topografix.com/GPX/Private/TopoGrafix/0/1"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xmlns:expectedTestResult="uri://some/url"
-		xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.topografix.com/GPX/Private/TopoGrafix/0/1 http://www.topografix.com/GPX/Private/TopoGrafix/0/1/topografix.xsd">
+<?xml version='1.0' encoding='UTF-8'?>
+<gpx	version='1.1'
+		xmlns='http://www.topografix.com/GPX/1/1'
+		xmlns:topografix='http://www.topografix.com/GPX/Private/TopoGrafix/0/1'
+		xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+		xmlns:expectedTestResult='uri:https://github.com/k3b/k3b-geoHelper/'
+		xmlns:k3b='uri:https://github.com/k3b/k3b-geoHelper/'
+		xsi:schemaLocation='http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.topografix.com/GPX/Private/TopoGrafix/0/1 http://www.topografix.com/GPX/Private/TopoGrafix/0/1/topografix.xsd'>
 
 	<!-- this is valid gpx-1.1 content -->
 	<trk>
 		<trkseg>
 			<trkpt lat="52" lon="9">
-              <expectedTestResult:id>geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z</expectedTestResult:id>
 				<name>theName</name>
 				<desc>theDesc</desc>
-				<time>2015-02-10T08:04:45.000Z</time>
 				<link href='theLink' />
-				<sym>theIconUrl</sym>
+				<extensions>
+				    <!-- Allow any elements from a namespace other than this schema's namespace -->
+                    <expectedTestResult:id>geo:52,9?q=(theName)&amp;z=5&amp;z2=7&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z</expectedTestResult:id>
+                    <k3b:time>2015-02-10T08:04:45.000Z</k3b:time>
+                    <k3b:sym>theIconUrl</k3b:sym>
+                    <k3b:z>5</k3b:z>
+                    <k3b:z2>7</k3b:z2>
+				</extensions>
 			</trkpt>
 		</trkseg>
 	</trk>

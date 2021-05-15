@@ -30,6 +30,8 @@ public class XmlDefinitions {
     public static class KmlDef_22 {
         public static final String PLACEMARK = "Placemark";
         public static final String DESCRIPTION = "description";
+
+        // note KmlDef_22.COORDINATES use lon,lat reverse order
         public static final String COORDINATES = "coordinates";
         public static final String COORDINATES2 = "coord";
         public static final String TIMESTAMP_WHEN = "when";

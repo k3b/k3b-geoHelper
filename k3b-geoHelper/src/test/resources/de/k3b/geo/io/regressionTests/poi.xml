@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<someRoot 	xmlns:expectedTestResult="uri://some/url" >
+<someRoot xmlns="uri:https://github.com/k3b/k3b-geoHelper/"
+          xmlns:expectedTestResult="uri:https://github.com/k3b/k3b-geoHelper/" >
     <!-- "poi" is de.k3b.geo internal format for "points of interest"
             LocationMapViewer can find this type of content in files *.poi (or *.gpx, *.kml)
         -->

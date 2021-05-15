@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<gpxAlike 	xmlns:expectedTestResult="uri://some/url">
+<gpxAlike 	xmlns:expectedTestResult="uri:https://github.com/k3b/k3b-geoHelper/">
 
     <!-- similar to gpx v1.1 file; non-standard understood by parser: -->
     <!-- <gpx>, <trk> and <trkseg> are not neccessary. <trkpt> can be anywhere in xml (with any namespace) -->

@@ -1,4 +1,4 @@
-<api batchcomplete="" xmlns:expectedTestResult="uri://some/url">
+<api batchcomplete="" xmlns:expectedTestResult="uri:https://github.com/k3b/k3b-geoHelper/">
     <!-- read via wikimedia api from
             https://en.wikipedia.org/w/api.php?action=query&format=xml&prop=coordinates|info|pageimages|extracts&inprop=url&piprop=thumbnail&generator=geosearch&ggscoord=28.12722|-15.43139&ggsradius=10000&ggslimit=5&pilimit=5&exsentences=2&explaintext&exintro
 

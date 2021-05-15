@@ -2,7 +2,7 @@
 <gpx version="1.0" creator="c:geo - http://www.cgeo.org/"
 	xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd http://www.groundspeak.com/cache/1/0 http://www.groundspeak.com/cache/1/0/1/cache.xsd"
 	xmlns="http://www.topografix.com/GPX/1/0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:expectedTestResult="uri://some/url"
+	xmlns:expectedTestResult="uri:https://github.com/k3b/k3b-geoHelper/"
 	xmlns:groundspeak="http://www.groundspeak.com/cache/1/0">
 
 	<!-- this is nearly valid gpx-1.0 content

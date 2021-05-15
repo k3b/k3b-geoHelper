@@ -329,6 +329,7 @@ public class GpxReaderBase extends DefaultHandler {
                 try {
                     String parts[] = currentXmlElementContent.split("[,\\s]");
                     if ((parts != null) && (parts.length >= 2)) {
+                        // note KmlDef_22.COORDINATES use lon,lat reverse order
                         this.currentGeoPoint.setLatitude(Double.parseDouble(parts[1]));
                         this.currentGeoPoint.setLongitude(Double.parseDouble(parts[0]));
                     }
@@ -336,7 +337,12 @@ public class GpxReaderBase extends DefaultHandler {
                     saxError("/kml//Placemark/Point/coordinates>Expected: 'lon,lat,...' but got "
                             + name +"=" + currentXmlElementContent);
                 }
+            } else if (name.equals(GeoUriDef.ZOOM) && currentGeoPoint.getZoomMin() <= 0  && currentXmlElementContent.length() > 0) {
+                currentGeoPoint.setZoomMin(Integer.parseInt(currentXmlElementContent));
+            } else if (name.equals(GeoUriDef.ZOOM_MAX) && currentGeoPoint.getZoomMax() <= 0  && currentXmlElementContent.length() > 0) {
+                currentGeoPoint.setZoomMax(Integer.parseInt(currentXmlElementContent));
             }
+
         }
     }
 

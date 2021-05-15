@@ -27,11 +27,12 @@ jacocoTestReport {
 }
 
 dependencies {
+    implementation 'org.slf4j:slf4j-api:1.7.7@jar'
+    implementation 'commons-io:commons-io:2.6'
+
     // compile fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.slf4j:slf4j-simple:1.7.7@jar'
-    implementation 'org.slf4j:slf4j-api:1.7.7@jar'
-
     // https://github.com/Pragmatists/JUnitParams
     testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<someRoot 	xmlns:expectedTestResult="uri://some/url" >
+<someRoot 	xmlns:expectedTestResult="uri:https://github.com/k3b/k3b-geoHelper/" >
     <!--
 		k3b-geoHelper/k3b-geoHelper/src/test/resources/de/k3b/geo/io/regressionTests/https-mapservice-urls.xml
 		This file conatain regression test data for http(s) urls that can be interpreted as
