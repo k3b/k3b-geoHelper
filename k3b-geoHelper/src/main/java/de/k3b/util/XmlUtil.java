@@ -20,7 +20,7 @@ package de.k3b.util;
 public class XmlUtil {
     private XmlUtil(){}
 
-    public static String escapeXML(String input) {
+    public static String escapeXMLElement(String input) {
         if (input == null) {
             return null;
         }
@@ -28,8 +28,18 @@ public class XmlUtil {
         return input
                 .replace("&","&amp;")
                 .replace("<", "&lt;")
-                .replace( ">","&gt;")
-                .replace("\"", "&quot;")
-                .replace("\'","&apos;");
+                .replace( ">","&gt;");
     }
+    /** q&d: replace chars that are illegal for xml attributes */
+    public static String escapeXmlAttribute(String value) {
+        if (value != null) {
+            return XmlUtil.escapeXMLElement(value)
+                    .replace('\n', ' ')
+                    .replace('\r', ' ')
+                    .replace("\"", "&quot;")
+                    .replace("\'","&apos;").replace("  ", " ");
+        }
+        return null;
+    }
+
 }

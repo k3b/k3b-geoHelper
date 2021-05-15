@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 by k3b.
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of k3b-geoHelper library.
  *
@@ -36,20 +36,20 @@ import de.k3b.geo.api.IGeoPointInfo;
  */
 public class GpxReaderTest {
     /** format for gpx v1.0 */
-    private String xmlMinimal_gpx_v10 = "<wpt lat='53.1099972' lon='8.7178206'><time>2014-12-19T21:13:21Z</time><name>262:3:562:54989</name><desc>type: cell, accuracy: 1640, confidence: 75</desc><url>geo:0,0?q=12.34,56.78(name)</url></wpt>\n";
+    private String xmlMinimal_gpx_v10 = "<wpt lat='53.1099972' lon='8.7178206'><name>262:3:562:54989</name><desc>type: cell, accuracy: 1640, confidence: 75</desc><url>geo:0,0?q=12.34,56.78(name)</url></wpt>\n";
 
     /** format for gpx v1.1 */
-    private String xmlMinimal_gpx_v11 = "<trkpt lat='53.1099972' lon='8.7178206'><time>2014-12-19T21:13:21Z</time><name>262:3:562:54989</name><desc>type: cell, accuracy: 1640, confidence: 75</desc><link href='geo:0,0?q=12.34,56.78(name)' /></trkpt>\n";
+    private String xmlMinimal_gpx_v11 = "<trkpt lat='53.1099972' lon='8.7178206'><name>262:3:562:54989</name><desc>type: cell, accuracy: 1640, confidence: 75</desc><link href='geo:0,0?q=12.34,56.78(name)' /></trkpt>\n";
     private String xmlFull_gpx_v11 = "<gpx xmlns='http://www.topografix.com/GPX/1/1' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' version='1.1' xsi:schemaLocation='http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd' creator='Location Cache Map'>"+
             "<trk><trkseg>" + xmlMinimal_gpx_v11 + "</trkseg></trk></gpx>";
 
     /** format for gpx v1.1 using xml namespace g: */
-    private String xmlMinimal_gpx_v11_withNS = "<g:trkpt lat='53.1099972' lon='8.7178206'><g:time>2014-12-19T21:13:21Z</g:time><g:name>262:3:562:54989</g:name><g:desc>type: cell, accuracy: 1640, confidence: 75</g:desc><g:link>geo:0,0?q=12.34,56.78(name)</g:link></g:trkpt>\n";
+    private String xmlMinimal_gpx_v11_withNS = "<g:trkpt lat='53.1099972' lon='8.7178206'><g:name>262:3:562:54989</g:name><g:desc>type: cell, accuracy: 1640, confidence: 75</g:desc><g:link>geo:0,0?q=12.34,56.78(name)</g:link></g:trkpt>\n";
     private String xmlFull_gpx_v11withNS = "<something xmlns:g='http://www.topografix.com/GPX/1/1' ><g:gpx >"+
             "<g:trk><g:trkseg>" + xmlMinimal_gpx_v11_withNS + "</g:trkseg></g:trk></g:gpx></something>";
 
     /** illegal kml format but containing the essential fields understood by the parser */
-    private String xmlMinimal_kml = "<Placemark><name>262:3:562:54989</name><description>type: cell, accuracy: 1640, confidence: 75</description><Point><coordinates>8.7178206,53.1099972,0</coordinates></Point><when>2014-12-19T21:13:21Z</when></Placemark>\n";
+    private String xmlMinimal_kml = "<Placemark><name>262:3:562:54989</name><description>type: cell, accuracy: 1640, confidence: 75</description><Point><coordinates>8.7178206,53.1099972,0</coordinates></Point></Placemark>\n";
 
     @Test
     public void parseFormatGpx11ShortTest() throws IOException {

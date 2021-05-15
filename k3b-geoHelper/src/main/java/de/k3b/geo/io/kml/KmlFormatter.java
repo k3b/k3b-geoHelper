@@ -78,8 +78,8 @@ public class KmlFormatter implements Closeable {
         if (symbol != null && symbol.length() > 0) {
             writeSymbolHeaderIfNecessary();
 
-            String baseName = XmlUtil.escapeXML(FilenameUtils.getBaseName(symbol));
-            pr(IDENT3 + "<IconStyle id='" + baseName +"'><Icon><href>" + XmlUtil.escapeXML(symbol) +
+            String baseName = XmlUtil.escapeXmlAttribute(FilenameUtils.getBaseName(symbol));
+            pr(IDENT3 + "<IconStyle id='" + baseName +"'><Icon><href>" + XmlUtil.escapeXMLElement(symbol) +
                     "</href></Icon></IconStyle>");
         }
     }
@@ -98,11 +98,11 @@ public class KmlFormatter implements Closeable {
 
             pr("k3b:" + GeoUriDef.ID, geoInfo.getId());
             if (geoInfo.getSymbol() != null) {
-                pr("styleUrl", "#" + XmlUtil.escapeXML(FilenameUtils.getBaseName(geoInfo.getSymbol())));
+                pr("styleUrl", "#" + XmlUtil.escapeXmlAttribute(FilenameUtils.getBaseName(geoInfo.getSymbol())));
             }
 
             if (geoInfo.getLink() != null) {
-                pr(IDENT3 + "<atom:link href='" + XmlUtil.escapeXML(geoInfo.getLink()) +"' />");
+                pr(IDENT3 + "<atom:link href='" + XmlUtil.escapeXmlAttribute(geoInfo.getLink()) +"' />");
             }
 
             boolean hasGeo = !GeoPointDto.isEmpty(geoInfo);
@@ -114,7 +114,7 @@ public class KmlFormatter implements Closeable {
                             geoInfo.getLongitude(), geoInfo.getLatitude()));
                 }
                 if (geoInfo.getTimeOfMeasurement() != null) {
-                    pr(IDENT3 + "\t<when>" + XmlUtil.escapeXML(GeoFormatter.formatDate(geoInfo.getTimeOfMeasurement())) + "</when>");
+                    pr(IDENT3 + "\t<when>" + XmlUtil.escapeXMLElement(GeoFormatter.formatDate(geoInfo.getTimeOfMeasurement())) + "</when>");
                 }
                 pr(IDENT3 + "</Point>");
             }
@@ -147,12 +147,9 @@ public class KmlFormatter implements Closeable {
     private void pr(String tag, String value) {
         if (notEmpty(value)) {
             pr(IDENT3 +
-                    "<" +
-                    tag +
-                    ">" + XmlUtil.escapeXML(value) +
-                    "</" +
-                    tag +
-                    ">");
+                    "<" + tag +">" +
+                    XmlUtil.escapeXMLElement(value) +
+                    "</" + tag +">");
         }
     }
 

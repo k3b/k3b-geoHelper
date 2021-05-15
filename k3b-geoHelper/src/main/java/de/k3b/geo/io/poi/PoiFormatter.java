@@ -17,8 +17,6 @@
  */
 package de.k3b.geo.io.poi;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,7 +29,6 @@ import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.api.ILocation;
 import de.k3b.geo.io.GeoFormatter;
 import de.k3b.geo.io.GeoUriDef;
-import de.k3b.geo.io.kml.KmlFormatter;
 import de.k3b.util.XmlUtil;
 
 /**
@@ -56,7 +53,6 @@ import de.k3b.util.XmlUtil;
  */
 
 public class PoiFormatter {
-    private static final String TEMP_AMP = "##!!##!!";
     public static final DateFormat TIME_FORMAT
             = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
@@ -137,19 +133,7 @@ public class PoiFormatter {
 
     private static void addAttr(StringBuilder result, String name, String value, boolean condition) {
         if (condition) {
-            result.append(" ").append(name).append("='").append(XmlUtil.escapeXML(value)).append("'");
+            result.append(" ").append(name).append("='").append(XmlUtil.escapeXmlAttribute(value)).append("'");
         }
     }
-
-    /** q&d: replace chars that are illegal for xml attributes */
-    private static String escapeAttribute(String value) {
-        if (value != null) {
-            return XmlUtil.escapeXML(value
-                    .replace('\n', ' ')
-                    .replace('\r', ' ')
-                    .replace('\'', '"')).replace("  ", " ");
-        }
-        return null;
-    }
-
 }
