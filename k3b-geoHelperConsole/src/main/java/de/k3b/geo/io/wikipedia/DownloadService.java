@@ -4,15 +4,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.xml.sax.InputSource;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
-import de.k3b.geo.api.GeoPointDto;
 import de.k3b.geo.api.IGeoPointInfo;
+import de.k3b.geo.io.DownloadSymbolsToDirService;
 import de.k3b.geo.io.gpx.GpxReader;
 
 public class DownloadService {
@@ -20,10 +19,13 @@ public class DownloadService {
 
     private final String serviceName;
     private final String userAgent;
+    private final DownloadSymbolsToDirService downloadSymbolsService;
 
     public DownloadService(String serviceName, String userAgent) {
         this.serviceName = serviceName;
         this.userAgent = userAgent;
+        downloadSymbolsService = new DownloadSymbolsToDirService(userAgent);
+
     }
 
     public InputStream getInputStream(String urlString) throws IOException {
@@ -37,6 +39,28 @@ public class DownloadService {
         hc.setRequestProperty("User-Agent",userAgent);
 
         return hc.getInputStream();
+    }
+
+    public List<IGeoPointInfo> getGeoPointInfos(String lat, String lon, File file) throws IOException {
+        List<IGeoPointInfo> points = getGeoPointInfos(lat, lon);
+        String baseName = FilenameUtils.getBaseName(file.getPath());
+        File dir = new File(file.getParentFile(), baseName);
+        dir.mkdirs();
+
+        points = downloadSymbolsService.dir(dir).convert(points);
+
+        return points;
+    }
+
+    public List<IGeoPointInfo> getGeoPointInfos(String lat, String lon) throws IOException {
+        int radius = 10000;
+        int maxcount = 5;
+        String urlString = this.getUrlString(lat, lon, radius, maxcount);
+        InputStream inputStream = this.getInputStream(urlString);
+        GpxReader<IGeoPointInfo> parser = new GpxReader<>();
+
+        List<IGeoPointInfo> points = parser.getTracks(new InputSource(inputStream));
+        return points;
     }
 
     public String getUrlString(String lat, String lon, int radius, int maxcount) {
@@ -62,51 +86,10 @@ public class DownloadService {
                 "&pithumbsize=" +
                 THUMBSIZE +
                 "&pilimit=" +
-                 maxcount+
+                maxcount+
 
                 // prop extracts: 2Sentenses in non-html before TOC
                 "&exsentences=2&explaintext&exintro";
         return urlString;
-    }
-
-    public List<IGeoPointInfo> getGeoPointInfos(String lat, String lon, File file) throws IOException {
-        List<IGeoPointInfo> points = getiGeoPointInfos(lat, lon);
-        String baseName = FilenameUtils.getBaseName(file.getPath());
-        File dir = new File(file.getParentFile(), baseName);
-        dir.mkdirs();
-        for (IGeoPointInfo geo : points) {
-            String icon = geo.getSymbol();
-            if (icon != null && icon.contains(".") && icon.toLowerCase().startsWith("http")) {
-                ((GeoPointDto) geo).setSymbol(saveIcon(dir, icon, geo.getName()));
-            }
-        }
-
-        return points;
-    }
-
-    public List<IGeoPointInfo> getiGeoPointInfos(String lat, String lon) throws IOException {
-        int radius = 10000;
-        int maxcount = 5;
-        String urlString = this.getUrlString(lat, lon, radius, maxcount);
-        InputStream inputStream = this.getInputStream(urlString);
-        GpxReader<IGeoPointInfo> parser = new GpxReader<IGeoPointInfo>();
-        List<IGeoPointInfo> points = parser.getTracks(new InputSource(inputStream));
-        return points;
-    }
-
-    protected String saveIcon(File dir, String icon, String name) throws IOException {
-        String iconName = FilenameUtils.getName(icon);
-        try (InputStream inputStream = getInputStream(icon);
-             FileOutputStream outputStream = new FileOutputStream(new File(dir, iconName))) {
-
-            byte[] buffer = new byte[1024];
-            for (int read = inputStream.read(buffer); read > -1; read = inputStream
-                    .read(buffer)) {
-                outputStream.write(buffer, 0, read);
-            }
-            return dir.getParentFile().getName() + "/" + iconName;
-        } catch (Exception e) {
-            return icon;
-        }
     }
 }
