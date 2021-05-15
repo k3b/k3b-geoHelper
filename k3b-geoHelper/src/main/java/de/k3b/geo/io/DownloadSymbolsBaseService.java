@@ -1,12 +1,26 @@
+/*
+ * Copyright (c) 2021 by k3b.
+ *
+ * This file is part of k3b-geoHelper library.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.k3b.geo.io;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,6 +36,7 @@ public abstract class DownloadSymbolsBaseService implements IGeoInfoConverter<IG
     private static final Logger LOGGER = LoggerFactory.getLogger(DownloadSymbolsBaseService.class);
 
     protected final String userAgent;
+    protected URLConnection lastConnection = null;
 
     public DownloadSymbolsBaseService(String userAgent) {
         this.userAgent = userAgent;
@@ -65,9 +80,13 @@ public abstract class DownloadSymbolsBaseService implements IGeoInfoConverter<IG
         } catch (Exception e) {
             return icon;
         } finally {
-            if (outputStream != null) outputStream.close();
+            if (outputStream != null) closeSymbolOutputStream(outputStream);
             if (inputStream != null) inputStream.close();
         }
+    }
+
+    protected void closeSymbolOutputStream(OutputStream outputStream) throws IOException {
+        outputStream.close();
     }
 
     public InputStream getInputStream(String urlString) throws IOException {
@@ -75,15 +94,15 @@ public abstract class DownloadSymbolsBaseService implements IGeoInfoConverter<IG
     }
 
     public InputStream getInputStream(URL url) throws IOException {
-        URLConnection hc = url.openConnection();
+        lastConnection = url.openConnection();
 
         // see https://meta.wikimedia.org/wiki/Special:MyLanguage/User-Agent_policy
-        hc.setRequestProperty("User-Agent",userAgent);
+        lastConnection.setRequestProperty("User-Agent",userAgent);
 
-        return hc.getInputStream();
+        return lastConnection.getInputStream();
     }
 
     protected abstract String createSymbolUri(String iconName);
 
-    protected abstract OutputStream createOutputStream(String iconName) throws FileNotFoundException;
+    protected abstract OutputStream createOutputStream(String iconName) throws IOException;
 }

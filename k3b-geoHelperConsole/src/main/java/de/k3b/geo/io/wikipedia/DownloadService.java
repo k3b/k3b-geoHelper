@@ -1,9 +1,24 @@
+/*
+ * Copyright (c) 2021 by k3b.
+ *
+ * This file is part of k3b-geoHelper library.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package de.k3b.geo.io.wikipedia;
 
-import org.apache.commons.io.FilenameUtils;
 import org.xml.sax.InputSource;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -11,7 +26,6 @@ import java.net.URLConnection;
 import java.util.List;
 
 import de.k3b.geo.api.IGeoPointInfo;
-import de.k3b.geo.io.DownloadSymbolsToDirService;
 import de.k3b.geo.io.gpx.GpxReader;
 
 public class DownloadService {
@@ -19,13 +33,10 @@ public class DownloadService {
 
     private final String serviceName;
     private final String userAgent;
-    private final DownloadSymbolsToDirService downloadSymbolsService;
 
     public DownloadService(String serviceName, String userAgent) {
         this.serviceName = serviceName;
         this.userAgent = userAgent;
-        downloadSymbolsService = new DownloadSymbolsToDirService(userAgent);
-
     }
 
     public InputStream getInputStream(String urlString) throws IOException {
@@ -39,17 +50,6 @@ public class DownloadService {
         hc.setRequestProperty("User-Agent",userAgent);
 
         return hc.getInputStream();
-    }
-
-    public List<IGeoPointInfo> getGeoPointInfos(String lat, String lon, File file) throws IOException {
-        List<IGeoPointInfo> points = getGeoPointInfos(lat, lon);
-        String baseName = FilenameUtils.getBaseName(file.getPath());
-        File dir = new File(file.getParentFile(), baseName);
-        dir.mkdirs();
-
-        points = downloadSymbolsService.dir(dir).convert(points);
-
-        return points;
     }
 
     public List<IGeoPointInfo> getGeoPointInfos(String lat, String lon) throws IOException {
