@@ -78,10 +78,14 @@ public class KmlFormatter implements Closeable {
         if (symbol != null && symbol.length() > 0) {
             writeSymbolHeaderIfNecessary();
 
-            String baseName = XmlUtil.escapeXmlAttribute(FilenameUtils.getBaseName(symbol));
+            String baseName = getSymbolname(symbol);
             pr(IDENT3 + "<IconStyle id='" + baseName +"'><Icon><href>" + XmlUtil.escapeXMLElement(symbol) +
                     "</href></Icon></IconStyle>");
         }
+    }
+
+    private String getSymbolname(String symbol) {
+        return XmlUtil.escapeXmlAttribute(FilenameUtils.getBaseName(symbol));
     }
 
     private void writeGeoInformation(IGeoPointInfo geoInfo) {
@@ -98,7 +102,7 @@ public class KmlFormatter implements Closeable {
 
             pr("k3b:" + GeoUriDef.ID, geoInfo.getId());
             if (geoInfo.getSymbol() != null) {
-                pr("styleUrl", "#" + XmlUtil.escapeXmlAttribute(FilenameUtils.getBaseName(geoInfo.getSymbol())));
+                pr("styleUrl", "#" + getSymbolname(geoInfo.getSymbol()));
             }
 
             if (geoInfo.getLink() != null) {
