@@ -68,6 +68,7 @@ public class KmlDownloadService {
             DownloadSymbolsToZipService downloadService = new DownloadSymbolsToZipService(userAgent);
             downloadService.translateSymbolUri(translateSymbolUri);
 
+            outFile.getParentFile().mkdirs();
             ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(outFile));
 
             points = downloadService.zipOutputStream(zip, "files").convert(points);

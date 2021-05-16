@@ -34,21 +34,25 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        Geo2WikipediaKmlDownloadService service = new Geo2WikipediaKmlDownloadService("en.wikipedia.org", USER_AGENT, null);
+        try {
+            Geo2WikipediaKmlDownloadService service = new Geo2WikipediaKmlDownloadService("en.wikipedia.org", USER_AGENT, null);
 
-        String lat = "28.12722";
-        String lon = "-15.43139";
+            String lat = "28.12722";
+            String lon = "-15.43139";
 
-        List<IGeoPointInfo> points = null;
-        File outFile = null;
+            List<IGeoPointInfo> points = null;
+            File outFile = null;
 
-        points = service.saveAs(lat, lon,outFile =  new File("./test2/test2geo.kml.zip"));
-        for (IGeoPointInfo geo : points) {
-            System.out.print(String.format("got lat=%f lon=%f\n", geo.getLatitude(),geo.getLongitude()));
+            points = service.saveAs(lat, lon, outFile = new File("./test2/test2geo.kml.zip"));
+            for (IGeoPointInfo geo : points) {
+                System.out.print(String.format("got lat=%f lon=%f\n", geo.getLatitude(), geo.getLongitude()));
+            }
+            LOGGER.info("Exported to " + outFile +
+                    " with " + points.size() +
+                    " elements");
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        LOGGER.info("Exported to " + outFile +
-                " with " + points.size() +
-                " elements");
 
     }
 
