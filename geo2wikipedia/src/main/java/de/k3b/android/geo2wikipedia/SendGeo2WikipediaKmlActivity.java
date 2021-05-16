@@ -24,14 +24,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
 import java.io.File;
@@ -46,51 +44,78 @@ import de.k3b.util.TempFileUtil;
 public class SendGeo2WikipediaKmlActivity extends Activity {
     private static final String TAG = "k3b.geo2wikipedia";
 
-    private static final int PERMISSION_CAMERA_REQUEST_CODE = 100;
-    static private final int ACTION_REQUEST_IMAGE_CAPTURE = 4;
-    private static final String STATE_RESULT_PHOTO_URI = "resultPhotoUri";
+    private static final int PERMISSION_REQUEST_ID_FILE_WRITE = 23;
+    private static final String PERMISSION_FILE_WRITE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-    private Uri resultPhotoUri = null;
+    private static final int PERMISSION_REQUEST_ID_INTERNET = 24;
+    private static final String PERMISSION_INTERNET = Manifest.permission.INTERNET;
+
+    private static final int RESULT_NO_PERMISSIONS = -22;
+
+    private Bundle lastSavedInstanceState = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState != null) {
-            this.resultPhotoUri = savedInstanceState.getParcelable(STATE_RESULT_PHOTO_URI);
-        }
+        checkPermissions(savedInstanceState);
+    }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M  && checkSelfPermission(Manifest.permission.CAMERA)
+    private void checkPermissions(Bundle savedInstanceState) {
+        if (ActivityCompat.checkSelfPermission(this, PERMISSION_INTERNET)
                 != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA},
-                    PERMISSION_CAMERA_REQUEST_CODE);
+            requestPermission(savedInstanceState, PERMISSION_INTERNET, PERMISSION_REQUEST_ID_INTERNET);
+            return;
+        }
+        if (ActivityCompat.checkSelfPermission(this, PERMISSION_FILE_WRITE)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermission(savedInstanceState, PERMISSION_FILE_WRITE, PERMISSION_REQUEST_ID_FILE_WRITE);
             return;
         }
 
-        onSendKml();
-
+        onSendKml(savedInstanceState);
     }
 
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    private void requestPermission(Bundle savedInstanceState, final String permission, final int requestCode) {
+        lastSavedInstanceState = savedInstanceState;
+        ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+    }
 
+    private boolean isGrantSuccess(int[] grantResults) {
+        return (grantResults != null)
+                && (grantResults.length > 0)
+                && (grantResults[0] == PackageManager.PERMISSION_GRANTED);
+    }
+
+    /**
+     * Callback received when a permissions request has been completed.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_ID_INTERNET) {
+            onRequestPermissionsResult(grantResults);
+            return;
+        }
+        if (requestCode == PERMISSION_REQUEST_ID_FILE_WRITE) {
+            onRequestPermissionsResult(grantResults);
+            return;
+        }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
-        if (requestCode == PERMISSION_CAMERA_REQUEST_CODE) {
-
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                onSendKml();
-            } else {
-                String message = "" + getText(R.string.permission_error);
-                Toast.makeText(this,message , Toast.LENGTH_LONG).show();
-                Log.e(TAG, message);
-                setResult(Activity.RESULT_CANCELED, null);
-                finish();
-            }
-
+    private void onRequestPermissionsResult(int[] grantResults) {
+        if (isGrantSuccess(grantResults)) {
+            checkPermissions(lastSavedInstanceState);
+        } else {
+            Toast.makeText(this, R.string.permission_error, Toast.LENGTH_LONG).show();
+            setResult(RESULT_NO_PERMISSIONS, null);
+            finish();
         }
     }
 
-    private void onSendKml() {
+    private void onSendKml(Bundle savedInstanceState) {
+        this.lastSavedInstanceState = null;
+        /* !!! TODO
         this.resultPhotoUri = createSharedUri();
         String action = getIntent().getAction();
 
@@ -105,30 +130,8 @@ public class SendGeo2WikipediaKmlActivity extends Activity {
 
         // start the image capture Intent
         startActivityForResult(intent, ACTION_REQUEST_IMAGE_CAPTURE);
-    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ACTION_REQUEST_IMAGE_CAPTURE && this.resultPhotoUri != null) {
-            if (resultCode == RESULT_OK) {
-                onResponsePhoto(this.resultPhotoUri);
-            } else {
-                getContentResolver().delete(this.resultPhotoUri, null, null);
-                this.resultPhotoUri = null;
-                setResult(Activity.RESULT_CANCELED, null);
-                finish();
-            }
-            return;
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void onResponsePhoto(Uri photo) {
-        Intent result = new Intent();
-        result.setData(photo);
-        result.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        setResult(Activity.RESULT_OK, result);
-        finish();
+         */
     }
 
     protected File getSharedDir() {
@@ -153,7 +156,7 @@ public class SendGeo2WikipediaKmlActivity extends Activity {
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putParcelable(STATE_RESULT_PHOTO_URI, this.resultPhotoUri);
+        // outState.putParcelable(STATE_RESULT_PHOTO_URI, this.resultPhotoUri);
     }
 
 
