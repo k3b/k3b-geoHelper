@@ -24,7 +24,7 @@ import java.io.File;
 import java.util.List;
 
 import de.k3b.geo.api.IGeoPointInfo;
-import de.k3b.geo.io.wikipedia.Geo2WikipediaKmlDownloadService;
+import de.k3b.geo.io.kml.Geo2WikipediaKmlDownloadService;
 
 /** tiny j2se console program to test the lib on a pc without Android */
 public class Main {

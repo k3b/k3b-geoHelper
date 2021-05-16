@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Geo to wikipedia article map</string>
+    <string name="permission_error">Missing permisions</string>
+    <string name="label_select_kml_viewer">Select kml viewer to open Wikipedia infos with</string>
+</resources>

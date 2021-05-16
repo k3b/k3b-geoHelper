@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.k3b.geo.io.wikipedia;
+package de.k3b.geo.io.kml;
 
 import org.xml.sax.InputSource;
 
@@ -27,9 +27,9 @@ import java.net.URLConnection;
 import java.util.List;
 
 import de.k3b.geo.api.IGeoPointInfo;
+import de.k3b.geo.io.DownloadSymbolsBaseService.ITranslateSymbolUri;
 import de.k3b.geo.io.gpx.GpxReader;
 import de.k3b.geo.io.kml.KmlDownloadService;
-import de.k3b.geo.io.DownloadSymbolsBaseService.ITranslateSymbolUri;
 
 /**
  * Translates geo / gps location to local kml/kmz file with nearby wikipedia articles.
