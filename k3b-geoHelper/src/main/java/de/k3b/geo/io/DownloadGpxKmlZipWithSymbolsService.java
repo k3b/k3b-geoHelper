@@ -29,10 +29,9 @@ import java.util.zip.ZipOutputStream;
 
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.DownloadSymbolsBaseService.ITranslateSymbolUri;
-import de.k3b.geo.io.DownloadSymbolsToDirService;
-import de.k3b.geo.io.DownloadSymbolsToZipService;
 import de.k3b.geo.io.gpx.GpxFormatter;
 import de.k3b.geo.io.kml.KmlFormatter;
+import de.k3b.geo.io.poi.PoiFormatter;
 
 /** Dowloads List<IGeoPointInfo> points including referenced Symbols and saves result
  * either to local Zip/kmz/gpz-file or as gpx/kml file plus folder for symbols  */
@@ -60,16 +59,18 @@ public class DownloadGpxKmlZipWithSymbolsService {
      * *** doc.kml
      * *** some symbol file files/aeropuerto.jpg
      *
-     * @param outFile : supported formats: .kml, .kml.zip, .kmz, .gpx, .gpx.zip, .gpz
+     * @param outFile : supported formats: .kml, .kml.zip, .kmz, .gpx, .gpx.zip, .gpz, .poi, .poi.zip, .poz
      * */
     public void saveAs(List<IGeoPointInfo> points, File outFile) throws IOException {
         String outFileNameLowerCase = outFile.getName().toLowerCase();
         boolean isKmlFormat = isKmlFormat(outFileNameLowerCase);
+        boolean isPoiFormat = isPoiFormat(outFileNameLowerCase);
         if (isZipped(outFileNameLowerCase)) {
             // kmz = kml in zip file
             // see https://developers.google.com/kml/documentation/kmzarchives
             // conventions: only first kml in zip is used (usually doc.kml)
             // referenced relative local items in zip-folder "files"
+            // analog olso for gpz (gpx in zip) and poz (poi in zip)
 
             DownloadSymbolsToZipService downloadService = new DownloadSymbolsToZipService(userAgent);
             downloadService.translateSymbolUri(translateSymbolUri);
@@ -81,6 +82,8 @@ public class DownloadGpxKmlZipWithSymbolsService {
 
             if (isKmlFormat) {
                 KmlFormatter.export(points, new PrintWriter(downloadService.createOutputStream("doc.kml", null, 0)));
+            } if (isPoiFormat) {
+                PoiFormatter.export(points, new PrintWriter(downloadService.createOutputStream("doc.poi", null, 0)));
             } else {
                 GpxFormatter.export(points, new PrintWriter(downloadService.createOutputStream("doc.gpx", null, 0)));
             }
@@ -97,6 +100,8 @@ public class DownloadGpxKmlZipWithSymbolsService {
             PrintWriter printWriter = new PrintWriter(new FileOutputStream(outFile));
             if (isKmlFormat) {
                 KmlFormatter.export(points, printWriter);
+            } if (isPoiFormat) {
+                PoiFormatter.export(points, printWriter);
             } else {
                 GpxFormatter.export(points, printWriter);
             }
@@ -104,9 +109,15 @@ public class DownloadGpxKmlZipWithSymbolsService {
     }
 
     private boolean isZipped(String outFileName) {
-        return outFileName.endsWith(".kmz") || outFileName.endsWith(".gpz") || outFileName.endsWith(".zip");
+        return outFileName.endsWith(".kmz")
+                || outFileName.endsWith(".gpz")
+                || outFileName.endsWith(".poz")
+                || outFileName.endsWith(".zip");
     }
     private boolean isKmlFormat(String outFileName) {
         return outFileName.endsWith(".kmz") || outFileName.contains(".kml");
+    }
+    private boolean isPoiFormat(String outFileName) {
+        return outFileName.endsWith(".poz") || outFileName.contains(".poi");
     }
 }

@@ -17,6 +17,8 @@
  */
 package de.k3b.geo.io.poi;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -63,6 +65,16 @@ public class PoiFormatter {
 
     static {
         TIME_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
+    public static void export(List<IGeoPointInfo> geoInfos, PrintWriter printWriter) throws IOException {
+        if (printWriter != null) {
+            try {
+                printWriter.println(toPoiXml(geoInfos));
+            } finally {
+                printWriter.close();
+            }
+        }
     }
 
     public static String toPoiXml(List<IGeoPointInfo> geoInfos) {
