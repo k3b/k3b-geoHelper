@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package de.k3b.geo.io.kml;
+package de.k3b.geo.io;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -31,9 +31,12 @@ import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.DownloadSymbolsBaseService.ITranslateSymbolUri;
 import de.k3b.geo.io.DownloadSymbolsToDirService;
 import de.k3b.geo.io.DownloadSymbolsToZipService;
+import de.k3b.geo.io.gpx.GpxFormatter;
+import de.k3b.geo.io.kml.KmlFormatter;
 
-/** Dowloads Symbols in List<IGeoPointInfo> points and saves them either to local file or to Zip/kmz */
-public class KmlDownloadService {
+/** Dowloads List<IGeoPointInfo> points including referenced Symbols and saves result
+ * either to local Zip/kmz/gpz-file or as gpx/kml file plus folder for symbols  */
+public class DownloadGpxKmlZipWithSymbolsService {
     protected final String userAgent;
     private final ITranslateSymbolUri translateSymbolUri;
 
@@ -43,7 +46,7 @@ public class KmlDownloadService {
      *                  see https://meta.wikimedia.org/wiki/Special:MyLanguage/User-Agent_policy
      * @param translateSymbolUri Under Android you can use this to translate File-Uris to Android-Content-uris
      */
-    public KmlDownloadService(String userAgent, ITranslateSymbolUri translateSymbolUri) {
+    public DownloadGpxKmlZipWithSymbolsService(String userAgent, ITranslateSymbolUri translateSymbolUri) {
         this.userAgent = userAgent;
         this.translateSymbolUri = translateSymbolUri;
     }
@@ -56,10 +59,13 @@ public class KmlDownloadService {
      * ** the generated kmz-zip file caontains
      * *** doc.kml
      * *** some symbol file files/aeropuerto.jpg
+     *
+     * @param outFile : supported formats: .kml, .kml.zip, .kmz, .gpx, .gpx.zip, .gpz
      * */
     public void saveAs(List<IGeoPointInfo> points, File outFile) throws IOException {
-        String outFileName = outFile.getName().toLowerCase();
-        if (outFileName.endsWith(".kmz") || outFileName.endsWith(".zip")) {
+        String outFileNameLowerCase = outFile.getName().toLowerCase();
+        boolean isKmlFormat = isKmlFormat(outFileNameLowerCase);
+        if (isZipped(outFileNameLowerCase)) {
             // kmz = kml in zip file
             // see https://developers.google.com/kml/documentation/kmzarchives
             // conventions: only first kml in zip is used (usually doc.kml)
@@ -73,7 +79,11 @@ public class KmlDownloadService {
 
             points = downloadService.zipOutputStream(zip, "files").convert(points);
 
-            KmlFormatter.export(points, new PrintWriter(downloadService.createOutputStream("doc.kml", null, 0)));
+            if (isKmlFormat) {
+                KmlFormatter.export(points, new PrintWriter(downloadService.createOutputStream("doc.kml", null, 0)));
+            } else {
+                GpxFormatter.export(points, new PrintWriter(downloadService.createOutputStream("doc.gpx", null, 0)));
+            }
             zip.close();
         } else {
             DownloadSymbolsToDirService downloadService = new DownloadSymbolsToDirService(userAgent);
@@ -84,7 +94,19 @@ public class KmlDownloadService {
             dir.mkdirs();
 
             points = downloadService.dir(dir).convert(points);
-            KmlFormatter.export(points, new PrintWriter(new FileOutputStream(outFile)));
+            PrintWriter printWriter = new PrintWriter(new FileOutputStream(outFile));
+            if (isKmlFormat) {
+                KmlFormatter.export(points, printWriter);
+            } else {
+                GpxFormatter.export(points, printWriter);
+            }
         }
+    }
+
+    private boolean isZipped(String outFileName) {
+        return outFileName.endsWith(".kmz") || outFileName.endsWith(".gpz") || outFileName.endsWith(".zip");
+    }
+    private boolean isKmlFormat(String outFileName) {
+        return outFileName.endsWith(".kmz") || outFileName.contains(".kml");
     }
 }

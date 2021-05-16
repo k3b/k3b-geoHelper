@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.k3b.geo.io.kml;
+package de.k3b.geo.io;
 
 import org.xml.sax.InputSource;
 
@@ -29,12 +29,11 @@ import java.util.List;
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.DownloadSymbolsBaseService.ITranslateSymbolUri;
 import de.k3b.geo.io.gpx.GpxReader;
-import de.k3b.geo.io.kml.KmlDownloadService;
 
 /**
  * Translates geo / gps location to local kml/kmz file with nearby wikipedia articles.
  */
-public class Geo2WikipediaKmlDownloadService extends KmlDownloadService {
+public class Geo2WikipediaDownloadWithSymbolsService extends DownloadGpxKmlZipWithSymbolsService {
     private static final int THUMBSIZE = 50;
 
     private final String serviceName;
@@ -46,7 +45,7 @@ public class Geo2WikipediaKmlDownloadService extends KmlDownloadService {
      *                  see https://meta.wikimedia.org/wiki/Special:MyLanguage/User-Agent_policy
      * @param translateSymbolUri Under Android you can use this to translate File-Uris to Android-Content-uris
      */
-    public Geo2WikipediaKmlDownloadService(String serviceName, String userAgent, ITranslateSymbolUri translateSymbolUri) {
+    public Geo2WikipediaDownloadWithSymbolsService(String serviceName, String userAgent, ITranslateSymbolUri translateSymbolUri) {
         super(userAgent, translateSymbolUri);
         this.serviceName = serviceName;
     }

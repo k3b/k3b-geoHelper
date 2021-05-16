@@ -24,7 +24,7 @@ import java.io.File;
 import java.util.List;
 
 import de.k3b.geo.api.IGeoPointInfo;
-import de.k3b.geo.io.kml.Geo2WikipediaKmlDownloadService;
+import de.k3b.geo.io.Geo2WikipediaDownloadWithSymbolsService;
 
 /** tiny j2se console program to test the lib on a pc without Android */
 public class Main {
@@ -35,7 +35,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         try {
-            Geo2WikipediaKmlDownloadService service = new Geo2WikipediaKmlDownloadService("en.wikipedia.org", USER_AGENT, null);
+            Geo2WikipediaDownloadWithSymbolsService service = new Geo2WikipediaDownloadWithSymbolsService("en.wikipedia.org", USER_AGENT, null);
 
             String lat = "28.12722";
             String lon = "-15.43139";
@@ -43,7 +43,7 @@ public class Main {
             List<IGeoPointInfo> points = null;
             File outFile = null;
 
-            points = service.saveAs(lat, lon, outFile = new File("./test2/test2geo.kml.zip"));
+            points = service.saveAs(lat, lon, outFile = new File("./test/gpx/test2geo.gpx"));
             for (IGeoPointInfo geo : points) {
                 System.out.print(String.format("got lat=%f lon=%f\n", geo.getLatitude(), geo.getLongitude()));
             }

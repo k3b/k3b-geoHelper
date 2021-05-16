@@ -18,6 +18,8 @@
 
  package de.k3b.geo.io.gpx;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -71,6 +73,16 @@ public class GpxFormatter {
     }
 
     private GpxFormatter() {}
+
+    public static void export(List<IGeoPointInfo> geoInfos, PrintWriter printWriter) throws IOException {
+        if (printWriter != null) {
+            try {
+                printWriter.println(toGpxXml(geoInfos));
+            } finally {
+                printWriter.close();
+            }
+        }
+    }
 
     public static String toGpxXml(List<IGeoPointInfo> geoInfos) {
         StringBuilder buffer = new StringBuilder();
