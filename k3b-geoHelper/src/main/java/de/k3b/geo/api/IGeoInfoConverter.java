@@ -21,7 +21,7 @@ package de.k3b.geo.api;
 import java.util.List;
 
 /**
- * A class that consumes or transforms Lists of {@link IGeoPointInfo}.
+ * A class that consumes or transforms Lists of {@link de.k3b.geo.api.IGeoPointInfo}.
  *
  * Created by EVE on 15.05.2021.
  */
