@@ -279,6 +279,7 @@ public class GpxReaderBase extends DefaultHandler {
         String currentXmlElementContent = currentXmlElementBufer.toString();
 
         logger.debug("endElement {} {} {}", localName, qName, currentXmlElementContent);
+
         if (name.equals(XmlDefinitions.GpxDef_11.TRKPT)
                 || name.equals(XmlDefinitions.GpxDef_10.WPT)
                 || name.equals(XmlDefinitions.KmlDef_22.PLACEMARK)
@@ -298,6 +299,9 @@ public class GpxReaderBase extends DefaultHandler {
             if (name.equals(XmlDefinitions.GpxDef_11.NAME)) {
                 this.currentGeoPoint.setName(currentXmlElementContent);
             } else if (name.equals(XmlDefinitions.GpxDef_11.DESC) || name.equals(XmlDefinitions.KmlDef_22.DESCRIPTION) || name.equals(XmlDefinitions.WikimediaDef.DESCRIPTION)) {
+                this.currentGeoPoint.setDescription(currentXmlElementContent.trim());
+            } else if (this.currentGeoPoint.getDescription() == null && name.equals(GeoUriDef.DESCRIPTION)) {
+                // <poi><d>theDescr with lowest priority</d></poi>
                 this.currentGeoPoint.setDescription(currentXmlElementContent.trim());
             } else if ((null == this.currentGeoPoint.getLink()) && (name.equals(XmlDefinitions.GpxDef_11.LINK) || name.equals(XmlDefinitions.GpxDef_10.URL))) {
                 this.currentGeoPoint.setLink(currentXmlElementContent);

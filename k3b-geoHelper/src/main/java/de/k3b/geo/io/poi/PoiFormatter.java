@@ -108,7 +108,6 @@ public class PoiFormatter {
                                        String description, String link, String symbol, int zoomMin, int zoomMax) {
         // <poi ll="52,9" n="theName" link="theLink" s="theIconUrl"  d="theDesc" t="2015-02-10T08:04:45Z" z="5" z2="7">
         result.append("<" + GeoUriDef.XML_ELEMENT_POI);
-        addAttr(result,GeoUriDef.DESCRIPTION , description);
         addAttr(result,GeoUriDef.ID , id);
         addAttr(result,GeoUriDef.LAT_LON,
                 String.format(Locale.US, "%f,%f", latitude,longitude) ,
@@ -121,6 +120,18 @@ public class PoiFormatter {
         addAttr(result,GeoUriDef.SYMBOL , symbol);
         addAttr(result,GeoUriDef.ZOOM , ""+ zoomMin, zoomMin > 0);
         addAttr(result,GeoUriDef.ZOOM_MAX , ""+ zoomMax, zoomMax > 0);
+
+        // last either <poi d=.../> or <poi><d>...</d></poi>
+        if (description != null) {
+            if (description.length() > 30 || description.contains("\n") || description.contains("\'") || description.contains("\"")) {
+                result.append("><").append(GeoUriDef.DESCRIPTION).append(">")
+                        .append( XmlUtil.escapeXMLElement(description)).append("</").append(GeoUriDef.DESCRIPTION).append(">")
+                        .append("</").append(GeoUriDef.XML_ELEMENT_POI).append(">");
+                return result;
+            } else {
+                addAttr(result,GeoUriDef.DESCRIPTION , description);
+            }
+        }
         result.append(" />");
         return result;
     }

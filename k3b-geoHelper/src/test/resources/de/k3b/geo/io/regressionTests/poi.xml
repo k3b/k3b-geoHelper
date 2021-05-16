@@ -5,10 +5,13 @@
             LocationMapViewer can find this type of content in files *.poi (or *.gpx, *.kml)
         -->
 
-	<!-- this is de.k3b.geo internal format from xml attributes -->
+	<!-- this is de.k3b.geo internal format from xml attributes for short descriptions-->
     <poi ll="52,9" n="theName" link="theLink" s="theIconUrl"  d="theDesc" t="2015-02-10T08:04:45Z" z="5" z2="7">
         <expectedTestResult:id>geo:52,9?q=(theName)&amp;z=5&amp;z2=7&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z</expectedTestResult:id>
     </poi>
+
+    <!-- this is de.k3b.geo internal format from xml attributes for long or multiline descriptions-->
+    <poi ll="52,9" id="geo:52,9?d=theDesc" ><d>theDesc</d></poi>
 
     <!-- this is de.k3b.geo internal format from an interpreted geo-uri -->
     <poi geoUri="geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z">
