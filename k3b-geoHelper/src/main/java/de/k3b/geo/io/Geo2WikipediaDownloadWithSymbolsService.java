@@ -17,6 +17,8 @@
  */
 package de.k3b.geo.io;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 import java.io.File;
@@ -26,6 +28,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
+import de.k3b.geo.GeoConfig;
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.DownloadSymbolsBaseService.ITranslateSymbolUri;
 import de.k3b.geo.io.gpx.GpxReader;
@@ -34,7 +37,7 @@ import de.k3b.geo.io.gpx.GpxReader;
  * Translates geo / gps location to local kml/kmz file with nearby wikipedia articles.
  */
 public class Geo2WikipediaDownloadWithSymbolsService extends DownloadGpxKmlZipWithSymbolsService {
-    private static final int THUMBSIZE = 50;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Geo2WikipediaDownloadWithSymbolsService.class);
 
     private final String serviceName;
 
@@ -67,6 +70,7 @@ public class Geo2WikipediaDownloadWithSymbolsService extends DownloadGpxKmlZipWi
         int radius = 10000;
         int maxcount = 5;
         String urlString = this.getQueryGeoUrlString(lat, lon, radius, maxcount);
+        LOGGER.info("downloading from {}", urlString);
         InputStream inputStream = this.getInputStream(urlString);
         GpxReader<IGeoPointInfo> parser = new GpxReader<>();
 
@@ -102,7 +106,7 @@ public class Geo2WikipediaDownloadWithSymbolsService extends DownloadGpxKmlZipWi
                 maxcount +
 
                 "&pithumbsize=" +
-                THUMBSIZE +
+                GeoConfig.THUMBSIZE +
                 "&pilimit=" +
                 maxcount+
 

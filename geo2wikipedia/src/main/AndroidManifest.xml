@@ -3,6 +3,7 @@
     package="de.k3b.android.geo2wikipedia">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"   />
+    <uses-permission android:name="android.permission.INTERNET"   />
     <application
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
@@ -11,7 +12,7 @@
          >
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="de.k3b.camerafolder .geo2wikipedia "
+            android:authorities="de.k3b.geo2wikipedia "
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

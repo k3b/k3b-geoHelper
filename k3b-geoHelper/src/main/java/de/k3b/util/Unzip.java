@@ -105,4 +105,14 @@ public class Unzip {
         output.flush();
     }
 
+    public static void deleteRecursive(File f) {
+        if (f != null && f.exists()) {
+            if (f.isDirectory()) {
+                for (File c : f.listFiles()) {
+                    deleteRecursive(c);
+                }
+            }
+            f.delete();
+        }
+    }
 }

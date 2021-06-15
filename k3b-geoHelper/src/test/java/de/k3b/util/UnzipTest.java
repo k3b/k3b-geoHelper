@@ -30,8 +30,6 @@ import java.io.InputStream;
 
 import de.k3b.geo.io.GeoFileRepositoryTests;
 
-import static org.junit.Assert.*;
-
 public class UnzipTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoFileRepositoryTests.class);
     private static final File OUTDIR = new File("./build/testresults/UnzipTests");
@@ -39,20 +37,9 @@ public class UnzipTest {
 
     @BeforeClass
     public static void initDirectories() {
-        delete(OUTDIR);
+        Unzip.deleteRecursive(OUTDIR);
         OUTDIR.mkdirs();
         Assert.assertEquals(0,OUTDIR.listFiles().length);
-    }
-
-    private static void delete(File f) {
-        if (f != null && f.exists()) {
-            if (f.isDirectory()) {
-                for (File c : f.listFiles()) {
-                    delete(c);
-                }
-            }
-            f.delete();
-        }
     }
 
     @Test

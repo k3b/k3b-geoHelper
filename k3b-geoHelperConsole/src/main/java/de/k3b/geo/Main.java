@@ -43,7 +43,7 @@ public class Main {
             List<IGeoPointInfo> points = null;
             File outFile = null;
 
-            points = service.saveAs(lat, lon, outFile = new File("./test/gpx/test2geo.gpx"));
+            points = service.saveAs(lat, lon, outFile = new File("./test/gpx/test2geo200.gpz"));
             for (IGeoPointInfo geo : points) {
                 System.out.print(String.format("got lat=%f lon=%f\n", geo.getLatitude(), geo.getLongitude()));
             }

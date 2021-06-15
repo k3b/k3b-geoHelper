@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.zip.ZipOutputStream;
 
+import de.k3b.geo.GeoConfig;
 import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.geo.io.DownloadSymbolsBaseService.ITranslateSymbolUri;
 import de.k3b.geo.io.gpx.GpxFormatter;
@@ -63,9 +64,9 @@ public class DownloadGpxKmlZipWithSymbolsService {
      * */
     public void saveAs(List<IGeoPointInfo> points, File outFile) throws IOException {
         String outFileNameLowerCase = outFile.getName().toLowerCase();
-        boolean isKmlFormat = isKmlFormat(outFileNameLowerCase);
-        boolean isPoiFormat = isPoiFormat(outFileNameLowerCase);
-        if (isZipped(outFileNameLowerCase)) {
+        boolean isKmlFormat = GeoConfig.isOneOf(outFileNameLowerCase, GeoConfig.EXT_ALL_KML);
+        boolean isPoiFormat = GeoConfig.isOneOf(outFileNameLowerCase, GeoConfig.EXT_ALL_POI);
+        if (GeoConfig.isOneOf(outFileNameLowerCase, GeoConfig.EXT_ALL_ZIP)) {
             // kmz = kml in zip file
             // see https://developers.google.com/kml/documentation/kmzarchives
             // conventions: only first kml in zip is used (usually doc.kml)
@@ -108,16 +109,4 @@ public class DownloadGpxKmlZipWithSymbolsService {
         }
     }
 
-    private boolean isZipped(String outFileName) {
-        return outFileName.endsWith(".kmz")
-                || outFileName.endsWith(".gpz")
-                || outFileName.endsWith(".poz")
-                || outFileName.endsWith(".zip");
-    }
-    private boolean isKmlFormat(String outFileName) {
-        return outFileName.endsWith(".kmz") || outFileName.contains(".kml");
-    }
-    private boolean isPoiFormat(String outFileName) {
-        return outFileName.endsWith(".poz") || outFileName.contains(".poi");
-    }
 }

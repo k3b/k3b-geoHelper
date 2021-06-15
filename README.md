@@ -25,9 +25,9 @@ A j2se geo support library that is compatible with Android
 * parse/format [geo-uri-s](https://github.com/k3b/k3b-geoHelper/wiki/data#geo) and geoarea-uri-s .
 	* Example uri: geo:53,10?q=(Hamburg)&z=8
 	* Java examples [GeoUriTests.java](https://github.com/k3b/k3b-geoHelper/blob/master/k3b-geoHelper/src/test/java/de/k3b/geo/io/GeoUriTests.java)
-* read geo-points from these file formats
+* read geo-points from or write to in these file formats
 	* [gpx](https://github.com/k3b/k3b-geoHelper/wiki/data#gpx)
-	* [kml](https://github.com/k3b/k3b-geoHelper/wiki/data#kml)
+	* [kml/kmz](https://github.com/k3b/k3b-geoHelper/wiki/data#kml)
 	* [poi](https://github.com/k3b/k3b-geoHelper/wiki/data#poi)
 	* [wikimedia](https://github.com/k3b/k3b-geoHelper/wiki/data#wikimedia) that is used by web-apis of wikipedia and wikivoyage
 	* [Example files](https://github.com/k3b/k3b-geoHelper/blob/master/k3b-geoHelper/src/test/resources/de/k3b/geo/io/regressionTests/)
@@ -36,7 +36,7 @@ A j2se geo support library that is compatible with Android
 
 For more details see [supported data formats](https://github.com/k3b/k3b-geoHelper/wiki/data)
 
-##Usage (with gradle)##
+## Usage (with gradle) ##
 
 Add dependencies to local build.gradle (via jcenter or mavencentral)
 
@@ -44,7 +44,7 @@ Add dependencies to local build.gradle (via jcenter or mavencentral)
 		compile 'com.github.k3b:k3b-geoHelper:v1.1.5'
 	}
 
-##Dependencies##
+## Dependencies ##
 
 * org.slf4j:slf4j-api
 
