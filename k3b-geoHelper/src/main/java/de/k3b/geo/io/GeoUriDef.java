@@ -41,6 +41,6 @@ public class GeoUriDef {
     public static final String XML_ELEMENT_POI = "poi";
     public static final String XML_ATTR_GEO_URI = "geoUri";
 
-    // "true" of "1" means infer missing parameters
+    // "true" or "1" means: infer missing parameters
     public static final String XML_ATTR_GEO_URI_INFER_MISSING = "infer";
 }
