@@ -10,6 +10,7 @@ apply plugin: 'ch.raffael.pegdown-doclet'
 
 
 // vvv maven upload stuff
+// https://jitpack.io/com/github/k3b/k3b-geoHelper/WikipediaAndroid-SNAPSHOT/pom.xml
 ext {
 	mavenUpload_archivesBaseName = 'k3b-geoHelper'
 	mavenUpload_description = 'A j2se geo support library that is compatible with Android.'
@@ -29,6 +30,7 @@ jacocoTestReport {
 dependencies {
     implementation 'org.slf4j:slf4j-api:1.7.7@jar'
     implementation 'commons-io:commons-io:2.6'
+    implementation 'androidx.annotation:annotation:1.1.0'
 
     // compile fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.13.2'

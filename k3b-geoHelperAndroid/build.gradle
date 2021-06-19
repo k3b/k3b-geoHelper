@@ -1,0 +1,48 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+
+// vvv maven upload stuff
+ext {
+    mavenUpload_archivesBaseName = 'k3b-geoHelper'
+    mavenUpload_description = 'Geo support library with Android specific code.'
+}
+
+group = "com.github.${github_userId}"
+description = "${mavenUpload_description}"
+version = project_version
+// ^^^ maven upload stuff
+
+group = "com.github.${github_userId}"
+description = "Android specific geo code"
+version = project_version
+
+android {
+    compileSdkVersion 29
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation 'org.slf4j:slf4j-api:1.7.7@jar'
+    implementation 'commons-io:commons-io:2.6'
+    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.documentfile:documentfile:1.0.1'
+    implementation project(path: ':k3b-geoHelper')
+    testImplementation 'junit:junit:4.+'
+}
