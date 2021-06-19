@@ -24,16 +24,20 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 import de.k3b.geo.io.GeoFileRepositoryTests;
 
+import static org.junit.Assert.*;
+
 public class UnzipTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoFileRepositoryTests.class);
     private static final File OUTDIR = new File("./build/testresults/UnzipTests");
     private static final String ZIP_EXAMPLE = "/de/k3b/geo/util/testDir.zip";
+    private static final String NON_ZIP_EXAMPLE = "/de/k3b/geo/io/regressionTests/wikimedia.poi";
 
     @BeforeClass
     public static void initDirectories() {
@@ -46,6 +50,19 @@ public class UnzipTest {
     public void unzip() throws IOException {
         InputStream in = this.getClass().getResourceAsStream(ZIP_EXAMPLE);
         Unzip.unzip(ZIP_EXAMPLE, in, OUTDIR);
-        Assert.assertTrue(new File(OUTDIR,"testDir/t2.txt").exists());
+        assertTrue(new File(OUTDIR,"testDir/t2.txt").exists());
+    }
+
+    @Test
+    public void isZipStream_true()  {
+        InputStream in = new BufferedInputStream(this.getClass().getResourceAsStream(ZIP_EXAMPLE));
+        Unzip.isZipStream(in);
+        Unzip.isZipStream(in);
+        assertTrue("can be called repeatably while InputStream is not used yet", Unzip.isZipStream(in));
+    }
+    @Test
+    public void isZipStream_false() {
+        InputStream in = new BufferedInputStream(this.getClass().getResourceAsStream(NON_ZIP_EXAMPLE));
+        assertFalse("can be called repeatably while InputStream is not used yet", Unzip.isZipStream(in));
     }
 }

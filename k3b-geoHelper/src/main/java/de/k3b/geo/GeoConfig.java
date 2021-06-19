@@ -40,7 +40,10 @@ public class GeoConfig {
     public static final String[] EXT_ALL_POI = new String[]{EXT_POZ, EXT_POZ2, EXT_POI};
 
     public static final String[] EXT_ALL_ZIP = new String[]{EXT_GPZ,EXT_KMZ,EXT_POZ,EXT_ZIP};
-    public static final String[] EXT_ALL = new String[]{EXT_GPZ,EXT_KMZ,EXT_POZ,EXT_GPZ2,EXT_KMZ2,EXT_POZ2, EXT_GPX,EXT_KML,EXT_POI};
+    public static final String[] EXT_ALL = new String[]{
+            EXT_GPZ,EXT_KMZ,EXT_POZ,
+            EXT_GPZ2,EXT_KMZ2,EXT_POZ2,
+            EXT_GPX,EXT_KML,EXT_POI};
 
     public static boolean isOneOf(String outFileName, String... suffixes) {
         String lowerCase = outFileName.toLowerCase();
