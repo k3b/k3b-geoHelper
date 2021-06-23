@@ -38,8 +38,7 @@ build/
 # vim swap files
 *.swp
 *.swo
-/gradle-app.setting
+gradle-app.setting
 
-/osmdroid-third-party/libs/maps.jar
-/osmdroid-android
-/gradle.properties
+osmdroid-third-party/libs/maps.jar
+osmdroid-android

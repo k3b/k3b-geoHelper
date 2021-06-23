@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 ext {
-    PUBLISH_VERSION = '1.1.6' // SNAPSHOT means latest version in in github branch "master"
-    ANDROID_VERSIONCODE = 101006
+    PUBLISH_VERSION = 'v1.1.7' // SNAPSHOT means latest version in in github branch "master"
+    ANDROID_VERSIONCODE = 101007
 
     PUBLISH_GROUP_ID = 'com.github.k3b'
     SOURCES = 'github.com/k3b/k3b-geoHelper'
