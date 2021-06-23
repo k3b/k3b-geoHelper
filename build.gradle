@@ -1,41 +1,17 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 ext {
-	// global project specific properties
-	github_repository='k3b-geoHelper'
-    // project_version='1.1.5' released 12.8.2016
-	project_version='1.1.6-SNAPSHOT'
-	project_licence_name='The Apache License, Version 2.0'
+    PUBLISH_VERSION = '1.1.6' // SNAPSHOT means latest version in in github branch "master"
+    ANDROID_VERSIONCODE = 101006
 
-	// default for global project specific properties from file gradle.properties
-	if (!hasProperty("github_userId")) github_userId='k3b'
-	
-	// calculated properties
-	project_description="${github_userId}.${github_repository} ver ${project_version}"
-	project_isReleaseVersion = !project_version.endsWith("SNAPSHOT")
-
-	// Params for Task uploadArchives
-	if (!hasProperty("mavenUpload_serverUrl")) mavenUpload_serverUrl = (project_isReleaseVersion) ? "https://oss.sonatype.org/service/local/staging/deploy/maven2/" : "https://oss.sonatype.org/content/repositories/snapshots/"
+    PUBLISH_GROUP_ID = 'com.github.k3b'
+    SOURCES = 'github.com/k3b/k3b-geoHelper'
+    LICENSE_TYP = 'The Apache License, Version 2.0'
 }
-
-// reset mavenUpload_serverUrl to local if parameter is missing 
-if (!hasProperty("signing.keyId") || !hasProperty("signing.password") || !hasProperty("signing.secretKeyRingFile")) {
-	ext.mavenUpload_serverUrl = "file:./build/testrepository/"
-	logger.info "signing.keyId=... or signing.password=... or signing.secretKeyRingFile=.. not found in gradle.properties\n"
-	logger.info "Cannot upload to 'maven@https://oss.sonatype.org/...' . Using repository '${mavenUpload_serverUrl}' instead \n"
-}
-
-if (!hasProperty("mavenUpload_login") || !hasProperty("mavenUpload_password")) {
-	ext.mavenUpload_serverUrl = "file:./build/testrepository/"
-	logger.info "mavenUpload_login=... or mavenUpload_password=.. not found in gradle.properties\n"
-	logger.info "Cannot upload to 'maven@https://oss.sonatype.org/...' . Using '${mavenUpload_serverUrl}' instead \n"
-}
-
-description = "${project_description}"
 
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:4.1.3"
@@ -65,12 +41,8 @@ task clean {
     dependsOn { subprojects.clean }
 }
 
-task uploadArchives {
-    description = "Upload ${project_description} to maven repository '${mavenUpload_serverUrl}'."
-    dependsOn { subprojects.uploadArchives }
-}
-
 // markdown in javadoc
 // https://github.com/Abnaxos/pegdown-doclet
 apply plugin: 'ch.raffael.pegdown-doclet'
 
+apply from: "${rootDir}/publish-root.gradle"

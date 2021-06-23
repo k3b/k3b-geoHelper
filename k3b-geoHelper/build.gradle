@@ -1,25 +1,16 @@
 // subproject k3b-geoHelper
 apply plugin: 'java'
 apply plugin: 'jacoco'
-apply plugin: 'maven'
-apply plugin: 'signing'
 
 // markdown in javadoc
 // https://github.com/Abnaxos/pegdown-doclet
 apply plugin: 'ch.raffael.pegdown-doclet'
 
-
-// vvv maven upload stuff
-// https://jitpack.io/com/github/k3b/k3b-geoHelper/WikipediaAndroid-SNAPSHOT/pom.xml
+// used by publish-module.gradle
 ext {
-	mavenUpload_archivesBaseName = 'k3b-geoHelper'
-	mavenUpload_description = 'A j2se geo support library that is compatible with Android.'
+    PUBLISH_ARTIFACT_ID = 'k3b-geoHelper'
+    PUBLISH_MODUL_DESCRIPTION = 'A j2se geo support library that is compatible with Android.'
 }
-
-group = "com.github.${github_userId}"
-description = "${mavenUpload_description}"
-version = project_version
-// ^^^ maven upload stuff
 
 jacocoTestReport {
     reports {
@@ -64,4 +55,4 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-// apply from: '../uploadArchives.gradle'
+apply from: "${rootProject.projectDir}/publish-module.gradle"

@@ -1,0 +1,92 @@
+// for details see https://proandroiddev.com/publishing-android-libraries-to-mavencentral-in-2021-8ac9975c3e52
+// inspired by  https://github.com/GetStream/stream-chat-android/blob/develop/scripts/publish-module.gradle
+
+apply plugin: 'maven-publish'
+
+// variables inherited from root-build.gradle
+ext {
+    PUBLISH_GROUP_ID = rootProject.ext.PUBLISH_GROUP_ID
+    PUBLISH_VERSION = rootProject.ext.PUBLISH_VERSION
+    SOURCES = rootProject.ext.SOURCES
+    LICENSE_TYP  = rootProject.ext.LICENSE_TYP
+}
+
+task javadocs(type: Javadoc) {
+    if (project.plugins.findPlugin("com.android.library")) {
+        source = android.sourceSets.main.java.srcDirs
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        android.libraryVariants.all { variant ->
+            if (variant.name == 'release') {
+                owner.classpath += variant.javaCompileProvider.get().classpath
+            }
+        }
+    } else {
+        source = sourceSets.main.java.srcDirs
+    }
+    exclude '**/R.html', '**/R.*.html', '**/index.html'
+}
+
+task javadocsJar(type: Jar, dependsOn: javadocs) {
+    archiveClassifier.set('javadoc')
+    from javadocs.destinationDir
+}
+
+task sourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    if (project.plugins.findPlugin("com.android.library")) {
+        from android.sourceSets.main.java.srcDirs
+    } else {
+        from sourceSets.main.java.srcDirs
+    }
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocsJar
+}
+
+group = PUBLISH_GROUP_ID
+version = PUBLISH_VERSION
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId PUBLISH_GROUP_ID
+                artifactId PUBLISH_ARTIFACT_ID
+                version PUBLISH_VERSION
+                if (project.plugins.findPlugin("com.android.library")) {
+                    from components.release
+                } else {
+                    from components.java
+                }
+
+                artifact sourcesJar
+
+                pom {
+                    name = PUBLISH_ARTIFACT_ID
+                    description = PUBLISH_MODUL_DESCRIPTION
+                    url = "https://" + SOURCES
+                    licenses {
+                        license {
+                            name = LICENSE_TYP
+                            url = 'https://' + SOURCES + '/blob/main/LICENSE'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'k3b'
+                            name = 'k3b'
+                            email = '1374583+k3b@users.noreply.github.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:' + SOURCES + '.git'
+                        developerConnection = 'scm:git:ssh://' + SOURCES + '.git'
+                        url = 'https://' + SOURCES + '/tree/main'
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,24 +1,10 @@
 // subproject k3b-geoHelperConsole
 apply plugin: 'java'
 apply plugin: 'jacoco'
-apply plugin: 'maven'
-apply plugin: 'signing'
 
 // markdown in javadoc
 // https://github.com/Abnaxos/pegdown-doclet
 apply plugin: 'ch.raffael.pegdown-doclet'
-
-
-// vvv maven upload stuff
-ext {
-	mavenUpload_archivesBaseName = 'k3b-geoHelperConsole'
-	mavenUpload_description = 'A j2se demo console program.'
-}
-
-group = "com.github.${github_userId}"
-description = "${mavenUpload_description}"
-version = project_version
-// ^^^ maven upload stuff
 
 jacocoTestReport {
     reports {
@@ -39,5 +25,3 @@ java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
-
-// apply from: '../uploadArchives.gradle'

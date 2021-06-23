@@ -1,5 +1,10 @@
 apply plugin: 'com.android.application'
 
+ext {
+    PUBLISH_VERSION = rootProject.ext.PUBLISH_VERSION // inherited from root project. i.e. 'v1.0' or 'v1.0-SNAPSHOT'
+    ANDROID_VERSIONCODE = rootProject.ext.ANDROID_VERSIONCODE
+}
+
 android {
     compileSdkVersion = 28
     defaultConfig {
@@ -9,8 +14,8 @@ android {
         targetSdkVersion 21
 
         // appXXX are defined in gradle.properties
-        versionCode = 1
-        versionName = '1.0.1'
+        versionCode = ANDROID_VERSIONCODE
+        versionName = PUBLISH_VERSION
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7

@@ -1,20 +1,12 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
 
-// vvv maven upload stuff
+// used by publish-module.gradle
 ext {
-    mavenUpload_archivesBaseName = 'k3b-geoHelper'
-    mavenUpload_description = 'Geo support library with Android specific code.'
+    PUBLISH_ARTIFACT_ID = 'k3b-geoHelperAndroid'
+    PUBLISH_MODUL_DESCRIPTION = 'Geo support library with Android specific code.'
+    PUBLISH_VERSION = rootProject.ext.PUBLISH_VERSION // inherited from root project. i.e. 'v1.0' or 'v1.0-SNAPSHOT'
+    ANDROID_VERSIONCODE = rootProject.ext.ANDROID_VERSIONCODE
 }
-
-group = "com.github.${github_userId}"
-description = "${mavenUpload_description}"
-version = project_version
-// ^^^ maven upload stuff
-
-group = "com.github.${github_userId}"
-description = "Android specific geo code"
-version = project_version
 
 android {
     compileSdkVersion 29
@@ -22,8 +14,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode ANDROID_VERSIONCODE
+        versionName PUBLISH_VERSION
     }
 
     buildTypes {
@@ -46,3 +38,6 @@ dependencies {
     implementation project(path: ':k3b-geoHelper')
     testImplementation 'junit:junit:4.+'
 }
+
+apply from: "${rootProject.projectDir}/publish-module.gradle"
+
