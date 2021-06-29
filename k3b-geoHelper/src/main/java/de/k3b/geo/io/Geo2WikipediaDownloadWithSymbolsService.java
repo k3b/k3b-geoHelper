@@ -66,7 +66,7 @@ public class Geo2WikipediaDownloadWithSymbolsService extends DownloadGpxKmlZipWi
         return hc.getInputStream();
     }
 
-    private List<IGeoPointInfo> getGeoPointInfos(String lat, String lon) throws IOException {
+    private List<IGeoPointInfo> getGeoPointInfos(Object lat, Object lon) throws IOException {
         int radius = 10000;
         int maxcount = 5;
         String urlString = this.getQueryGeoUrlString(lat, lon, radius, maxcount);
@@ -78,14 +78,14 @@ public class Geo2WikipediaDownloadWithSymbolsService extends DownloadGpxKmlZipWi
         return points;
     }
 
-    public List<IGeoPointInfo> saveAs(String lat, String lon, File out) throws IOException {
+    public List<IGeoPointInfo> saveAs(Object lat, Object lon, File out) throws IOException {
         List<IGeoPointInfo> points = getGeoPointInfos(lat, lon);
         saveAs(points, out);
         return points;
     }
 
     /** api creates url that encodes what we want to get from wikipedia  */
-    private String getQueryGeoUrlString(String lat, String lon, int radius, int maxcount) {
+    private String getQueryGeoUrlString(Object lat, Object lon, int radius, int maxcount) {
         // see https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page
         String urlString = "https://" +
                 serviceName +

@@ -83,7 +83,7 @@ public class DownloadGpxKmlZipWithSymbolsService {
 
             if (isKmlFormat) {
                 KmlFormatter.export(points, new PrintWriter(downloadService.createOutputStream("doc.kml", null, 0)));
-            } if (isPoiFormat) {
+            } else if (isPoiFormat) {
                 PoiFormatter.export(points, new PrintWriter(downloadService.createOutputStream("doc.poi", null, 0)));
             } else {
                 GpxFormatter.export(points, new PrintWriter(downloadService.createOutputStream("doc.gpx", null, 0)));

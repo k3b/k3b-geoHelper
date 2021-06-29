@@ -10,17 +10,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
          >
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="de.k3b.geo2wikipedia "
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_provider_paths"/>
-        </provider>
 
-        <activity android:name=".SendGeo2WikipediaKmlActivity"
+        <activity android:name=".Geo2WikipediaMapActivity"
             android:label="@string/label_select_kml_viewer" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -34,6 +25,26 @@
                 <data android:scheme="geo" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="de.k3b.geo2wikipedia"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths"/>
+        </provider>
 
     </application>
 

@@ -31,8 +31,9 @@ public class TempFileUtil {
      * #11: remove unused temporary crops from send/get_content after some time.
      * */
     public static void removeOldTempFiles(File dir, long nowInMilliSecs) {
-        if (dir != null) {
-            for (File candidate : dir.listFiles()) {
+        File[] files = dir != null ? dir.listFiles() : null;
+        if (files != null) {
+            for (File candidate : files) {
                 if (candidate.isFile() && shouldDeleteTempFile(candidate, nowInMilliSecs)) {
                     candidate.delete();
                 }

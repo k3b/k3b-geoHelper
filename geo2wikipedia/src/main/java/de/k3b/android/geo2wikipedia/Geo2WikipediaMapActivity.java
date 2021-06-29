@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -33,15 +34,17 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.IOException;
 
+import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.io.Geo2WikipediaDownloadWithSymbolsService;
+import de.k3b.geo.io.GeoUri;
 import de.k3b.util.TempFileUtil;
 
 /**
- * Translates from ACTION_SEND(TO)/VIEW with geo-uri to ACTION_SEND(TO)/VIEW with kml/kmz uri
+ * Translates from ACTION_SEND(TO)/VIEW with geo-uri to ACTION_SEND(TO)/VIEW with kml/kmz/gpx... uri
  */
-public class SendGeo2WikipediaKmlActivity extends Activity {
+public class Geo2WikipediaMapActivity extends Activity {
     private static final String TAG = "k3b.geo2wikipedia";
 
     private static final int PERMISSION_REQUEST_ID_FILE_WRITE = 23;
@@ -49,6 +52,8 @@ public class SendGeo2WikipediaKmlActivity extends Activity {
 
     private static final int PERMISSION_REQUEST_ID_INTERNET = 24;
     private static final String PERMISSION_INTERNET = Manifest.permission.INTERNET;
+
+    private static final int ACTION_SHOW_MAP = 26;
 
     private static final int RESULT_NO_PERMISSIONS = -22;
 
@@ -73,7 +78,7 @@ public class SendGeo2WikipediaKmlActivity extends Activity {
             return;
         }
 
-        onSendKml(savedInstanceState);
+        onCreateEx(savedInstanceState);
     }
 
     private void requestPermission(Bundle savedInstanceState, final String permission, final int requestCode) {
@@ -113,43 +118,102 @@ public class SendGeo2WikipediaKmlActivity extends Activity {
         }
     }
 
-    private void onSendKml(Bundle savedInstanceState) {
+    class GeoLoadTask extends AsyncTask<GeoPointDto, Void, File> {
+
+        @Override
+        protected File doInBackground(GeoPointDto... arg0) {
+            //Your implementation
+            try {
+                return saveGeoAsFile(arg0[0]);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(File result) {
+            showResult(result);
+        }
+    }
+
+    private void onCreateEx(Bundle savedInstanceState) {
         this.lastSavedInstanceState = null;
-        /* !!! TODO
-        this.resultPhotoUri = createSharedUri();
+
+        GeoPointDto geoPointFromIntent = getGeoPointDtoFromIntent(getIntent());
+
+        if (geoPointFromIntent != null) {
+            File outFile = new File(
+                    createSharedOutDir(geoPointFromIntent.getLatitude(), geoPointFromIntent.getLongitude()),
+                    GeoConfig.outFileName);
+            createSharedUri(outFile);
+
+            new GeoLoadTask().execute(geoPointFromIntent);
+        }
+    }
+
+    private void showResult(File outFile) {
         String action = getIntent().getAction();
 
-        Intent intent = new Intent(action)
-                .setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        Uri outUri = createSharedUri(outFile);
+        Intent newIntent = new Intent(action)
+                .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         if (Intent.ACTION_SEND.compareTo(action) == 0) {
-            intent.putExtra(Intent.EXTRA_STREAM, this.resultPhotoUri);
+            newIntent.putExtra(Intent.EXTRA_STREAM, outUri);
         } else {
             // ACTION_SENDTO or ACTION_VIEW
-            intent.setData(this.resultPhotoUri);
+            newIntent.setDataAndTypeAndNormalize(outUri, GeoConfig.outMimeType);
         }
 
         // start the image capture Intent
-        startActivityForResult(intent, ACTION_REQUEST_IMAGE_CAPTURE);
+        startActivityForResult(Intent.createChooser(
+                newIntent,getString(R.string.label_select_kml_viewer)), ACTION_SHOW_MAP);
+    }
 
-         */
+    private File saveGeoAsFile(GeoPointDto geoPointFromIntent) throws java.io.IOException {
+        Geo2WikipediaDownloadWithSymbolsService service = new Geo2WikipediaDownloadWithSymbolsService(
+                GeoConfig.serviceName, GeoConfig.USER_AGENT, null);
+
+        File outFile = new File(
+                createSharedOutDir(geoPointFromIntent.getLatitude(), geoPointFromIntent.getLongitude()),
+                GeoConfig.outFileName);
+
+        service.saveAs(geoPointFromIntent.getLatitude(), geoPointFromIntent.getLongitude(),
+                outFile);
+        return outFile;
+    }
+
+    private GeoPointDto getGeoPointDtoFromIntent(Intent intent) {
+        final Uri uri = (intent != null) ? intent.getData() : null;
+        String uriAsString = (uri != null) ? uri.toString() : null;
+        GeoPointDto pointFromIntent = null;
+        if (uriAsString != null) {
+            // Toast.makeText(this, getString(R.string.app_name) + ": received  " + uriAsString, Toast.LENGTH_LONG).show();
+            GeoUri parser = new GeoUri(GeoUri.OPT_PARSE_INFER_MISSING);
+            pointFromIntent = (GeoPointDto) parser.fromUri(uriAsString, new GeoPointDto());
+        }
+        return pointFromIntent;
     }
 
     protected File getSharedDir() {
-        File sharedDir = new File(this.getFilesDir(), "shared");
+        File sharedDir = new File(this.getCacheDir(), "shared");
+        // unused temporary files from send/get_content after some time.
+        TempFileUtil.removeOldTempFiles(sharedDir, System.currentTimeMillis());
         sharedDir.mkdirs();
 
-        // #11: remove unused temporary crops from send/get_content after some time.
-        TempFileUtil.removeOldTempFiles(sharedDir, System.currentTimeMillis());
         return sharedDir;
     }
 
-    protected String createCropFileName() {
-        return new SimpleDateFormat("'img_'yyyyMMsd-HHmmss'.jpg'").format(new Date());
+    protected String createFileName(double latitude, double longitude) {
+        return latitude + "_" +longitude;
     }
 
-    protected Uri createSharedUri() {
-        File outFile = new File(getSharedDir(), createCropFileName());
+    protected Uri createSharedUri(File outFile) {
         return FileProvider.getUriForFile(this, "de.k3b.geo2wikipedia", outFile);
+    }
+
+    private File createSharedOutDir(double latitude, double longitude) {
+        return new File(getSharedDir(), createFileName(latitude, longitude));
     }
 
     @Override
@@ -159,5 +223,14 @@ public class SendGeo2WikipediaKmlActivity extends Activity {
         // outState.putParcelable(STATE_RESULT_PHOTO_URI, this.resultPhotoUri);
     }
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ACTION_SHOW_MAP) {
+            // originator -> geo2wikipedia -> mapviewer -> geo2wikipedia -> originator
+            // tell originator that we are done
+            setResult(resultCode);
+            finish();
+        }
+    }
 }
