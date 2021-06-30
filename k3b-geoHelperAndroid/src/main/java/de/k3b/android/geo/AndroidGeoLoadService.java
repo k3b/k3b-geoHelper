@@ -23,6 +23,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,10 +45,8 @@ public class AndroidGeoLoadService extends GeoLoadService {
 
     /**
      * @param isZipped null: means unknows: try to find out
-     * @return
-     * @throws IOException
      */
-    @NonNull
+    @Nullable
     public static InputStream openGeoInputStream(Context context, Uri uri, String name, Boolean isZipped) throws IOException {
         InputStream inputStream = null;
         inputStream = new BufferedInputStream(context.getContentResolver().openInputStream(uri));
@@ -111,15 +110,15 @@ public class AndroidGeoLoadService extends GeoLoadService {
             } catch (IOException e) {
                 LOGGER.warn("loadGeoPointDtos: Cannot open " + uri, e);
             } finally {
-                AndroidGeoLoadService.closeSilently(is);
+                closeSilently(is);
             }
         }
     }
 
     public static String getName(Uri uri) {
         String decodedPath = null;
-        if (uri != null) {
-            String lastPathSegment = uri.getLastPathSegment();
+        String lastPathSegment = uri == null ? null : uri.getLastPathSegment();
+        if (lastPathSegment != null) {
             try {
                 decodedPath = URLDecoder.decode(lastPathSegment, "UTF8");
 
