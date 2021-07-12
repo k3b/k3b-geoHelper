@@ -236,15 +236,13 @@ public class GpxReaderBase extends DefaultHandler {
         logger.debug("startElement {}-{}", localName, qName);
         if (name.equals(XmlDefinitions.GpxDef_11.TRKPT) || name.equals(XmlDefinitions.GpxDef_10.WPT)) {
             this.currentGeoPoint = this.newInstance(attributes);
-            final String lat = attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LAT);
-            if (lat != null) this.currentGeoPoint.setLatitude(Double.parseDouble(lat));
-            final String lon = attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LON);
-            if (lon != null) this.currentGeoPoint.setLongitude(Double.parseDouble(lon));
+            final Double lat = getLatOrLong(attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LAT));
+            final Double lon = getLatOrLong(attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LON));
+            if (lat != null && lon != null) this.currentGeoPoint.setLatLon(lat, lon);
         } else if (name.equals(XmlDefinitions.WikimediaDef.COORDINATE)) {
-            final String lat = attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LAT);
-            if (lat != null) this.currentGeoPoint.setLatitude(Double.parseDouble(lat));
-            final String lon = attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LON);
-            if (lon != null) this.currentGeoPoint.setLongitude(Double.parseDouble(lon));
+            final Double lat = getLatOrLong(attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LAT));
+            final Double lon = getLatOrLong(attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LON));
+            if (lat != null && lon != null) this.currentGeoPoint.setLatLon(lat, lon);
         } else if (name.equals(XmlDefinitions.WikimediaDef.IMAGE)) {
             final String symbol = attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_IMAGE);
             if (symbol != null) this.currentGeoPoint.setSymbol(symbol);
@@ -334,8 +332,11 @@ public class GpxReaderBase extends DefaultHandler {
                     String parts[] = currentXmlElementContent.split("[,\\s]");
                     if ((parts != null) && (parts.length >= 2)) {
                         // note KmlDef_22.COORDINATES use lon,lat reverse order
-                        this.currentGeoPoint.setLatitude(Double.parseDouble(parts[1]));
-                        this.currentGeoPoint.setLongitude(Double.parseDouble(parts[0]));
+                        Double lat = getLatOrLong(parts[1]);
+                        Double lon= getLatOrLong(parts[0]);
+                        if (!GeoPointDto.isEmpty(lat) && !GeoPointDto.isEmpty(lon)) {
+                            this.currentGeoPoint.setLatLon(lat, lon);
+                        }
                     }
                 } catch (NumberFormatException e) {
                     saxError("/kml//Placemark/Point/coordinates>Expected: 'lon,lat,...' but got "
@@ -348,6 +349,14 @@ public class GpxReaderBase extends DefaultHandler {
             }
 
         }
+    }
+
+    protected Double getLatOrLong(String strLatOrLong) {
+        Double result = null;
+        if (strLatOrLong != null) {
+            result = Double.parseDouble(strLatOrLong);
+        }
+        return result;
     }
 
     /** Called for every xml-sax-parser-error */

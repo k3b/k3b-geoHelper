@@ -324,13 +324,13 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         return true;
     }
 
-    public static boolean isEmpty(double value) {
-        return (value == NO_LAT_LON); // (Double.isNaN(value)|| (value == NO_LAT_LON) || (value < -180) || (value > 180));
+    public static boolean isEmpty(Double value) {
+        return (value == null || value == NO_LAT_LON); // (Double.isNaN(value)|| (value == NO_LAT_LON) || (value < -180) || (value > 180));
     }
 
 
     /** return true if either lat or lon is not set (NaN) or if both are 0. */
-    public static boolean isEmpty(double latitude, double longitude) {
+    public static boolean isEmpty(Double latitude, Double longitude) {
         if (isEmpty(latitude) || isEmpty(longitude)) return true;
         return ((latitude == 0.0f) && (longitude == 0.0f));
     }

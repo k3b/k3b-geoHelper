@@ -16,7 +16,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:4.1.3"
+        classpath 'com.android.tools.build:gradle:4.2.2'
 
 		// markdown in javadoc
 		// https://github.com/Abnaxos/pegdown-doclet
@@ -33,8 +33,8 @@ allprojects {
 
 	// https://stackoverflow.com/questions/28450703/how-to-set-the-language-level-in-gradle-so-it-is-ide-agnostic/35827609#35827609
     tasks.withType(JavaCompile) {
-        sourceCompatibility = '1.7'
-        targetCompatibility = '1.7'
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
     } 
 }
 

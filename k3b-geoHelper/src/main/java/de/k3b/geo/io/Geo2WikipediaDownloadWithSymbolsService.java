@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+import java.lang.String;
 
 import de.k3b.geo.GeoConfig;
 import de.k3b.geo.api.IGeoPointInfo;
@@ -41,6 +42,9 @@ public class Geo2WikipediaDownloadWithSymbolsService extends DownloadGpxKmlZipWi
 
     private final String serviceName;
 
+    int radius = 10000;
+    int maxcount = 5;
+
     /**
      * @param serviceName where the data comes from. i.e.  "en.wikipedia.org" or "de.wikivoyage.org"
      * @param userAgent a string identifying the calling app.
@@ -51,6 +55,16 @@ public class Geo2WikipediaDownloadWithSymbolsService extends DownloadGpxKmlZipWi
     public Geo2WikipediaDownloadWithSymbolsService(String serviceName, String userAgent, ITranslateSymbolUri translateSymbolUri) {
         super(userAgent, translateSymbolUri);
         this.serviceName = serviceName;
+    }
+
+    public Geo2WikipediaDownloadWithSymbolsService setRadius(int radius) {
+        this.radius = radius;
+        return this;
+    }
+
+    public Geo2WikipediaDownloadWithSymbolsService setMaxcount(int maxcount) {
+        this.maxcount = maxcount;
+        return this;
     }
 
     private InputStream getInputStream(String urlString) throws IOException {
@@ -67,9 +81,7 @@ public class Geo2WikipediaDownloadWithSymbolsService extends DownloadGpxKmlZipWi
     }
 
     private List<IGeoPointInfo> getGeoPointInfos(Object lat, Object lon) throws IOException {
-        int radius = 10000;
-        int maxcount = 5;
-        String urlString = this.getQueryGeoUrlString(lat, lon, radius, maxcount);
+        String urlString = this.getQueryGeoUrlString(lat, lon);
         LOGGER.info("downloading from {}", urlString);
         InputStream inputStream = this.getInputStream(urlString);
         GpxReader<IGeoPointInfo> parser = new GpxReader<>();
@@ -85,7 +97,7 @@ public class Geo2WikipediaDownloadWithSymbolsService extends DownloadGpxKmlZipWi
     }
 
     /** api creates url that encodes what we want to get from wikipedia  */
-    private String getQueryGeoUrlString(Object lat, Object lon, int radius, int maxcount) {
+    private String getQueryGeoUrlString(Object lat, Object lon) {
         // see https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page
         String urlString = "https://" +
                 serviceName +

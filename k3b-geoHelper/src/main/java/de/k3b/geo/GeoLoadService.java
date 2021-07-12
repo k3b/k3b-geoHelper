@@ -39,7 +39,6 @@ import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.io.gpx.GeoXmlOrTextParser;
 import de.k3b.geo.io.gpx.GpxReaderBase;
 
-/* TODO: move to Geohelper */
 public class GeoLoadService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoLoadService.class);
 

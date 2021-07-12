@@ -1,6 +1,5 @@
 // startParameter.offline=true
 
 include ':k3b-geoHelper', ':geo-testgui', ':demo-geoHelper', ':k3b-geoHelperConsole'
-include ':geo2wikipedia'
 include ':k3b-geoHelperAndroid'
 

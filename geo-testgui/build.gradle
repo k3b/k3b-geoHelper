@@ -18,8 +18,8 @@ android {
         versionName = PUBLISH_VERSION
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         release {
@@ -29,6 +29,9 @@ android {
     }
     lintOptions {
         abortOnError false
+    }
+    dependenciesInfo {
+        includeInApk true
     }
 }
 
