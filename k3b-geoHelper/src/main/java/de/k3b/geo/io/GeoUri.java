@@ -321,7 +321,8 @@ public class GeoUri {
 
             // parameters from standard value and/or infered
             List<String> whereToSearch = new ArrayList<String>();
-            whereToSearch.add(getParam(parmLookup, GeoUriDef.QUERY, null)); // lat lon from q have precedence over url-path
+            String queryParameter = getParam(parmLookup, GeoUriDef.QUERY, null);
+            whereToSearch.add(queryParameter); // lat lon from q have precedence over url-path
             whereToSearch.add(newUri);
             whereToSearch.add(getParam(parmLookup, GeoUriDef.LAT_LON, null));
 
@@ -342,6 +343,9 @@ public class GeoUri {
             if (inferMissing) {
                 parseResult.setLink(parseFindFromPattern(patternHref, parseResult.getLink(), whereToSearch));
                 parseResult.setSymbol(parseFindFromPattern(patternSrc, parseResult.getSymbol(), whereToSearch));
+            }
+            if (parseResult.getName() == null && GeoPointDto.isEmpty(parseResult) && queryParameter != null) {
+                parseResult.setName(queryParameter);
             }
         } else {
             // no query parameter

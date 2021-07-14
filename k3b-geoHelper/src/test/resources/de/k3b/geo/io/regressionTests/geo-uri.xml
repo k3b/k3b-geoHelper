@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<someRoot 	xmlns:expectedTestResult="uri:https://github.com/k3b/k3b-geoHelper/" >
+    <!--
+		k3b-geoHelper/k3b-geoHelper/src/test/resources/de/k3b/geo/io/regressionTests/geo-uri.xml
+		This file conatain regression test data for geo-uri-s that can be interpreted as
+        geopoint by extracting geo data from uri.
+
+        expectedTestResult:id contain the expected parsing result
+
+        since this is xml, special chars must be url-encoded
+        -->
+
+    <!-- full geo uri -->
+    <poi geoUri="geo:52,9?q=(theName)&amp;z=5&amp;z2=7&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z">
+        <expectedTestResult:id>geo:52,9?q=(theName)&amp;z=5&amp;z2=7&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z</expectedTestResult:id>
+    </poi>
+    <!-- standard geo uri with lat/lon/name -->
+    <poi geoUri="geo:52,9?q=(theName)">
+        <expectedTestResult:id>geo:52,9?q=(theName)</expectedTestResult:id>
+    </poi>
+    <!-- standard geo uri with lat/lon/name used by google -->
+    <poi geoUri="geo:0,0?q=52,9,0(theName)">
+        <expectedTestResult:id>geo:52,9?q=(theName)</expectedTestResult:id>
+    </poi>
+
+    <!-- name only without lat/lon -->
+    <poi geoUri="geo:0,0?q=(theName)">
+        <expectedTestResult:id>geo:0,0?q=(theName)</expectedTestResult:id>
+    </poi>
+    <!-- name only without lat/lon -->
+    <poi geoUri="geo:?q=(theName)">
+        <expectedTestResult:id>geo:?q=(theName)</expectedTestResult:id>
+    </poi>
+
+    <!-- name only without () and without lat/lon used to translate adress from text to geo -->
+    <poi geoUri="geo:?q=searchTerm">
+        <expectedTestResult:id>geo:?q=(searchTerm)</expectedTestResult:id>
+    </poi>
+    <poi geoUri="geo:0,0?q=searchTerm">
+        <expectedTestResult:id>geo:0,0?q=(searchTerm)</expectedTestResult:id>
+    </poi>
+    <!-- adress search used by Android calendar Etar -->
+    <poi geoUri="geo:0,0?q=Street%20name%2012,%20[postal code]%20[city name]">
+        <expectedTestResult:id>geo:0,0?q=(Street+name+12%2C+%5Bpostal+code%5D+%5Bcity+name%5D)</expectedTestResult:id>
+    </poi>
+
+    <poi geoUri="geo:0,0?q=Street%20name%2012,%20[postal code]%20[city name]">
+        <expectedTestResult:id><![CDATA[geo:0,0?q=(Street+name+12%2C+%5Bpostal+code%5D+%5Bcity+name%5D)]]></expectedTestResult:id>
+    </poi>
+</someRoot>

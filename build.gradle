@@ -2,7 +2,7 @@
 ext {
     // v1.1.7
     // v1.1.8 fix npe
-    PUBLISH_VERSION = 'v1.1.8' // SNAPSHOT means latest version in in github branch "master"
+    PUBLISH_VERSION = 'v1.1.9-SNAPSHOT' // SNAPSHOT means latest version in in github branch "master"
     ANDROID_VERSIONCODE = 101008
 
     PUBLISH_GROUP_ID = 'com.github.k3b'
