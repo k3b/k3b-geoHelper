@@ -316,6 +316,29 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         return super.toString();
     }
 
+    /** For display/debugging: Either the {@link #getName()}
+     * or #{@link #getId()} plus (lat/lon). */
+    public static String toString(IGeoPointInfo point) {
+        if (point != null) {
+            StringBuilder result = new StringBuilder();
+            if (point.getName() != null && !point.getName().isEmpty()) {
+                result.append(point.getName());
+            } else if (point.getId() != null) {
+                result.append("#" + point.getId());
+            }
+            if (!isEmpty(point)) {
+                result.append("(" + point.getLatitude() +
+                        "," + point.getLongitude() + ")");
+            }
+            if (result.length() > 0) {
+                return result.toString();
+            }
+        }
+
+        return "";
+    }
+
+
     /** return true if either lat or lon is not set (NaN) or if both are 0. */
     public static boolean isEmpty(ILocation point) {
         if (point != null) {
