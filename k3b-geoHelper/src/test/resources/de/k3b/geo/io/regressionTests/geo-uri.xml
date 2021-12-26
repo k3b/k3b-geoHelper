@@ -11,22 +11,33 @@
         -->
 
     <!-- full geo uri -->
-    <poi geoUri="geo:52,9?q=(theName)&amp;z=5&amp;z2=7&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z">
-        <expectedTestResult:id>geo:52,9?q=(theName)&amp;z=5&amp;z2=7&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z</expectedTestResult:id>
+    <poi geoUri="geo:-89,-179?q=(theName)&amp;z=5&amp;z2=7&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z">
+        <expectedTestResult:id>geo:-89,-179?q=(theName)&amp;z=5&amp;z2=7&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z</expectedTestResult:id>
     </poi>
     <!-- standard geo uri with lat/lon/name -->
     <poi geoUri="geo:52,9?q=(theName)">
         <expectedTestResult:id>geo:52,9?q=(theName)</expectedTestResult:id>
     </poi>
     <!-- standard geo uri with lat/lon/name used by google -->
-    <poi geoUri="geo:0,0?q=52,9,0(theName)">
-        <expectedTestResult:id>geo:52,9?q=(theName)</expectedTestResult:id>
+    <poi geoUri="geo:0,0?q=52,9,0(theName,containing,kommas)">
+        <expectedTestResult:id>geo:52,9?q=(theName%2Ccontaining%2Ckommas)</expectedTestResult:id>
     </poi>
 
     <!-- name only without lat/lon -->
     <poi geoUri="geo:0,0?q=(theName)">
         <expectedTestResult:id>geo:0,0?q=(theName)</expectedTestResult:id>
     </poi>
+
+    <!-- lat/lon only in query part -->
+    <poi geoUri="geo:0,0?q=52,9">
+        <expectedTestResult:id>geo:52,9</expectedTestResult:id>
+    </poi>
+
+    <!-- lat/lon only in query part -->
+    <poi geoUri="geo:?q=52,9">
+        <expectedTestResult:id>geo:52,9</expectedTestResult:id>
+    </poi>
+
     <!-- name only without lat/lon -->
     <poi geoUri="geo:?q=(theName)">
         <expectedTestResult:id>geo:?q=(theName)</expectedTestResult:id>
@@ -44,7 +55,19 @@
         <expectedTestResult:id>geo:0,0?q=(Street+name+12%2C+%5Bpostal+code%5D+%5Bcity+name%5D)</expectedTestResult:id>
     </poi>
 
+    <!-- adress search used by Android calendar Etar -->
     <poi geoUri="geo:0,0?q=Street%20name%2012,%20[postal code]%20[city name]">
-        <expectedTestResult:id><![CDATA[geo:0,0?q=(Street+name+12%2C+%5Bpostal+code%5D+%5Bcity+name%5D)]]></expectedTestResult:id>
+        <expectedTestResult:id>geo:0,0?q=(Street+name+12%2C+%5Bpostal+code%5D+%5Bcity+name%5D)</expectedTestResult:id>
     </poi>
+
+    <!-- https://github.com/k3b/k3b-geoHelper/issues/7 lat/lon outside -180..+180 -->
+    <poi geoUri="geo:0,0?q=Testgasse13, 12345 Testhausen, Germany">
+        <expectedTestResult:id>geo:?q=(Testgasse13%2C+12345+Testhausen%2C+Germany)</expectedTestResult:id>
+    </poi>
+
+    <!-- https://github.com/k3b/k3b-geoHelper/issues/7 ignore because of " " before lat/lon -->
+    <poi geoUri="geo:0,0?q=Testgasse 13, 00045 Testhausen, Germany">
+        <expectedTestResult:id>geo:?q=(Testgasse+13%2C+00045+Testhausen%2C+Germany)</expectedTestResult:id>
+    </poi>
+
 </someRoot>

@@ -37,15 +37,15 @@ import de.k3b.geo.api.IGeoPointInfo;
  */
 public class GeoFormatter {
     /* Converter for Datatypes */
-    private static final DecimalFormat latLonFormatter
+    private static final DecimalFormat FORMATTER_LAT_LON
             = new DecimalFormat("#.#######", new DecimalFormatSymbols(Locale.ENGLISH));
-    private static final DateFormat timeFormatter
+    private static final DateFormat FORMATTER_TIME
             = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-    public static final String LatLonNegativPrefix = "sSwW";
-    public static final String LatLonPrefix = "nNeE" + LatLonNegativPrefix;
+    public static final String PREFIX_LAT_LON_NEGATIV = "sSwW";
+    public static final String PREFIX_LAT_LON = "nNeE" + PREFIX_LAT_LON_NEGATIV;
 
     static {
-        timeFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        FORMATTER_TIME.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     private GeoFormatter() {}
@@ -55,18 +55,18 @@ public class GeoFormatter {
         String newVal = oldVal;
         if ((newVal == null) || (newVal.length() < 1)) return IGeoPointInfo.NO_LAT_LON;
         char latLonPrefix = newVal.charAt(0);
-        if (LatLonPrefix.indexOf(latLonPrefix) >= 0) {
+        if (PREFIX_LAT_LON.indexOf(latLonPrefix) >= 0) {
             newVal = newVal.substring(1);
         }
-        double doubleValue = latLonFormatter.parse(newVal).doubleValue();
-        if (LatLonNegativPrefix.indexOf(latLonPrefix) >= 0) doubleValue *= -1;
+        double doubleValue = FORMATTER_LAT_LON.parse(newVal).doubleValue();
+        if (PREFIX_LAT_LON_NEGATIV.indexOf(latLonPrefix) >= 0) doubleValue *= -1;
         return doubleValue;
     }
 
     /** Parsing helper: Converts  a {@link double} lat or lon value to {@link String}. */
     public static String formatLatLon(double latitude) {
         if (latitude != IGeoPointInfo.NO_LAT_LON) {
-            return latLonFormatter.format(latitude);
+            return FORMATTER_LAT_LON.format(latitude);
         }
         return "";
     }
@@ -74,7 +74,7 @@ public class GeoFormatter {
     /** Parsing helper: Converts a {@link Date} value to {@link String}. */
     public static String formatDate(Date date) {
         if (date != null) {
-            return timeFormatter.format(date);
+            return FORMATTER_TIME.format(date);
         }
         return "";
     }

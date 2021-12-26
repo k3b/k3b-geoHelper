@@ -18,6 +18,8 @@
 
 package de.k3b.geo.io;
 
+import static de.k3b.geo.api.IGeoPointInfo.NO_ZOOM;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -127,24 +129,25 @@ public class GeoUri {
 
     /* Regular expressions used by the parser.<br/>
        '(?:"+something+")"' is a non capturing group; "\s" white space */
-    private final static String regexpName = "(?:\\s*\\(([^\\(\\)]+)\\))"; // i.e. " (hallo world)"
-    private final static Pattern patternName = Pattern.compile(regexpName);
-    private final static String regexpDouble = "([+\\-" + GeoFormatter.LatLonPrefix +
-            "]?[0-9\\.]+)"; // i.e. "-123.456" or "S123.456"
-    // private final static String regexpDoubleOptional = regexpDouble + "?";
-    private final static String regexpCommaDouble = "(?:\\s*,\\s*" + regexpDouble + ")"; // i.e. " , +123.456"
-    private final static String regexpCommaDoubleOptional = regexpCommaDouble + "?";
-    private final static String regexpLatLonAlt = regexpDouble + regexpCommaDouble + regexpCommaDoubleOptional;
-    private final static String regexpLatLonLatLon = regexpDouble + regexpCommaDouble + regexpCommaDouble + regexpCommaDouble;
-    private final static Pattern patternLatLonAlt = Pattern.compile(regexpLatLonAlt);
-    private final static Pattern patternLatLonLatLon = Pattern.compile(regexpLatLonLatLon);
-    // private final static Pattern patternTime = Pattern.compile("([12]\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ)");
+    private static final String REGEXP_NAME = "(?:\\s*\\(([^()]+)\\))"; // i.e. " (hallo world)"
+    private static final Pattern PATTERN_NAME = Pattern.compile(REGEXP_NAME);
+    private static final String REGEXP_DOUBLE = "([+\\-" + GeoFormatter.PREFIX_LAT_LON +
+            "]?[0-9.]+)"; // i.e. "-123.456" or "S123.456"
+    // private static final String regexpDoubleOptional = regexpDouble + "?";
+    private static final String REGEXP_COMMA_DOUBLE = "(?:\\s*,\\s*" + REGEXP_DOUBLE + ")"; // i.e. " , +123.456"
+    private static final String REGEXP_COMMA_DOUBLE_OPTIONAL = REGEXP_COMMA_DOUBLE + "?";
+    private static final String REGEXP_VALID_PREFIX = ""; //  "^(?:[^a-mo-rt-zA-MO-RT-Z])*"; // no chars except nsew
+    private static final String REGEXP_LAT_LON_ALT = REGEXP_VALID_PREFIX + REGEXP_DOUBLE + REGEXP_COMMA_DOUBLE + REGEXP_COMMA_DOUBLE_OPTIONAL;
+    private static final String REGEXP_LAT_LON_LAT_LON = REGEXP_DOUBLE + REGEXP_COMMA_DOUBLE + REGEXP_COMMA_DOUBLE + REGEXP_COMMA_DOUBLE;
+    private static final Pattern PATTERN_LAT_LON_ALT = Pattern.compile(REGEXP_LAT_LON_ALT);
+    private static final Pattern PATTERN_LAT_LON_LAT_LON = Pattern.compile(REGEXP_LAT_LON_LAT_LON);
+    // private static final Pattern patternTime = Pattern.compile("([12]\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ)");
 
-    private final static String regexpHref = "(?:\\s*href\\s?\\=\\s?['\"]([^'\"]*)['\"])"; // i.e. href='hallo'
-    private final static Pattern patternHref = Pattern.compile(regexpHref);
+    private static final String REGEXP_HREF = "(?:\\s*href\\s?=\\s?['\"]([^'\"]*)['\"])"; // i.e. href='hallo'
+    private static final Pattern PATTERN_HREF = Pattern.compile(REGEXP_HREF);
 
-    private final static String regexpSrc = "(?:\\s*src\\s?\\=\\s?['\"]([^'\"]*)['\"])"; // i.e. src='hallo'
-    private final static Pattern patternSrc = Pattern.compile(regexpSrc);
+    private static final String REGEXP_SRC = "(?:\\s*src\\s?=\\s?['\"]([^'\"]*)['\"])"; // i.e. src='hallo'
+    private static final Pattern PATTERN_SRC = Pattern.compile(REGEXP_SRC);
 
     /* Current state */
 
@@ -224,17 +227,33 @@ public class GeoUri {
     }
 
     private static void setLatLonZoom(GeoPointDto parseResult, String latString, String lonString, String zoom) {
-        if ((parseResult.getZoomMin() == GeoPointDto.NO_ZOOM) && (zoom != null)) {
+        if ((parseResult.getZoomMin() == NO_ZOOM) && (zoom != null)) {
             parseResult.setZoomMin(GeoFormatter.parseZoom(zoom));
         }
 
         try {
+
+            Double lat = null;
+            Double lon = null;
             // !!! isNaN does not work
-            if ((latString != null) && GeoPointDto.isEmpty(parseResult.getLatitude())) parseResult.setLatitude(GeoFormatter.parseLatOrLon(latString));
-            if ((lonString != null) && GeoPointDto.isEmpty(parseResult.getLongitude()))  parseResult.setLongitude(GeoFormatter.parseLatOrLon(lonString));
+            if ((latString != null) && GeoPointDto.isEmpty(parseResult.getLatitude())) {
+                lat = GeoFormatter.parseLatOrLon(latString);
+            }
+            if ((lonString != null) && GeoPointDto.isEmpty(parseResult.getLongitude()))  {
+                lon = GeoFormatter.parseLatOrLon(lonString);
+            }
+
+            if (isValid(lon,-180.0,+180.0) && isValid(lat,-90.0,+90.0)) {
+                parseResult.setLongitude(lon);
+                parseResult.setLatitude(lat);
+            }
         } catch (ParseException e) {
             e.printStackTrace();
         }
+    }
+
+    private static boolean isValid(Double value, double min, double max) {
+        return value != null && value >= min && value <= max;
     }
 
     private <TGeo extends GeoPointDto> TGeo getOpenstreetmapUri(String uri, TGeo parseResult) {
@@ -278,7 +297,7 @@ public class GeoUri {
     }
 
     private <TGeo extends GeoPointDto> TGeo getGoogleUri(String uri, TGeo parseResult) {
-        String newUri = uri.replaceAll("q=loc:", "q=");
+        String newUri = uri.replace("q=loc:", "q=");
 
         // https://www.google.com/maps/@52.1,9.2,14z"
         int dataStart = contentIndexBehind(newUri, "/@");
@@ -302,7 +321,7 @@ public class GeoUri {
         if (queryOffset >= 0) {
             String query = uri.substring(queryOffset + 1);
             String newUri = uri.substring(0, queryOffset);
-            HashMap<String, String> parmLookup = new HashMap<String, String>();
+            HashMap<String, String> parmLookup = new HashMap<>();
             String[] params = query.split("&");
             for (String param : params) {
                 parseAddQueryParamToMap(parmLookup, param);
@@ -312,15 +331,15 @@ public class GeoUri {
             parseResult.setSymbol(getParam(parmLookup, GeoUriDef.SYMBOL, parseResult.getSymbol()));
             parseResult.setId(getParam(parmLookup, GeoUriDef.ID, parseResult.getId()));
 
-            if (parseResult.getZoomMin() == GeoPointDto.NO_ZOOM) {
+            if (parseResult.getZoomMin() == NO_ZOOM) {
                 setLatLonZoom(parseResult, null, null, getParam(parmLookup, GeoUriDef.ZOOM, null));
             }
-            if (parseResult.getZoomMax() == GeoPointDto.NO_ZOOM) {
+            if (parseResult.getZoomMax() == NO_ZOOM) {
                 parseResult.setZoomMax(GeoFormatter.parseZoom(getParam(parmLookup, GeoUriDef.ZOOM_MAX, null)));
             }
 
             // parameters from standard value and/or infered
-            List<String> whereToSearch = new ArrayList<String>();
+            List<String> whereToSearch = new ArrayList<>();
             String queryParameter = getParam(parmLookup, GeoUriDef.QUERY, null);
             whereToSearch.add(queryParameter); // lat lon from q have precedence over url-path
             whereToSearch.add(newUri);
@@ -332,26 +351,26 @@ public class GeoUri {
                 whereToSearch.addAll(parmLookup.values());
             }
 
-            parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));
+            parseResult.setName(parseFindFromPattern(PATTERN_NAME, parseResult.getName(), whereToSearch));
             parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), getParam(parmLookup, GeoUriDef.TIME, null), whereToSearch));
 
-            parseLatOrLon(parseResult, whereToSearch);
+            parseLatOrLon(parseResult, whereToSearch, inferMissing);
 
             if (parseResult.getName() == null) {
                 parseResult.setName(getParam(parmLookup, GeoUriDef.NAME, null));
             }
             if (inferMissing) {
-                parseResult.setLink(parseFindFromPattern(patternHref, parseResult.getLink(), whereToSearch));
-                parseResult.setSymbol(parseFindFromPattern(patternSrc, parseResult.getSymbol(), whereToSearch));
+                parseResult.setLink(parseFindFromPattern(PATTERN_HREF, parseResult.getLink(), whereToSearch));
+                parseResult.setSymbol(parseFindFromPattern(PATTERN_SRC, parseResult.getSymbol(), whereToSearch));
             }
             if (parseResult.getName() == null && GeoPointDto.isEmpty(parseResult) && queryParameter != null) {
                 parseResult.setName(queryParameter);
             }
         } else {
             // no query parameter
-            List<String> whereToSearch = new ArrayList<String>();
+            List<String> whereToSearch = new ArrayList<>();
             whereToSearch.add(uri);
-            parseLatOrLon(parseResult, whereToSearch);
+            parseLatOrLon(parseResult, whereToSearch, false);
         }
         return parseResult;
     }
@@ -368,17 +387,13 @@ public class GeoUri {
         if ((uri == null) || (parseResult == null) || (parseResult.length < 2)) return null;
         if (!uri.startsWith(AREA_SCHEME)) return null;
 
-        Matcher m = parseFindWithPattern(patternLatLonLatLon, uri);
+        Matcher m = parseFindWithPattern(PATTERN_LAT_LON_LAT_LON, uri);
 
         if (m != null) {
             int nextCoord = 1;
-            try {
-                parseResult[0].setLatitude(GeoFormatter.parseLatOrLon(m.group(nextCoord++))).setLongitude(GeoFormatter.parseLatOrLon(m.group(nextCoord++)));
-                parseResult[1].setLatitude(GeoFormatter.parseLatOrLon(m.group(nextCoord++))).setLongitude(GeoFormatter.parseLatOrLon(m.group(nextCoord++)));
-                return parseResult;
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            setLatLonZoom(parseResult[0], m.group(nextCoord++), m.group(nextCoord++), null);
+            setLatLonZoom(parseResult[1], m.group(nextCoord++), m.group(nextCoord++), null);
+            return parseResult;
         }
         return null;
     }
@@ -387,13 +402,13 @@ public class GeoUri {
     public static GeoPointDto inferMissing(GeoPointDto parseResult, String textToBeAnalysed) {
 
         if (textToBeAnalysed != null) {
-            List<String> whereToSearch = new ArrayList<String>();
+            List<String> whereToSearch = new ArrayList<>();
             whereToSearch.add(textToBeAnalysed);
 
-            parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));
+            parseResult.setName(parseFindFromPattern(PATTERN_NAME, parseResult.getName(), whereToSearch));
             parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), null, whereToSearch));
-            parseResult.setLink(parseFindFromPattern(patternHref, parseResult.getLink(), whereToSearch));
-            parseResult.setSymbol(parseFindFromPattern(patternSrc, parseResult.getSymbol(), whereToSearch));
+            parseResult.setLink(parseFindFromPattern(PATTERN_HREF, parseResult.getLink(), whereToSearch));
+            parseResult.setSymbol(parseFindFromPattern(PATTERN_SRC, parseResult.getSymbol(), whereToSearch));
         }
         return parseResult;
     }
@@ -405,15 +420,21 @@ public class GeoUri {
 
     /** Parsing helper: Set first finding of lat and lon to parseResult */
     public static void parseLatOrLon(GeoPointDto parseResult, String... whereToSearch) {
-        parseLatOrLon(parseResult, toStringArray(whereToSearch));
+        parseLatOrLon(parseResult, toStringArray(whereToSearch), false);
     }
 
     /** Parsing helper: Set first finding of lat and lon to parseResult */
-    private static void parseLatOrLon(GeoPointDto parseResult, List<String> whereToSearch) {
-        Matcher m = parseFindWithPattern(patternLatLonAlt, whereToSearch);
+    private static void parseLatOrLon(GeoPointDto parseResult, List<String> whereToSearch, boolean inferMissing) {
+        StringBuilder originalSearchText = new StringBuilder();
+        Matcher m = parseFindWithPattern(PATTERN_LAT_LON_ALT, whereToSearch, originalSearchText);
 
         if (m != null) {
-           setLatLonZoom(parseResult, m.group(1), m.group(2), null);
+            int start = m.start();
+            boolean valid = inferMissing || start == 0
+                    || originalSearchText.charAt(start - 1) != ' ';
+            if (valid) {
+                setLatLonZoom(parseResult, m.group(1), m.group(2), null);
+            }
         }
     }
 
@@ -421,7 +442,7 @@ public class GeoUri {
      * Returns currentValue or content of first matching group of pattern. */
     private static String parseFindFromPattern(Pattern pattern, String currentValue, List<String> whereToSearch) {
         if ((currentValue == null) || (currentValue.length() == 0)) {
-            Matcher m = parseFindWithPattern(pattern, whereToSearch);
+            Matcher m = parseFindWithPattern(pattern, whereToSearch, null);
             String found = (m != null) ? m.group(1) : null;
             if (found != null) {
                 return found;
@@ -442,11 +463,17 @@ public class GeoUri {
     }
 
     /** Parsing helper: Returns the match of the first finding of pattern in whereToSearch. */
-    private static Matcher parseFindWithPattern(Pattern pattern, List<String> whereToSearch) {
+    private static Matcher parseFindWithPattern(Pattern pattern, List<String> whereToSearch,
+                                                StringBuilder originalSearchText) {
         if (whereToSearch != null) {
             for (String candidate : whereToSearch) {
                 Matcher m = parseFindWithPattern(pattern, candidate);
-                if (m != null) return m;
+                if (m != null) {
+                    if (originalSearchText != null) {
+                        originalSearchText.append(candidate);
+                    }
+                    return m;
+                }
             }
         }
         return null;

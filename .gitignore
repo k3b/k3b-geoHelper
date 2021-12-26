@@ -42,3 +42,4 @@ gradle-app.setting
 
 osmdroid-third-party/libs/maps.jar
 osmdroid-android
+/k3b-geoHelper/src/test/resources/de/k3b/geo/io/regressionTests/debug.xml
