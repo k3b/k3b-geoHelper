@@ -321,14 +321,18 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
     public static String toString(IGeoPointInfo point) {
         if (point != null) {
             StringBuilder result = new StringBuilder();
-            if (point.getName() != null && !point.getName().isEmpty()) {
+            if (isNotEmpty(point.getName())) {
                 result.append(point.getName());
             } else if (point.getId() != null) {
                 result.append("#" + point.getId());
             }
             if (!isEmpty(point)) {
-                result.append("(" + point.getLatitude() +
-                        "," + point.getLongitude() + ")");
+                result
+                        .append("(")
+                        .append(point.getLatitude())
+                        .append(",")
+                        .append(point.getLongitude())
+                        .append(")");
             }
             if (result.length() > 0) {
                 return result.toString();
@@ -336,6 +340,13 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
         }
 
         return "";
+    }
+
+    private static boolean isNotEmpty(String name) {
+        // !name.isEmpty() requieres android GINGERBREAD and later
+        // return name != null && !name.isEmpty();
+        // code should run on older android versions, too
+        return name != null && name.length() > 0;
     }
 
 
