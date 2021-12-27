@@ -70,4 +70,9 @@
         <expectedTestResult:id>geo:?q=(Testgasse+13%2C+00045+Testhausen%2C+Germany)</expectedTestResult:id>
     </poi>
 
+    <!-- https://github.com/k3b/k3b-geoHelper/issues/7 False positive because of infer -->
+    <poi infer="1" geoUri="geo:0,0?q=Testgasse 13, 00045 Testhausen, Germany">
+        <expectedTestResult:id>geo:13,45</expectedTestResult:id>
+    </poi>
+
 </someRoot>

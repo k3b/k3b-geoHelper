@@ -62,7 +62,7 @@ public class GeoPointDtoRegressionTests {
             "2, gpx-similar.gpx",
             "10, poi.xml",
             "1, wikimedia.poi",
-            "13, geo-uri.xml",
+            "14, geo-uri.xml",
             "15, https-mapservice-urls.xml"})
     public void checkPoiResource(int expectedNumberOfPois, String resourceName)  {
         List<IGeoPointInfo> pois = getiGeoPointInfos(resourceName);
