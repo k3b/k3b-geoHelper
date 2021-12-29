@@ -23,7 +23,7 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">5</div>
+<div class="counter">6</div>
 <p>tests</p>
 </div>
 </td>
@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.017s</div>
+<div class="counter">0.014s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,27 +79,32 @@
 </thead>
 <tr>
 <td class="success">parseFormatGpx10ShortTest</td>
-<td>0.003s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">parseFormatGpx11FullTest</td>
-<td>0.005s</td>
+<td class="success">0.003s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">parseFormatGpx11ShortTest</td>
-<td>0.003s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">parseFormatGpx11WithNamespaceTest</td>
-<td>0.003s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">parseFormatKmlShortTest</td>
-<td>0.003s</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">shouldNotCrashWithEllegalCharsGpxFormatter</td>
+<td class="success">0.003s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -111,68 +116,86 @@
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -trk
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -trkseg
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -trkpt
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -time
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -name
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name 262:3:562:54989
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -desc
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc type: cell, accuracy: 1640, confidence: 75
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -link
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  link
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkpt
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkseg
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trk
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  gpx
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  link 
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkpt 
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkseg 
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trk 
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  gpx 
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Placemark
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -name
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name 262:3:562:54989
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -description
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  description
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  description type: cell, accuracy: 1640, confidence: 75
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Point
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -coordinates
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  coordinates
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Point
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -when
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  when
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  coordinates 8.7178206,53.1099972,0
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Point 8.7178206,53.1099972,0
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark 8.7178206,53.1099972,0
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -trkpt
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -time
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -name
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name 262:3:562:54989
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -desc
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc type: cell, accuracy: 1640, confidence: 75
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -link
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  link
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkpt
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -wpt
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -time
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  link 
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkpt 
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -xml
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -trkpt
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -name
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name charsNotAllowdInXml:=&gt;&lt;&amp; '&quot;
+
+	
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -desc
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc charsNotAllowdInXml:=&gt;&lt;&amp; '&quot;
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -link
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  link 
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -extensions
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:sym
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:sym charsNotAllowdInXml:=&gt;&lt;&amp; '&quot;
+
+	
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:id charsNotAllowdInXml:=&gt;&lt;&amp; '&quot;
+
+	
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  extensions charsNotAllowdInXml:=&gt;&lt;&amp; '&quot;
+
+	
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkpt charsNotAllowdInXml:=&gt;&lt;&amp; '&quot;
+
+	
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  xml charsNotAllowdInXml:=&gt;&lt;&amp; '&quot;
+
+	
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -wpt
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -name
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name 262:3:562:54989
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -desc
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc type: cell, accuracy: 1640, confidence: 75
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -url
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  url
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  wpt
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  url geo:0,0?q=12.34,56.78(name)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  wpt geo:0,0?q=12.34,56.78(name)
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -something
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -g:gpx
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -g:trk
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -g:trkseg
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -g:trkpt
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -g:time
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:time
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -g:name
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:name
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:name 262:3:562:54989
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -g:desc
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:desc
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:desc type: cell, accuracy: 1640, confidence: 75
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -g:link
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:link
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:trkpt
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:trkseg
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:trk
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:gpx
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  something
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:link geo:0,0?q=12.34,56.78(name)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:trkpt geo:0,0?q=12.34,56.78(name)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:trkseg geo:0,0?q=12.34,56.78(name)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:trk geo:0,0?q=12.34,56.78(name)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  g:gpx geo:0,0?q=12.34,56.78(name)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  something geo:0,0?q=12.34,56.78(name)
 </pre>
 </span>
 </div>
@@ -184,7 +207,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 2.4</a> at 30.03.2016 17:15:07</p>
+<a href="http://www.gradle.org">Gradle 6.7.1</a> at 27.12.2021, 01:04:32</p>
 </div>
 </div>
 </body>

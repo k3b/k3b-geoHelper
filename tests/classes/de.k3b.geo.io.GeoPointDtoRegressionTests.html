@@ -23,7 +23,7 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">1</div>
+<div class="counter">9</div>
 <p>tests</p>
 </div>
 </td>
@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.138s</div>
+<div class="counter">0.193s</div>
 <p>duration</p>
 </div>
 </td>
@@ -78,8 +78,48 @@
 </tr>
 </thead>
 <tr>
-<td class="success">regressionTest</td>
-<td>0.138s</td>
+<td class="success">checkPoiResource(0, empty.xml) [0]</td>
+<td class="success">0.096s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">checkPoiResource(1, gpx10.gpx) [2]</td>
+<td class="success">0.006s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">checkPoiResource(1, gpx11.gpx) [1]</td>
+<td class="success">0.021s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">checkPoiResource(1, wikimedia.poi) [6]</td>
+<td class="success">0.006s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">checkPoiResource(10, poi.xml) [5]</td>
+<td class="success">0.016s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">checkPoiResource(14, geo-uri.xml) [7]</td>
+<td class="success">0.013s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">checkPoiResource(15, https-mapservice-urls.xml) [8]</td>
+<td class="success">0.013s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">checkPoiResource(2, gpx-similar.gpx) [4]</td>
+<td class="success">0.008s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">checkPoiResource(5, kml22.kml) [3]</td>
+<td class="success">0.014s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -88,163 +128,419 @@
 <h2>Standard error</h2>
 <span class="code">
 <pre>[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -someRoot
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  someRoot
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  someRoot 
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -gpx
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -trk
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -trkseg
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -trkpt
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -name
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name theName
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -desc
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -time
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc theDesc
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -link
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  link
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkpt
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkseg
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trk
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  gpx
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  link 
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -extensions
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName)&amp;z=5&amp;z2=7&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:time
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:time 2015-02-10T08:04:45.000Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:sym
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:sym theIconUrl
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:z 5
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:z2
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:z2 7
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  extensions 7
+				
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkpt 7
+				
+			
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkseg 7
+				
+			
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trk 7
+				
+			
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  gpx 7
+				
+			
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -gpx
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -wpt
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -time
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time 2009-10-16T00:00:00Z
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -url
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  url
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  url theLink
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -name
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name theName
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -desc
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc theDesc
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -time
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  wpt
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  gpx
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time 2015-02-10T08:04:45.000Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -sym
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  sym theIconUrl
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  wpt theIconUrl
+	
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  gpx theIconUrl
+	
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -kml
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Document
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Style
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -IconStyle
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Icon
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -href
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  href 
+              
+                theStyleLink.png
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Icon 
+              
+                theStyleLink.png
+              
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  IconStyle 
+              
+                theStyleLink.png
+              
+            
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Style 
+              
+                theStyleLink.png
+              
+            
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Placemark
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName)&amp;link=theLink&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -description
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  description
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  description theDesc
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -name
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name theName
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -atom:link
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  atom:link
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  atom:link 
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Point
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -coordinates
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  coordinates
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  coordinates 9,52
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -when
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  when
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Point
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  when 2015-02-10T08:04:45.000Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Point 2015-02-10T08:04:45.000Z
+			
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark 2015-02-10T08:04:45.000Z
+			
+		
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Placemark
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:49.5447917,11.949285?t=2015-02-24T03:32:50Z
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -gx:Track
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -when
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  when
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  when 2015-02-24T03:32:50Z
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -gx:coord
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  gx:coord
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  gx:Track
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  gx:coord 11.949285000000001 49.54479166666667 413.4
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  gx:Track 11.949285000000001 49.54479166666667 413.4
+			
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark 11.949285000000001 49.54479166666667 413.4
+			
+		
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Placemark
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?link=theLink&amp;d=%3Ca+href%3D%27theLink%27%3Esomething%3C%2Fa%3E
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -description
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  description
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  description &lt;a href='theLink'&gt;something&lt;/a&gt;
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Point
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -coordinates
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  coordinates
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Point
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Document
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  kml
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  coordinates 9,52
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Point 9,52
+			
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark 9,52
+			
+		
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Placemark
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?s=theStyleLink.png
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -styleUrl
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  styleUrl #theIconId
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Point
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -coordinates
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  coordinates 9,52
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Point 9,52
+			
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark 9,52
+			
+		
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Placemark
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?s=someIcon.png
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -styleUrl
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  styleUrl someIcon.png
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Point
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -coordinates
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  coordinates 9,52
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Point 9,52
+			
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark 9,52
+			
+		
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Document 9,52
+			
+		
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  kml 9,52
+			
+		
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -gpxAlike
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -trkpt
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName)&amp;link=theLink&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -name
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name theName
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -desc
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc theDesc
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -time
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time 2015-02-10T08:04:45.000Z
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -link
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  link
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkpt
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  link theLink
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkpt theLink
+	
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -wpt
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName)&amp;link=theLink&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -time
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time 2009-10-16T00:00:00Z
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -url
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  url
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  url theLink
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -name
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name theName
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -desc
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc theDesc
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -time
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  wpt
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  gpxAlike
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  time 2015-02-10T08:04:45.000Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  wpt 2015-02-10T08:04:45.000Z
+	
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  gpxAlike 2015-02-10T08:04:45.000Z
+	
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -someRoot
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName)&amp;z=5&amp;z2=7&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52,9?q=(theName)&amp;z=5&amp;z2=7&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -d
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  d theDesc
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi theDesc
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+    
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2?q=(theName)&amp;d=the+Descr+contain+%28theName%29%2C+loc+52.1%2C9.2+and+time+2015-02-10T08%3A04%3A45Z&amp;t=2015-02-10T08:04:45Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2?q=(theName)&amp;d=the+Descr+contain+%28theName%29%2C+loc+52.1%2C9.2+and+time+2015-02-10T08%3A04%3A45Z&amp;t=2015-02-10T08:04:45Z
+    
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?link=theLink&amp;s=theIconUrl&amp;d=+href%3D%27theLink%27+src+%3D+%27theIconUrl%27+
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52,9?link=theLink&amp;s=theIconUrl&amp;d=+href%3D%27theLink%27+src+%3D+%27theIconUrl%27+
+    
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?link=theLink&amp;s=theIconUrl&amp;d=+href%3D%22theLink%22+src+%3D+%22theIconUrl%22+
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52,9?link=theLink&amp;s=theIconUrl&amp;d=+href%3D%22theLink%22+src+%3D+%22theIconUrl%22+
+    
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=%28theName%29+2015-02-10T08%3A04%3A45Z+src%3D%27theIconUrl%27+href%3D%27theLink%27&amp;t=2015-02-10T08:04:45Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=%28theName%29+2015-02-10T08%3A04%3A45Z+src%3D%27theIconUrl%27+href%3D%27theLink%27&amp;t=2015-02-10T08:04:45Z
+    
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -trkpt
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkpt
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkpt geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+    
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -wpt
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  wpt
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  wpt geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+    
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Placemark
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  someRoot
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  someRoot geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+    
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -api
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -query
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -pages
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -page
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName)&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -coordinates
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -co
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  co
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  coordinates
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  co 
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  coordinates 
+                
 [Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -thumbnail
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  thumbnail
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  page
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  pages
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  query
-[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  api
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  thumbnail 
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -extract
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  extract theDesc
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  page theDesc
+            
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  pages theDesc
+            
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  query theDesc
+            
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  api theDesc
+            
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -someRoot
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:-89,-179?q=(theName)&amp;z=5&amp;z2=7&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:-89,-179?q=(theName)&amp;z=5&amp;z2=7&amp;link=theLink&amp;s=theIconUrl&amp;d=theDesc&amp;t=2015-02-10T08:04:45Z
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52,9?q=(theName)
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9?q=(theName%2Ccontaining%2Ckommas)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52,9?q=(theName%2Ccontaining%2Ckommas)
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:0,0?q=(theName)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:0,0?q=(theName)
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52,9
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52,9
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52,9
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:?q=(theName)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:?q=(theName)
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:?q=(searchTerm)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:?q=(searchTerm)
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:0,0?q=(searchTerm)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:0,0?q=(searchTerm)
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:0,0?q=(Street+name+12%2C+%5Bpostal+code%5D+%5Bcity+name%5D)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:0,0?q=(Street+name+12%2C+%5Bpostal+code%5D+%5Bcity+name%5D)
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:0,0?q=(Street+name+12%2C+%5Bpostal+code%5D+%5Bcity+name%5D)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:0,0?q=(Street+name+12%2C+%5Bpostal+code%5D+%5Bcity+name%5D)
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:?q=(Testgasse13%2C+12345+Testhausen%2C+Germany)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:?q=(Testgasse13%2C+12345+Testhausen%2C+Germany)
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:?q=(Testgasse+13%2C+00045+Testhausen%2C+Germany)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:?q=(Testgasse+13%2C+00045+Testhausen%2C+Germany)
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:13,45
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:13,45
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  someRoot geo:13,45
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -someRoot
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2?q=(theName)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2?q=(theName)
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2?q=(theName)
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2?q=(theName)
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2?z=14
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2?z=14
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2?z=14
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2?z=14
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2?z=14
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2?z=14
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2?z=14
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2?z=14
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2?z=14
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2?z=14
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2?z=14
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2?z=14
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2?z=14
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2?z=14
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2?z=14
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2?z=14
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2?z=14
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2?z=14
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -expectedTestResult:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  expectedTestResult:id geo:52.1,9.2?z=14
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi geo:52.1,9.2?z=14
+    
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  someRoot geo:52.1,9.2?z=14
+    
 </pre>
 </span>
 </div>
@@ -256,7 +552,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 2.4</a> at 30.03.2016 17:15:07</p>
+<a href="http://www.gradle.org">Gradle 6.7.1</a> at 27.12.2021, 01:04:32</p>
 </div>
 </div>
 </body>

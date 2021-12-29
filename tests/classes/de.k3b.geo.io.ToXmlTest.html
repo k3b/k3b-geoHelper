@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - Class de.k3b.geo.io.ToXmlTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>Class de.k3b.geo.io.ToXmlTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/de.k3b.geo.io.html">de.k3b.geo.io</a> &gt; ToXmlTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">3</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.035s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard error</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">testGpxExport</td>
+<td class="success">0.016s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testKmlExport</td>
+<td class="success">0.015s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testPoiExport</td>
+<td class="success">0.004s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard error</h2>
+<span class="code">
+<pre>[Test worker] INFO de.k3b.geo.io.ToXmlTest - testGpxExport
+&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+&lt;gpx version='1.1' xmlns='http://www.topografix.com/GPX/1/1'
+	xmlns:topografix='http://www.topografix.com/GPX/Private/TopoGrafix/0/1'
+	xmlns:k3b='uri:https://github.com/k3b/k3b-geoHelper/'
+	xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+	xsi:schemaLocation='http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.topografix.com/GPX/Private/TopoGrafix/0/1 http://www.topografix.com/GPX/Private/TopoGrafix/0/1/topografix.xsd'&gt;
+	&lt;trkpt lat='53.1099972' lon='8.7178206'&gt;
+		&lt;name&gt;myName  with forbidden chars &amp;lt;hello world='' &amp;gt;&lt;/name&gt;
+		&lt;desc&gt;my Description  with forbidden chars &amp;lt;hello world='' &amp;gt;&lt;/desc&gt;
+		&lt;link href='https://server/path/to/link?hello=world&amp;amp;32' /&gt;
+		&lt;extensions&gt;
+			&lt;k3b:time&gt;2014-12-19T21:13:21Z&lt;/k3b:time&gt;
+			&lt;k3b:sym&gt;https://server/path/to/Symbol.jpg?hello=world&amp;amp;32&lt;/k3b:sym&gt;
+			&lt;k3b:id&gt;myId with forbidden chars &amp;lt;hello world='' &amp;gt;&lt;/k3b:id&gt;
+			&lt;k3b:z&gt;12&lt;/k3b:z&gt;
+			&lt;k3b:z2&gt;33&lt;/k3b:z2&gt;
+		&lt;/extensions&gt;
+	&lt;/trkpt&gt;
+
+	&lt;trkpt lat='53.0' lon='8.0'&gt;
+	&lt;/trkpt&gt;
+&lt;/gpx&gt;
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -gpx
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -trkpt
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -name
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name myName  with forbidden chars &lt;hello world='' &gt;
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -desc
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  desc my Description  with forbidden chars &lt;hello world='' &gt;
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -link
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  link 
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -extensions
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:time
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:time 2014-12-19T21:13:21Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:sym
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:sym https://server/path/to/Symbol.jpg?hello=world&amp;32
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:id myId with forbidden chars &lt;hello world='' &gt;
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:z 12
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:z2
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:z2 33
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  extensions 33
+		
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkpt 33
+		
+	
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -trkpt
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  trkpt 
+	
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  gpx 
+	
+[Test worker] INFO de.k3b.geo.io.ToXmlTest - testKmlExport
+&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+&lt;kml xmlns='http://www.opengis.net/kml/2.2'
+	xmlns:atom='http://www.w3.org/2005/Atom'
+	xmlns:gx='http://www.google.com/kml/ext/2.2'
+	xmlns:k3b='uri:https://github.com/k3b/k3b-geoHelper/' &gt;
+	&lt;Document&gt;
+		&lt;Style id='default'&gt;
+			&lt;IconStyle id='Symbol'&gt;&lt;Icon&gt;&lt;href&gt;https://server/path/to/Symbol.jpg?hello=world&amp;amp;32&lt;/href&gt;&lt;/Icon&gt;&lt;/IconStyle&gt;
+		&lt;/Style&gt;
+
+		&lt;Placemark&gt;
+			&lt;description&gt;my Description  with forbidden chars &amp;lt;hello world='' &amp;gt;&lt;/description&gt;
+			&lt;name&gt;myName  with forbidden chars &amp;lt;hello world='' &amp;gt;&lt;/name&gt;
+			&lt;k3b:id&gt;myId with forbidden chars &amp;lt;hello world='' &amp;gt;&lt;/k3b:id&gt;
+			&lt;styleUrl&gt;#Symbol&lt;/styleUrl&gt;
+			&lt;atom:link href='https://server/path/to/link?hello=world&amp;amp;32' /&gt;
+			&lt;Point&gt;
+				&lt;coordinates&gt;8.717821,53.109997&lt;/coordinates&gt;
+				&lt;when&gt;2014-12-19T21:13:21Z&lt;/when&gt;
+			&lt;/Point&gt;
+			&lt;k3b:z&gt;12&lt;/k3b:z&gt;
+			&lt;k3b:z2&gt;33&lt;/k3b:z2&gt;
+		&lt;/Placemark&gt;
+		&lt;Placemark&gt;
+			&lt;Point&gt;
+				&lt;coordinates&gt;8.000000,53.000000&lt;/coordinates&gt;
+			&lt;/Point&gt;
+		&lt;/Placemark&gt;
+	&lt;/Document&gt;
+&lt;/kml&gt;
+
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -kml
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Document
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Style
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -IconStyle
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Icon
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -href
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  href https://server/path/to/Symbol.jpg?hello=world&amp;32
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Icon https://server/path/to/Symbol.jpg?hello=world&amp;32
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  IconStyle https://server/path/to/Symbol.jpg?hello=world&amp;32
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Style https://server/path/to/Symbol.jpg?hello=world&amp;32
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Placemark
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -description
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  description my Description  with forbidden chars &lt;hello world='' &gt;
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -name
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  name myName  with forbidden chars &lt;hello world='' &gt;
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:id
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:id myId with forbidden chars &lt;hello world='' &gt;
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -styleUrl
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  styleUrl #Symbol
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -atom:link
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  atom:link 
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Point
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -coordinates
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  coordinates 8.717821,53.109997
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -when
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  when 2014-12-19T21:13:21Z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Point 2014-12-19T21:13:21Z
+			
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:z
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:z 12
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b:z2
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b:z2 33
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark 33
+		
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Placemark
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -Point
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -coordinates
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  coordinates 8.000000,53.000000
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Point 8.000000,53.000000
+			
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Placemark 8.000000,53.000000
+			
+		
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  Document 8.000000,53.000000
+			
+		
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  kml 8.000000,53.000000
+			
+		
+[Test worker] INFO de.k3b.geo.io.ToXmlTest - testPoiExport
+&lt;?xml version='1.0' encoding='UTF-8'?&gt;
+&lt;k3b xmlns='uri:https://github.com/k3b/k3b-geoHelper/'&gt;
+	&lt;poi id='myId with forbidden chars &amp;lt;hello world=&amp;apos;&amp;apos; &amp;gt;' ll='53.109997,8.717821' t='2014-12-19T21:13:21Z' n='myName with forbidden chars &amp;lt;hello world=&amp;apos;&amp;apos; &amp;gt;' link='https://server/path/to/link?hello=world&amp;amp;32' s='https://server/path/to/Symbol.jpg?hello=world&amp;amp;32' z='12' z2='33'&gt;&lt;d&gt;my Description  with forbidden chars &amp;lt;hello world='' &amp;gt;&lt;/d&gt;&lt;/poi&gt;
+	&lt;poi ll='53.000000,8.000000' /&gt;
+&lt;/k3b&gt;
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -k3b
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -d
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  d my Description  with forbidden chars &lt;hello world='' &gt;
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi my Description  with forbidden chars &lt;hello world='' &gt;
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - startElement -poi
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  poi 
+[Test worker] DEBUG de.k3b.geo.io.gpx.GpxReaderBase - endElement  k3b 
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 6.7.1</a> at 27.12.2021, 01:04:32</p>
+</div>
+</div>
+</body>
+</html>
