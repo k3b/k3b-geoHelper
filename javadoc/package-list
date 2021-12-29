@@ -1,4 +1,7 @@
+de.k3b.geo
 de.k3b.geo.api
 de.k3b.geo.io
 de.k3b.geo.io.gpx
+de.k3b.geo.io.kml
+de.k3b.geo.io.poi
 de.k3b.util
