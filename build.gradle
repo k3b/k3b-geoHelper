@@ -1,9 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 ext {
-    // v1.1.7
-    // v1.1.8 fix npe
-    PUBLISH_VERSION = 'v1.1.9-SNAPSHOT' // SNAPSHOT means latest version in in github branch "master"
-    ANDROID_VERSIONCODE = 101008
+    // v1.1.5 (101005) parse http(s) urls of maps.google.com, Openstreetmap and other mapproviders
+    // v1.1.7 (101007)
+    // v1.1.8 (101008) fix npe
+    // v1.1.9 (101009) Support for fuzzy geo uri-s (without lat/lon but with Search expression)
+    // v1.1.10 (101010) Bugfix: "geo:0,0?q=Testgasse 13, 12345 Testhausen" resulted in geo:13,12345
+    PUBLISH_VERSION = 'v1.1.10-SNAPSHOT' // SNAPSHOT means latest version in in github branch "master"
+    ANDROID_VERSIONCODE = 101010
 
     PUBLISH_GROUP_ID = 'com.github.k3b'
     SOURCES = 'github.com/k3b/k3b-geoHelper'

@@ -30,8 +30,8 @@ import java.util.TimeZone;
 import de.k3b.geo.api.IGeoPointInfo;
 
 /**
- * Converts between uri-{@link String} and geo-component-type {@link double}, {@link Date},
- *    {@link int}.
+ * Converts between uri-{@link String} and geo-component-type {@link Double}, {@link Date},
+ *    {@link Integer}.
  *
  * Created by k3b on 25.03.2015.
  */
@@ -39,18 +39,13 @@ public class GeoFormatter {
     /* Converter for Datatypes */
     private static final DecimalFormat FORMATTER_LAT_LON
             = new DecimalFormat("#.#######", new DecimalFormatSymbols(Locale.ENGLISH));
-    private static final DateFormat FORMATTER_TIME
-            = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+    private static final String EXPRESSION_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     public static final String PREFIX_LAT_LON_NEGATIV = "sSwW";
     public static final String PREFIX_LAT_LON = "nNeE" + PREFIX_LAT_LON_NEGATIV;
 
-    static {
-        FORMATTER_TIME.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
-
     private GeoFormatter() {}
 
-    /** Parsing helper: Converts a lat or lon value from {@link String} to {@link double}. */
+    /** Parsing helper: Converts a lat or lon value from {@link String} to {@link Double}. */
     public static double parseLatOrLon(String oldVal) throws ParseException {
         String newVal = oldVal;
         if ((newVal == null) || (newVal.length() < 1)) return IGeoPointInfo.NO_LAT_LON;
@@ -63,7 +58,7 @@ public class GeoFormatter {
         return doubleValue;
     }
 
-    /** Parsing helper: Converts  a {@link double} lat or lon value to {@link String}. */
+    /** Parsing helper: Converts  a {@link Double} lat or lon value to {@link String}. */
     public static String formatLatLon(double latitude) {
         if (latitude != IGeoPointInfo.NO_LAT_LON) {
             return FORMATTER_LAT_LON.format(latitude);
@@ -74,12 +69,16 @@ public class GeoFormatter {
     /** Parsing helper: Converts a {@link Date} value to {@link String}. */
     public static String formatDate(Date date) {
         if (date != null) {
-            return FORMATTER_TIME.format(date);
+            DateFormat formatter
+                    = new SimpleDateFormat(EXPRESSION_TIME_FORMAT, Locale.US);
+            formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+            return formatter.format(date);
         }
         return "";
     }
 
-    /** Parsing helper: Converts a zoom {@link int} value to {@link String}. */
+    /** Parsing helper: Converts a zoom {@link Integer} value to {@link String}. */
     public static String formatZoom(int val) {
         if (val != IGeoPointInfo.NO_ZOOM) {
             return Integer.toString(val);
