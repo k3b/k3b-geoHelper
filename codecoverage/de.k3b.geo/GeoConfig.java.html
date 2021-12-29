@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GeoConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo</a> &gt; <span class="el_source">GeoConfig.java</span></div><h1>GeoConfig.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2021 by k3b.
+ *
+ * This file is part of k3b-geoHelper library.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.k3b.geo;
+
+<span class="nc" id="L21">public class GeoConfig {</span>
+    public static final int THUMBSIZE = 200;
+
+    /* File extensions (lowercase) */
+    public static final String EXT_ZIP = &quot;.zip&quot;;
+
+    public static final String EXT_KML = &quot;.kml&quot;;
+    public static final String EXT_KMZ = &quot;.kmz&quot;;
+    public static final String EXT_KMZ2 = EXT_KML+EXT_ZIP;
+<span class="fc" id="L30">    public static final String[] EXT_ALL_KML = new String[]{EXT_KMZ, EXT_KMZ2, EXT_KML};</span>
+
+    public static final String EXT_GPX = &quot;.gpx&quot;;
+    public static final String EXT_GPZ = &quot;.gpz&quot;;
+    public static final String EXT_GPZ2 = EXT_GPX+EXT_ZIP;
+<span class="fc" id="L35">    public static final String[] EXT_ALL_GPX = new String[]{EXT_GPZ, EXT_GPZ2, EXT_GPX};</span>
+
+    public static final String EXT_POI = &quot;.poi&quot;;
+    public static final String EXT_POZ = &quot;.poz&quot;;
+    public static final String EXT_POZ2 = EXT_POI+EXT_ZIP;
+<span class="fc" id="L40">    public static final String[] EXT_ALL_POI = new String[]{EXT_POZ, EXT_POZ2, EXT_POI};</span>
+
+<span class="fc" id="L42">    public static final String[] EXT_ALL_ZIP = new String[]{EXT_GPZ,EXT_KMZ,EXT_POZ,EXT_ZIP};</span>
+<span class="fc" id="L43">    public static final String[] EXT_ALL = new String[]{</span>
+            EXT_GPZ,EXT_KMZ,EXT_POZ,
+            EXT_GPZ2,EXT_KMZ2,EXT_POZ2,
+            EXT_GPX,EXT_KML,EXT_POI};
+
+    public static boolean isOneOf(String outFileName, String... suffixes) {
+<span class="fc" id="L49">        String lowerCase = outFileName.toLowerCase();</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        for (String ext : suffixes) {</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">            if (lowerCase.endsWith(ext)) return true;</span>
+        }
+<span class="fc" id="L53">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

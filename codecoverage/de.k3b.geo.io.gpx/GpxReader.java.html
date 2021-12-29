@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GpxReader.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io.gpx</a> &gt; <span class="el_source">GpxReader.java</span></div><h1>GpxReader.java</h1><pre class="source lang-java linenums">/*
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GpxReader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io.gpx</a> &gt; <span class="el_source">GpxReader.java</span></div><h1>GpxReader.java</h1><pre class="source lang-java linenums">/*
  * Copyright (c) 2015-2016 by k3b.
  *
  * This file is part of k3b-geoHelper library.
@@ -28,38 +28,87 @@ import de.k3b.geo.api.IGeoInfoHandler;
 import de.k3b.geo.api.IGeoPointInfo;
 
 /**
- * Reads {@link de.k3b.geo.api.GeoPointDto} from gpx file or stream.&lt;br/&gt;
+ * Class to read {@link List} of {@link de.k3b.geo.api.IGeoPointInfo} points from gpx/kml/xml/... file or stream.
  *
- * inspired by http://stackoverflow.com/questions/672454/how-to-parse-gpx-files-with-saxreader
+ * ![GpxReader-getTracks](GpxReader-getTracks.png)
+ **
+ * ```java
+ * GpxReader&lt;IGeoPointInfo&gt; parser = new GpxReader&lt;IGeoPointInfo&gt;();
+ * List&lt;IGeoPointInfo&gt; points = parser.getTracks(new InputSource(new FileReader( &quot;test.gpx&quot;)));
+ * for (IGeoPointInfo geo : points) {
+ *    System.out.print(String.format(&quot;got lat=%f lon=%f\n&quot;, geo.getLatitude(),geo.getLongitude()));
+ * }
+ * ```
+ *
+ *
+ * Supported formats:
+ *
+ * * [gpx-1.0](https://github.com/k3b/androFotoFinder/wiki/data#gpx10) and [gpx-1.1](https://github.com/k3b/androFotoFinder/wiki/data#gpx) files
+ * * [kml-2.2](https://github.com/k3b/androFotoFinder/wiki/data#kml) files used by google
+ * * [wikimedia](https://github.com/k3b/androFotoFinder/wiki/data#wikimedia) that is used by web-apis of wikipedia and wikivoyage
+ * * [poi](https://github.com/k3b/androFotoFinder/wiki/data#poi) files, k3b-s internal xml format
+ *
+ * Inspired by http://stackoverflow.com/questions/672454/how-to-parse-gpx-files-with-saxreader
  */
 public class GpxReader&lt;T extends IGeoPointInfo&gt; extends GpxReaderBase implements IGeoInfoHandler {
+    /** Used to collect the reived points */
     private List&lt;T&gt; track;
 
     /**
-     * Creates a new GpxReader
-     * @param reuse if not null this instance is cleared and then reused for every new gpx found
+     * Creates a new GpxReader.
+     *
+     * @since 1.1.5
+     */
+    public GpxReader() {
+<span class="nc" id="L63">        this(new GeoPointDto());</span>
+<span class="nc" id="L64">    }</span>
+    /**
+     * Creates a new GpxReader.
+     *
+     * @param reuse if not null this instance is cleared and then reused for every new gpx found. This way the reader can load different implementations of {@link de.k3b.geo.api.IGeoPointInfo}
      */
     public GpxReader(final GeoPointDto reuse) {
-<span class="fc" id="L43">        super(null,reuse);</span>
-<span class="fc" id="L44">        this.onGotNewWaypoint = this; // cannot do this in constructor</span>
-<span class="fc" id="L45">    }</span>
+<span class="fc" id="L71">        super(null,reuse);</span>
+<span class="fc" id="L72">        this.onGotNewWaypoint = this; // cannot do this in constructor</span>
+<span class="fc" id="L73">    }</span>
 
+    /**
+     * Call the parser and return the points contained in the stream
+     *
+     * ![GpxReader-getTracks](GpxReader-getTracks.png)
+     *
+     * @startuml GpxReader-getTracks.png
+     * title Read gpx/kml/poi/xml data to List
+     * interface List
+     * interface IGeoPointInfo
+     *
+     * class GpxReader
+     * GpxReader : getTracks
+     *
+     * GpxReader -&gt; List
+     * List *-- IGeoPointInfo
+     * InputSource -&gt; GpxReader : &quot;file:points.gpx&quot;
+     * InputSource -&gt; GpxReader : &quot;file:points.kml&quot;
+     * InputSource -&gt; GpxReader : &quot;file:points.poi&quot;
+     * InputSource -&gt; GpxReader : &quot;https://de.wikivoyage.org/w/api.php?...&quot;
+     * @enduml
+     *
+     */
     public List&lt;T&gt; getTracks(InputSource in) throws IOException {
-<span class="fc" id="L48">        track = new ArrayList&lt;T&gt;();</span>
-<span class="fc" id="L49">        parse(in);</span>
-<span class="fc" id="L50">        return track;</span>
+<span class="fc" id="L98">        track = new ArrayList&lt;T&gt;();</span>
+<span class="fc" id="L99">        parse(in);</span>
+<span class="fc" id="L100">        return track;</span>
     }
 
-    /** is called for every completed gpx-trackpoint */
+    /** Is called for every completed gpx-trackpoint to collect the received tracks. */
     @Override
     public boolean onGeoInfo(IGeoPointInfo geoInfo) {
-<span class="fc bfc" id="L56" title="All 2 branches covered.">        if (mReuse != null) {</span>
-<span class="fc" id="L57">            track.add((T) mReuse.clone());</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        if (mReuse != null) {</span>
+<span class="fc" id="L107">            track.add((T) mReuse.clone());</span>
         } else {
-<span class="fc" id="L59">            track.add((T) this.current);</span>
+<span class="fc" id="L109">            track.add((T) this.currentGeoPoint);</span>
         }
-<span class="fc" id="L61">        return true;</span>
+<span class="fc" id="L111">        return true;</span>
     }
-
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

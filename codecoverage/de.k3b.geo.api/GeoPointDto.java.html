@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GeoPointDto.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.api</a> &gt; <span class="el_source">GeoPointDto.java</span></div><h1>GeoPointDto.java</h1><pre class="source lang-java linenums">/*
- * Copyright (c) 2015-2016 by k3b.
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GeoPointDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.api</a> &gt; <span class="el_source">GeoPointDto.java</span></div><h1>GeoPointDto.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of k3b-geoHelper library.
  *
@@ -21,143 +21,133 @@ package de.k3b.geo.api;
 import java.util.Date;
 
 /**
- * A location or trackpoint that can be displayed in a locationmap.&lt;br/&gt;
- * &lt;p/&gt;
+ * A minimal location or trackpoint implementation of {@link ILocation}, {@link IGeoPointInfo}.
+ *
  * Created by k3b on 07.01.2015.
  */
 public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
-    /**
-     * Latitude, in degrees north. NO_LAT_LON if not set
-     */
-<span class="fc" id="L32">    private double latitude = NO_LAT_LON;</span>
+    /** Latitude, in degrees north. {@link #NO_LAT_LON} means &quot;not set&quot; */
+<span class="fc" id="L30">    private double latitude = NO_LAT_LON;</span>
 
-    /**
-     * Longitude, in degrees east. NO_LAT_LON if not set
-     */
-<span class="fc" id="L37">    private double longitude = NO_LAT_LON;</span>
+    /** Longitude, in degrees east. {@link #NO_LAT_LON} means &quot;not set&quot; */
+<span class="fc" id="L33">    private double longitude = NO_LAT_LON;</span>
 
-    /**
-     * Date when the measurement was taken. Null if unknown.
-     */
-<span class="fc" id="L42">    private Date timeOfMeasurement = null;</span>
+    /** Date when the measurement was taken. Null if unknown. */
+<span class="fc" id="L36">    private Date timeOfMeasurement = null;</span>
 
-    /**
-     * Short non-unique text used as marker label. Null if not set.
-     */
-<span class="fc" id="L47">    private String name = null;</span>
+    /** Short non-unique text used as marker label. Null means &quot;not set&quot;. */
+<span class="fc" id="L39">    private String name = null;</span>
 
-    /**
-     * Detailed descript of the point displayed in popup on long-click . Null if not set.
-     */
-<span class="fc" id="L52">    private String description = null;</span>
+    /** Detailed descript of the point displayed in popup on long-click . Null means &quot;not set&quot;. */
+<span class="fc" id="L42">    private String description = null;</span>
 
-    /**
-     * filter: this item is only shown if current zoom-level is &gt;= this value. NO_ZOOM means no lower bound.
-     */
-<span class="fc" id="L57">    private int zoomMin = NO_ZOOM;</span>
+    /** Filter: This item is only shown if current zoom-level is &gt;= this value.
+     * NO_ZOOM means no lower bound. */
+<span class="fc" id="L46">    private int zoomMin = NO_ZOOM;</span>
 
-    /**
-     * filter: this item is only shown if current zoom-level is &lt;= this value. NO_ZOOM means no upper bound.
-     */
-<span class="fc" id="L62">    private int zoomMax = NO_ZOOM;</span>
+    /** Filter: This item is only shown if current zoom-level is &lt;= this value.
+     * NO_ZOOM means no upper bound. */
+<span class="fc" id="L50">    private int zoomMax = NO_ZOOM;</span>
 
-    /**
-     * if not null: a unique id for this item.
-     */
-<span class="fc" id="L67">    private String id = null;</span>
+    /** If not null: A unique id for this item. */
+<span class="fc" id="L53">    private String id = null;</span>
 
-    /** Optional: if not null: link-url belonging to this item.&lt;br/&gt;
-     * In show view after clicking on a marker: clock on button &quot;&gt;&quot; opens this url.&lt;br/&gt;
-     * persistet in geo-uri as geo:...&amp;link=https://path/to/file.html
-     * */
-<span class="fc" id="L73">    private String link = null;</span>
+    /** Optional: If not null: Link-url belonging to this item.
+     *
+     * In show view after clicking on &quot;&gt;&quot; in marker: opens this url.
+     *
+     * Persistet in geo-uri as geo:...&amp;link=https://path/to/file.html. */
+<span class="fc" id="L60">    private String link = null;</span>
 
-    /** Optional: if not null: url to an icon belonging to this item.&lt;br/&gt;
-     * persistet in geo-uri as geo:...&amp;s=https://path/to/file.html
-     * */
-<span class="fc" id="L78">    private String symbol = null;</span>
+    /** Optional: If not null: Url to an icon belonging to this item.&lt;br/&gt;
+     * Persistet in geo-uri as geo:...&amp;s=https://path/to/file.html . */
+<span class="fc" id="L64">    private String symbol = null;</span>
 
-<span class="fc" id="L80">    public GeoPointDto() {</span>
-<span class="fc" id="L81">    }</span>
+<span class="fc" id="L66">    public GeoPointDto() {</span>
+<span class="fc" id="L67">    }</span>
 
     public GeoPointDto(double latitude, double longitude,
                        String name, String description) {
-<span class="nc" id="L85">        this(latitude, longitude,name, null, null, null, description, NO_ZOOM, NO_ZOOM, null);</span>
-<span class="nc" id="L86">    }</span>
+<span class="nc" id="L71">        this(latitude, longitude,name, null, null, null, description, NO_ZOOM, NO_ZOOM, null);</span>
+<span class="nc" id="L72">    }</span>
 
     public GeoPointDto(double latitude, double longitude,int zoomMin) {
-<span class="fc" id="L89">        this(latitude, longitude,null, null, null, null, null, zoomMin, NO_ZOOM, null);</span>
-<span class="fc" id="L90">    }</span>
+<span class="fc" id="L75">        this(latitude, longitude,null, null, null, null, null, zoomMin, NO_ZOOM, null);</span>
+<span class="fc" id="L76">    }</span>
 
     public GeoPointDto(double latitude, double longitude,
                        String name, String link, String symbol,
                        String id,
-<span class="fc" id="L95">                       String description, int zoomMin, int zoomMax, Date timeOfMeasurement) {</span>
-<span class="fc" id="L96">        this.latitude = latitude;</span>
-<span class="fc" id="L97">        this.longitude = longitude;</span>
-<span class="fc" id="L98">        this.name = name;</span>
-<span class="fc" id="L99">        this.link = link;</span>
-<span class="fc" id="L100">        this.symbol = symbol;</span>
-<span class="fc" id="L101">        this.id = id;</span>
-<span class="fc" id="L102">        this.description = description;</span>
-<span class="fc" id="L103">        this.zoomMin = zoomMin;</span>
-<span class="fc" id="L104">        this.zoomMax = zoomMax;</span>
-<span class="fc" id="L105">        this.timeOfMeasurement = timeOfMeasurement;</span>
-<span class="fc" id="L106">    }</span>
+<span class="fc" id="L81">                       String description, int zoomMin, int zoomMax, Date timeOfMeasurement) {</span>
+<span class="fc" id="L82">        setLatLon(latitude, longitude);</span>
+<span class="fc" id="L83">        this.name = name;</span>
+<span class="fc" id="L84">        this.link = link;</span>
+<span class="fc" id="L85">        this.symbol = symbol;</span>
+<span class="fc" id="L86">        this.id = id;</span>
+<span class="fc" id="L87">        this.description = description;</span>
+<span class="fc" id="L88">        this.zoomMin = zoomMin;</span>
+<span class="fc" id="L89">        this.zoomMax = zoomMax;</span>
+<span class="fc" id="L90">        this.timeOfMeasurement = timeOfMeasurement;</span>
+<span class="fc" id="L91">    }</span>
 
-<span class="fc" id="L108">    public GeoPointDto(IGeoPointInfo src) {</span>
-<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        if (src != null) {</span>
-<span class="fc" id="L110">            this.latitude = src.getLatitude();</span>
-<span class="fc" id="L111">            this.longitude = src.getLongitude();</span>
-<span class="fc" id="L112">            this.name = src.getName();</span>
-<span class="fc" id="L113">            this.link = src.getLink();</span>
-<span class="fc" id="L114">            this.symbol = src.getSymbol();</span>
-<span class="fc" id="L115">            this.id = src.getId();</span>
-<span class="fc" id="L116">            this.description = src.getDescription();</span>
-<span class="fc" id="L117">            this.zoomMin = src.getZoomMin();</span>
-<span class="fc" id="L118">            this.zoomMax = src.getZoomMax();</span>
-<span class="fc" id="L119">            this.timeOfMeasurement = src.getTimeOfMeasurement();</span>
-        }
-<span class="fc" id="L121">    }</span>
-
-    /**
-     * Latitude, in degrees north. NO_LAT_LON if not set
-     */
-    public GeoPointDto setLatitude(double latitude) {
-<span class="fc" id="L127">        this.latitude = latitude;</span>
-<span class="fc" id="L128">        return this;</span>
+    public GeoPointDto setLatLon(double latitude, double longitude) {
+<span class="fc" id="L94">        setLatitude(latitude);</span>
+<span class="fc" id="L95">        setLongitude(longitude);</span>
+<span class="fc" id="L96">        return this;</span>
     }
 
-    /**
-     * Latitude, in degrees north. NO_LAT_LON if not set
-     */
+<span class="fc" id="L99">    public GeoPointDto(IGeoPointInfo src) {</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        if (src != null) {</span>
+<span class="fc" id="L101">            setLatLon(src.getLatitude(), src.getLongitude());</span>
+<span class="fc" id="L102">            this.name = src.getName();</span>
+<span class="fc" id="L103">            this.link = src.getLink();</span>
+<span class="fc" id="L104">            this.symbol = src.getSymbol();</span>
+<span class="fc" id="L105">            this.id = src.getId();</span>
+<span class="fc" id="L106">            this.description = src.getDescription();</span>
+<span class="fc" id="L107">            this.zoomMin = src.getZoomMin();</span>
+<span class="fc" id="L108">            this.zoomMax = src.getZoomMax();</span>
+<span class="fc" id="L109">            this.timeOfMeasurement = src.getTimeOfMeasurement();</span>
+        }
+<span class="fc" id="L111">    }</span>
+
+    /** Latitude, in degrees north.
+     *
+     * {@link #NO_LAT_LON} means &quot;not set&quot;. */
+    public GeoPointDto setLatitude(double latitude) {
+<span class="fc" id="L117">        this.latitude = latitude;</span>
+<span class="fc" id="L118">        return this;</span>
+    }
+
+    /** Latitude, in degrees north.
+     *
+     * {@link #NO_LAT_LON} means &quot;not set&quot;. */
     @Override
     public double getLatitude() {
-<span class="fc" id="L136">        return latitude;</span>
+<span class="fc" id="L126">        return latitude;</span>
     }
 
-    /**
-     * Longitude, in degrees east. NO_LAT_LON if not set
-     */
+    /** Longitude, in degrees east.
+     *
+     * {@link #NO_LAT_LON} means &quot;not set&quot;. */
     public GeoPointDto setLongitude(double longitude) {
-<span class="fc" id="L143">        this.longitude = longitude;</span>
-<span class="fc" id="L144">        return this;</span>
+<span class="fc" id="L133">        this.longitude = longitude;</span>
+<span class="fc" id="L134">        return this;</span>
     }
 
-    /**
-     * Longitude, in degrees east. NO_LAT_LON if not set
-     */
+    /** Longitude, in degrees east.
+     *
+     * {@link #NO_LAT_LON} means &quot;not set&quot;. */
     @Override
     public double getLongitude() {
-<span class="fc" id="L152">        return longitude;</span>
+<span class="fc" id="L142">        return longitude;</span>
     }
 
-    /**
-     * Date when the measurement was taken. Null if unknown.
-     */
+    /** Date when the measurement was taken.
+     *
+     * Null means unknown. */
     public GeoPointDto setTimeOfMeasurement(Date timeOfMeasurement) {
-<span class="fc" id="L159">        this.timeOfMeasurement = timeOfMeasurement;</span>
-<span class="fc" id="L160">        return this;</span>
+<span class="fc" id="L149">        this.timeOfMeasurement = timeOfMeasurement;</span>
+<span class="fc" id="L150">        return this;</span>
     }
 
     /**
@@ -165,163 +155,233 @@ public class GeoPointDto implements ILocation, IGeoPointInfo, Cloneable   {
      */
     @Override
     public Date getTimeOfMeasurement() {
-<span class="fc" id="L168">        return timeOfMeasurement;</span>
+<span class="fc" id="L158">        return timeOfMeasurement;</span>
     }
 
     /**
-     * Short non-unique text used as marker label. Null if not set.
+     * Short non-unique text used as marker label. Null means &quot;not set&quot;.
      */
     public GeoPointDto setName(String name) {
-<span class="fc" id="L175">        this.name = name;</span>
-<span class="fc" id="L176">        return this;</span>
+<span class="fc" id="L165">        this.name = name;</span>
+<span class="fc" id="L166">        return this;</span>
     }
 
     /**
-     * Short non-unique text used as marker label. Null if not set.
+     * Short non-unique text used as marker label. Null means &quot;not set&quot;.
      */
     @Override
     public String getName() {
-<span class="fc" id="L184">        return name;</span>
+<span class="fc" id="L174">        return name;</span>
     }
 
     /**
-     * Detailed descript of the point displayed in popup on long-click . Null if not set.
+     * Detailed descript of the point displayed in popup on long-click . Null means &quot;not set&quot;.
      */
     public GeoPointDto setDescription(String description) {
-<span class="fc" id="L191">        this.description = description;</span>
-<span class="fc" id="L192">        return this;</span>
+<span class="fc" id="L181">        this.description = description;</span>
+<span class="fc" id="L182">        return this;</span>
     }
 
     /**
-     * Detailed descript of the point displayed in popup on long-click . Null if not set.
+     * Detailed descript of the point displayed in popup on long-click . Null means &quot;not set&quot;.
      */
     @Override
     public String getDescription() {
-<span class="fc" id="L200">        return description;</span>
+<span class="fc" id="L190">        return description;</span>
     }
 
     /**
-     * filter: this item is only shown if current zoom-level is &gt;= this value. NO_ZOOM means no lower bound.
+     * Filter: This item is only shown if current zoom-level is &gt;= this value. NO_ZOOM means no lower bound.
      */
     @Override
     public int getZoomMin() {
-<span class="fc" id="L208">        return zoomMin;</span>
-    }
-
-    public GeoPointDto setZoomMin(int zoomMin) {
-<span class="fc" id="L212">        this.zoomMin = zoomMin;</span>
-<span class="fc" id="L213">        return this;</span>
+<span class="fc" id="L198">        return zoomMin;</span>
     }
 
     /**
-     * filter: this item is only shown if current zoom-level is &lt;= this value. NO_ZOOM means no upper bound.
+     * Filter: This item is only shown if current zoom-level is &gt;= this value. NO_ZOOM means no lower bound.
+     */
+    public GeoPointDto setZoomMin(int zoomMin) {
+<span class="fc" id="L205">        this.zoomMin = zoomMin;</span>
+<span class="fc" id="L206">        return this;</span>
+    }
+
+    /**
+     * Filter: This item is only shown if current zoom-level is &lt;= this value. NO_ZOOM means no upper bound.
      */
     @Override
     public int getZoomMax() {
-<span class="fc" id="L221">        return zoomMax;</span>
-    }
-
-    public GeoPointDto setZoomMax(int zoomMax) {
-<span class="fc" id="L225">        this.zoomMax = zoomMax;</span>
-<span class="fc" id="L226">        return this;</span>
+<span class="fc" id="L214">        return zoomMax;</span>
     }
 
     /**
-     * if not null: a unique id for this item.
+     * Filter: This item is only shown if current zoom-level is &lt;= this value. NO_ZOOM means no upper bound.
+     */
+    public GeoPointDto setZoomMax(int zoomMax) {
+<span class="fc" id="L221">        this.zoomMax = zoomMax;</span>
+<span class="fc" id="L222">        return this;</span>
+    }
+
+    /**
+     * If not null: A unique id for this item.
      */
     @Override
     public String getId() {
-<span class="fc" id="L234">        return id;</span>
+<span class="fc" id="L230">        return id;</span>
     }
 
+    /**
+     * If not null: A unique id for this item.
+     */
     public GeoPointDto setId(String id) {
-<span class="fc" id="L238">        this.id = id;</span>
-<span class="fc" id="L239">        return this;</span>
+<span class="fc" id="L237">        this.id = id;</span>
+<span class="fc" id="L238">        return this;</span>
     }
 
-    /** Optional: if not null: link-url belonging to this item.&lt;br/&gt;
-     * In show view after clicking on a marker: clock on button &quot;&gt;&quot; opens this url.&lt;br/&gt;
-     * persistet in geo-uri as geo:...&amp;link=https://path/to/file.html
-     * */
+    /** Optional: If not null: Link-url belonging to this item.
+     *
+     * After clicking on &quot;&gt;&quot;-button in &quot;show view&quot; of a marker: opens this url.
+     *
+     * Persistet in geo-uri as geo:...&amp;link=https://path/to/file.html. */
     @Override
     public String getLink() {
 <span class="fc" id="L248">        return link;</span>
     }
 
-    /** Optional: if not null: link-url belonging to this item.&lt;br/&gt;
-     * In show view after clicking on a marker: clock on button &quot;&gt;&quot; opens this url.&lt;br/&gt;
-     * persistet in geo-uri as geo:...&amp;link=https://path/to/file.html
-     * */
+    /** Optional: If not null: Link-url belonging to this item.
+     *
+     * After clicking on &quot;&gt;&quot;-button in &quot;show view&quot; of a marker: opens this url.
+     *
+     * Persistet in geo-uri as geo:...&amp;link=https://path/to/file.html. */
     public GeoPointDto setLink(String link) {
-<span class="fc" id="L256">        this.link = link;</span>
-<span class="fc" id="L257">        return this;</span>
+<span class="fc" id="L257">        this.link = link;</span>
+<span class="fc" id="L258">        return this;</span>
     }
 
-    /** Optional: if not null: icon-url belonging to this item.&lt;br/&gt;
-     * persistet in geo-uri as geo:...&amp;s=https://path/to/file.png
-     * */
+    /** Optional: If not null: Icon-url belonging to this item.
+     *
+     * Persistet in geo-uri as geo:...&amp;s=https://path/to/file.png */
     @Override
     public String getSymbol() {
-<span class="fc" id="L265">        return symbol;</span>
+<span class="fc" id="L266">        return symbol;</span>
     }
 
-    /** Optional: if not null: icon-url belonging to this item.&lt;br/&gt;
-     * persistet in geo-uri as geo:...&amp;s=https://path/to/file.png
-     * */
-    public GeoPointDto setSymbol(String symbol) {
-<span class="fc" id="L272">        this.symbol = symbol;</span>
-<span class="fc" id="L273">        return this;</span>
-    }
-
-    /**
-     * sets all members back to defaultvalue to allow reuse of class.
+    /** Optional: If not null: Icon-url belonging to this item.
      *
+     * Persistet in geo-uri as geo:...&amp;s=https://path/to/file.png */
+    public GeoPointDto setSymbol(String symbol) {
+<span class="fc" id="L273">        this.symbol = symbol;</span>
+<span class="fc" id="L274">        return this;</span>
+    }
+
+    /** Sets all members back to defaultvalue to allow reuse of class.
+     *
+     * {@link #clone()} and {@link #clear()} are used as factory method when reading a list.
+     * 
      * @return this to to allow chains
      */
     public GeoPointDto clear() {
-<span class="fc" id="L282">        this.latitude = GeoPointDto.NO_LAT_LON;</span>
-<span class="fc" id="L283">        this.longitude = GeoPointDto.NO_LAT_LON;</span>
-<span class="fc" id="L284">        this.name = null;</span>
-<span class="fc" id="L285">        this.link = null;</span>
-<span class="fc" id="L286">        this.symbol = null;</span>
-<span class="fc" id="L287">        this.id = null;</span>
-<span class="fc" id="L288">        this.description = null;</span>
-<span class="fc" id="L289">        this.zoomMin = NO_ZOOM;</span>
-<span class="fc" id="L290">        this.zoomMax = NO_ZOOM;</span>
-<span class="fc" id="L291">        this.timeOfMeasurement = null;</span>
-<span class="fc" id="L292">        return this;</span>
+<span class="fc" id="L284">        setLatLon(GeoPointDto.NO_LAT_LON, GeoPointDto.NO_LAT_LON);</span>
+<span class="fc" id="L285">        this.name = null;</span>
+<span class="fc" id="L286">        this.link = null;</span>
+<span class="fc" id="L287">        this.symbol = null;</span>
+<span class="fc" id="L288">        this.id = null;</span>
+<span class="fc" id="L289">        this.description = null;</span>
+<span class="fc" id="L290">        this.zoomMin = NO_ZOOM;</span>
+<span class="fc" id="L291">        this.zoomMax = NO_ZOOM;</span>
+<span class="fc" id="L292">        this.timeOfMeasurement = null;</span>
+<span class="fc" id="L293">        return this;</span>
     }
 
+    /** Create a copy.
+     *
+     * {@link #clone()} and {@link #clear()} are used as factory method when reading a list. */
+    @Override
     public GeoPointDto clone() {
         try {
-<span class="fc" id="L297">            return (GeoPointDto) super.clone();</span>
-<span class="nc" id="L298">        } catch (CloneNotSupportedException e) {</span>
-<span class="nc" id="L299">            e.printStackTrace();</span>
-<span class="nc" id="L300">            return null;</span>
+<span class="fc" id="L302">            GeoPointDto result = (GeoPointDto) super.clone();</span>
+<span class="fc" id="L303">            return result;</span>
+<span class="nc" id="L304">        } catch (CloneNotSupportedException e) {</span>
+<span class="nc" id="L305">            e.printStackTrace();</span>
+<span class="nc" id="L306">            return null;</span>
         }
+    }
+
+    /** For display/debugging: Either the {@link #getName()}
+     * or #{@link #getId()}. */
+    @Override
+    public String toString() {
+<span class="pc bpc" id="L314" title="1 of 2 branches missed.">        if (this.name != null) return this.name;</span>
+<span class="nc bnc" id="L315" title="All 2 branches missed.">        if (this.id != null) return &quot;#&quot; + this.id;</span>
+<span class="nc" id="L316">        return super.toString();</span>
+    }
+
+    /** For display/debugging: Either the {@link #getName()}
+     * or #{@link #getId()} plus (lat/lon). */
+    public static String toString(IGeoPointInfo point) {
+<span class="fc bfc" id="L322" title="All 2 branches covered.">        if (point != null) {</span>
+<span class="fc" id="L323">            StringBuilder result = new StringBuilder();</span>
+<span class="pc bpc" id="L324" title="1 of 2 branches missed.">            if (isNotEmpty(point.getName())) {</span>
+<span class="fc" id="L325">                result.append(point.getName());</span>
+<span class="nc bnc" id="L326" title="All 2 branches missed.">            } else if (point.getId() != null) {</span>
+<span class="nc" id="L327">                result.append(&quot;#&quot; + point.getId());</span>
+            }
+<span class="pc bpc" id="L329" title="1 of 2 branches missed.">            if (!isEmpty(point)) {</span>
+<span class="fc" id="L330">                result</span>
+<span class="fc" id="L331">                        .append(&quot;(&quot;)</span>
+<span class="fc" id="L332">                        .append(point.getLatitude())</span>
+<span class="fc" id="L333">                        .append(&quot;,&quot;)</span>
+<span class="fc" id="L334">                        .append(point.getLongitude())</span>
+<span class="fc" id="L335">                        .append(&quot;)&quot;);</span>
+            }
+<span class="pc bpc" id="L337" title="1 of 2 branches missed.">            if (result.length() &gt; 0) {</span>
+<span class="fc" id="L338">                return result.toString();</span>
+            }
+        }
+
+<span class="fc" id="L342">        return &quot;&quot;;</span>
+    }
+
+    private static boolean isNotEmpty(String name) {
+        // !name.isEmpty() requieres android GINGERBREAD and later
+        // return name != null &amp;&amp; !name.isEmpty();
+        // code should run on older android versions, too
+<span class="pc bpc" id="L349" title="2 of 4 branches missed.">        return name != null &amp;&amp; name.length() &gt; 0;</span>
+    }
+
+
+    /** return true if either lat or lon is not set (NaN) or if both are 0. */
+    public static boolean isEmpty(ILocation point) {
+<span class="pc bpc" id="L355" title="1 of 2 branches missed.">        if (point != null) {</span>
+<span class="fc" id="L356">            return (isEmpty(point.getLatitude(), point.getLongitude()));</span>
+        }
+<span class="nc" id="L358">        return true;</span>
+    }
+
+    public static boolean isEmpty(Double value) {
+<span class="pc bpc" id="L362" title="1 of 4 branches missed.">        return (value == null || value == NO_LAT_LON); // (Double.isNaN(value)|| (value == NO_LAT_LON) || (value &lt; -180) || (value &gt; 180));</span>
+    }
+
+
+    /** return true if either lat or lon is not set (NaN) or if both are 0. */
+    public static boolean isEmpty(Double latitude, Double longitude) {
+<span class="pc bpc" id="L368" title="1 of 4 branches missed.">        if (isEmpty(latitude) || isEmpty(longitude)) return true;</span>
+<span class="pc bpc" id="L369" title="1 of 4 branches missed.">        return ((latitude == 0.0f) &amp;&amp; (longitude == 0.0f));</span>
     }
 
     @Override
-    public String toString() {
-<span class="pc bpc" id="L306" title="1 of 2 branches missed.">        if (this.name != null) return this.name;</span>
-<span class="nc bnc" id="L307" title="All 2 branches missed.">        if (this.id != null) return &quot;#&quot; + this.id;</span>
-<span class="nc" id="L308">        return super.toString();</span>
+    public boolean equals(Object other) {
+<span class="pc bpc" id="L374" title="2 of 4 branches missed.">        if ((other == null) || !(other instanceof IGeoPointInfo)) return false;</span>
+<span class="fc" id="L375">        return equals(this, (IGeoPointInfo) other);</span>
     }
 
-    public static boolean isEmpty(ILocation point) {
-<span class="nc bnc" id="L312" title="All 2 branches missed.">        if (point != null) {</span>
-<span class="nc" id="L313">            return (isEmpty(point.getLatitude(), point.getLongitude()));</span>
-        }
-<span class="nc" id="L315">        return true;</span>
-    }
+    public static boolean equals(IGeoPointInfo lhs, IGeoPointInfo rhs) {
+<span class="pc bpc" id="L379" title="3 of 4 branches missed.">        if ((lhs == null) &amp;&amp; (rhs == null)) return true;</span>
+<span class="pc bpc" id="L380" title="2 of 4 branches missed.">        if ((lhs == null) || (rhs == null)) return false;</span>
 
-    /**
-     * @return true if either lat or lon is not set (NaN) or if both are 0
-     */
-    public static boolean isEmpty(double latitude, double longitude) {
-<span class="nc bnc" id="L322" title="All 4 branches missed.">        if (Double.isNaN(latitude) || Double.isNaN(longitude)) return true;</span>
-<span class="nc bnc" id="L323" title="All 4 branches missed.">        if ((latitude == NO_LAT_LON) || (longitude == NO_LAT_LON)) return true;</span>
-<span class="nc bnc" id="L324" title="All 4 branches missed.">        return ((latitude == 0.0f) &amp;&amp; (longitude == 0.0f));</span>
+<span class="pc bpc" id="L382" title="1 of 4 branches missed.">        if (lhs.getId() != null) return lhs.getId().compareTo(rhs.getId()) == 0;</span>
+
+<span class="nc bnc" id="L384" title="All 4 branches missed.">        return (lhs.getLatitude() == rhs.getLatitude()) &amp;&amp; (lhs.getLongitude() == rhs.getLongitude());</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GeoFormatter.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io</a> &gt; <span class="el_source">GeoFormatter.java</span></div><h1>GeoFormatter.java</h1><pre class="source lang-java linenums">/*
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GeoFormatter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io</a> &gt; <span class="el_source">GeoFormatter.java</span></div><h1>GeoFormatter.java</h1><pre class="source lang-java linenums">/*
  * Copyright (c) 2015-2016 by k3b.
  *
  * This file is part of k3b-geoHelper library.
@@ -28,61 +28,77 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import de.k3b.geo.api.IGeoPointInfo;
-import de.k3b.util.IsoDateTimeParser;
 
 /**
- * converts between string an geo-component-type.
+ * Converts between uri-{@link String} and geo-component-type {@link Double}, {@link Date},
+ *    {@link Integer}.
  *
  * Created by k3b on 25.03.2015.
  */
-<span class="nc" id="L38">public class GeoFormatter {</span>
-    /* converter for Datatypes */
-<span class="fc" id="L40">    private static final DecimalFormat latLonFormatter = new DecimalFormat(&quot;#.#######&quot;, new DecimalFormatSymbols(Locale.ENGLISH));</span>
-<span class="fc" id="L41">    private static final DateFormat timeFormatter = new SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm:ss'Z'&quot;);</span>
+public class GeoFormatter {
+    /* Converter for Datatypes */
+<span class="fc" id="L40">    private static final DecimalFormat FORMATTER_LAT_LON</span>
+            = new DecimalFormat(&quot;#.#######&quot;, new DecimalFormatSymbols(Locale.ENGLISH));
+    private static final String EXPRESSION_TIME_FORMAT = &quot;yyyy-MM-dd'T'HH:mm:ss'Z'&quot;;
+    public static final String PREFIX_LAT_LON_NEGATIV = &quot;sSwW&quot;;
+    public static final String PREFIX_LAT_LON = &quot;nNeE&quot; + PREFIX_LAT_LON_NEGATIV;
 
-    static {
-<span class="fc" id="L44">        timeFormatter.setTimeZone(TimeZone.getTimeZone(&quot;UTC&quot;));</span>
-<span class="fc" id="L45">    }</span>
+    private GeoFormatter() {}
 
-    /** parsing helper: converts a double value from string to double */
-    public static double parseLatOrLon(String val) throws ParseException {
-<span class="pc bpc" id="L49" title="2 of 4 branches missed.">        if ((val == null) || (val.length() == 0)) return IGeoPointInfo.NO_LAT_LON;</span>
-<span class="fc" id="L50">        return latLonFormatter.parse(val).doubleValue();</span>
+    /** Parsing helper: Converts a lat or lon value from {@link String} to {@link Double}. */
+    public static double parseLatOrLon(String oldVal) throws ParseException {
+<span class="fc" id="L50">        String newVal = oldVal;</span>
+<span class="pc bpc" id="L51" title="2 of 4 branches missed.">        if ((newVal == null) || (newVal.length() &lt; 1)) return IGeoPointInfo.NO_LAT_LON;</span>
+<span class="fc" id="L52">        char latLonPrefix = newVal.charAt(0);</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if (PREFIX_LAT_LON.indexOf(latLonPrefix) &gt;= 0) {</span>
+<span class="fc" id="L54">            newVal = newVal.substring(1);</span>
+        }
+<span class="fc" id="L56">        double doubleValue = FORMATTER_LAT_LON.parse(newVal).doubleValue();</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">        if (PREFIX_LAT_LON_NEGATIV.indexOf(latLonPrefix) &gt;= 0) doubleValue *= -1;</span>
+<span class="fc" id="L58">        return doubleValue;</span>
     }
 
+    /** Parsing helper: Converts  a {@link Double} lat or lon value to {@link String}. */
     public static String formatLatLon(double latitude) {
-<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (latitude != IGeoPointInfo.NO_LAT_LON) {</span>
-<span class="fc" id="L55">            return latLonFormatter.format(latitude);</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        if (latitude != IGeoPointInfo.NO_LAT_LON) {</span>
+<span class="fc" id="L64">            return FORMATTER_LAT_LON.format(latitude);</span>
         }
-<span class="fc" id="L57">        return &quot;&quot;;</span>
+<span class="fc" id="L66">        return &quot;&quot;;</span>
     }
 
+    /** Parsing helper: Converts a {@link Date} value to {@link String}. */
     public static String formatDate(Date date) {
-<span class="pc bpc" id="L61" title="1 of 2 branches missed.">        if (date != null) {</span>
-<span class="fc" id="L62">            return timeFormatter.format(date);</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (date != null) {</span>
+<span class="fc" id="L72">            DateFormat formatter</span>
+                    = new SimpleDateFormat(EXPRESSION_TIME_FORMAT, Locale.US);
+<span class="fc" id="L74">            formatter.setTimeZone(TimeZone.getTimeZone(&quot;UTC&quot;));</span>
+
+<span class="fc" id="L76">            return formatter.format(date);</span>
         }
-<span class="nc" id="L64">        return &quot;&quot;;</span>
+<span class="fc" id="L78">        return &quot;&quot;;</span>
     }
 
+    /** Parsing helper: Converts a zoom {@link Integer} value to {@link String}. */
     public static String formatZoom(int val) {
-<span class="nc bnc" id="L68" title="All 2 branches missed.">        if (val != IGeoPointInfo.NO_ZOOM) {</span>
-<span class="nc" id="L69">            return Integer.toString(val);</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if (val != IGeoPointInfo.NO_ZOOM) {</span>
+<span class="fc" id="L84">            return Integer.toString(val);</span>
         }
-<span class="nc" id="L71">        return &quot;&quot;;</span>
+<span class="fc" id="L86">        return &quot;&quot;;</span>
     }
 
-    /** parsing helper: converts value into zoom compatible int */
+    /** Parsing helper: Converts zoom {@link String} value to zoom compatible int. */
     public static int parseZoom(String value) {
-<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (value != null) {</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (value != null) {</span>
             try {
-<span class="fc" id="L78">                int result = Integer.parseInt(value);</span>
-<span class="pc bpc" id="L79" title="2 of 4 branches missed.">                if ((result &gt;= 0) &amp;&amp; (result &lt; 64)) {</span>
-<span class="fc" id="L80">                    return result;</span>
+<span class="fc" id="L93">                int result = Integer.parseInt(value);</span>
+<span class="pc bpc" id="L94" title="2 of 4 branches missed.">                if ((result &gt;= 0) &amp;&amp; (result &lt; 64)) {</span>
+<span class="fc" id="L95">                    return result;</span>
                 }
-<span class="nc" id="L82">            } catch (Exception ignore) {</span>
-<span class="nc" id="L83">            }</span>
+<span class="nc" id="L97">            } catch (Exception ignore) {</span>
+                // silent fail
+<span class="nc" id="L99">            }</span>
         }
-<span class="fc" id="L85">        return IGeoPointInfo.NO_ZOOM;</span>
+<span class="fc" id="L101">        return IGeoPointInfo.NO_ZOOM;</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

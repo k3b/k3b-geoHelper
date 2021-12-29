@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PoiFormatter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io.poi</a> &gt; <span class="el_source">PoiFormatter.java</span></div><h1>PoiFormatter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2021 by k3b.
+ *
+ * This file is part of k3b-geoHelper library.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.k3b.geo.io.poi;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.api.IGeoPointInfo;
+import de.k3b.geo.api.ILocation;
+import de.k3b.geo.io.GeoFormatter;
+import de.k3b.geo.io.GeoUriDef;
+import de.k3b.util.XmlUtil;
+
+/**
+ * Formats {@link de.k3b.geo.api.GeoPointDto}-s as
+ * poi-xml-fragment without the xml-root element and with no xml-namespace.&lt;br/&gt;
+ *
+ * ```java
+ *  StringBuilder xmlString = new StringBuilder()
+ *       .append(&quot;&lt;poi&gt;\n&quot;);
+ *
+ *  GeoPointDto geo = new GeoPointDto()
+ *       .setLatitude(52.1)
+ *       .setLongitude(9.2);
+ *  PoiFormatter.toPoi(xmlString, geo);
+ *
+ *  xmlString.append(&quot;\n&lt;/poi&gt;\n&quot;);
+ *
+ *  System.out.print(xmlString);
+ *
+ * ```
+ * Created by k3b on 07.01.2015.
+ */
+
+public class PoiFormatter {
+<span class="fc" id="L58">    public static final DateFormat TIME_FORMAT</span>
+            = new SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm:ss'Z'&quot;, Locale.US);
+
+    private static final String HEADER = &quot;&lt;?xml version='1.0' encoding='UTF-8'?&gt;\n&quot; +
+            &quot;&lt;k3b xmlns='uri:https://github.com/k3b/k3b-geoHelper/'&gt;&quot;;
+    private static final String FOOTER = &quot;\n&lt;/k3b&gt;&quot;;
+    private static final String INDENT = &quot;\n\t&quot;;
+
+    static {
+<span class="fc" id="L67">        TIME_FORMAT.setTimeZone(TimeZone.getTimeZone(&quot;UTC&quot;));</span>
+<span class="fc" id="L68">    }</span>
+
+    public static void export(List&lt;IGeoPointInfo&gt; geoInfos, PrintWriter printWriter) throws IOException {
+<span class="nc bnc" id="L71" title="All 2 branches missed.">        if (printWriter != null) {</span>
+            try {
+<span class="nc" id="L73">                printWriter.println(toPoiXml(geoInfos));</span>
+            } finally {
+<span class="nc" id="L75">                printWriter.close();</span>
+            }
+        }
+<span class="nc" id="L78">    }</span>
+
+    public static String toPoiXml(List&lt;IGeoPointInfo&gt; geoInfos) {
+<span class="fc" id="L81">        StringBuilder buffer = new StringBuilder();</span>
+
+        try {
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            for (IGeoPointInfo geoInfo : geoInfos) {</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">                if (!GeoPointDto.isEmpty(geoInfo)) {</span>
+
+<span class="fc bfc" id="L87" title="All 2 branches covered.">                    if (buffer.length() == 0) {</span>
+<span class="fc" id="L88">                        buffer.append(HEADER);</span>
+                    }
+<span class="fc" id="L90">                    toPoi(buffer.append(INDENT), geoInfo);</span>
+                }
+<span class="fc" id="L92">            }</span>
+        } finally {
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">            if (buffer.length() &gt; 0) {</span>
+<span class="fc" id="L95">                buffer.append(FOOTER);            }</span>
+        }
+<span class="fc" id="L97">        return buffer.toString();</span>
+    }
+
+    private PoiFormatter() {
+    }
+
+    /** Add poi-xml-fragments to result */
+    public static StringBuilder toPoi(StringBuilder result, IGeoPointInfo location) {
+<span class="fc" id="L105">        return toPoi(result, location.getId(), location.getLatitude(), location.getLongitude(),</span>
+<span class="fc" id="L106">                location.getTimeOfMeasurement(), location.getName(),location.getDescription(),</span>
+<span class="fc" id="L107">                location.getLink(), location.getSymbol(), location.getZoomMin(),</span>
+<span class="fc" id="L108">                location.getZoomMax());</span>
+    }
+
+    /** Add poi-xml-fragments to result */
+    public static StringBuilder toPoi(StringBuilder result, ILocation location) {
+<span class="nc" id="L113">        return toPoi(result, null, location.getLatitude(), location.getLongitude(),</span>
+<span class="nc" id="L114">                location.getTimeOfMeasurement(), null, null, null, null, -1, -1);</span>
+    }
+
+    /** Add poi-xml-fragments to result */
+    private static StringBuilder toPoi(StringBuilder result, String id, double latitude, double longitude,
+                                       Date timeOfMeasurement, String name,
+                                       String description, String link, String symbol, int zoomMin, int zoomMax) {
+        // &lt;poi ll=&quot;52,9&quot; n=&quot;theName&quot; link=&quot;theLink&quot; s=&quot;theIconUrl&quot;  d=&quot;theDesc&quot; t=&quot;2015-02-10T08:04:45Z&quot; z=&quot;5&quot; z2=&quot;7&quot;&gt;
+<span class="fc" id="L122">        result.append(&quot;&lt;&quot; + GeoUriDef.XML_ELEMENT_POI);</span>
+<span class="fc" id="L123">        addAttr(result,GeoUriDef.ID , id);</span>
+<span class="fc" id="L124">        addAttr(result,GeoUriDef.LAT_LON,</span>
+<span class="fc" id="L125">                String.format(Locale.US, &quot;%f,%f&quot;, latitude,longitude) ,</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">                !GeoPointDto.isEmpty(latitude,longitude));</span>
+<span class="fc" id="L127">        addAttr(result,GeoUriDef.TIME ,</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">                GeoFormatter.formatDate(timeOfMeasurement),</span>
+                timeOfMeasurement != null);
+<span class="fc" id="L130">        addAttr(result,GeoUriDef.NAME , name);</span>
+<span class="fc" id="L131">        addAttr(result,GeoUriDef.LINK , link);</span>
+<span class="fc" id="L132">        addAttr(result,GeoUriDef.SYMBOL , symbol);</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        addAttr(result,GeoUriDef.ZOOM , &quot;&quot;+ zoomMin, zoomMin &gt; 0);</span>
+<span class="fc bfc" id="L134" title="All 2 branches covered.">        addAttr(result,GeoUriDef.ZOOM_MAX , &quot;&quot;+ zoomMax, zoomMax &gt; 0);</span>
+
+        // last either &lt;poi d=.../&gt; or &lt;poi&gt;&lt;d&gt;...&lt;/d&gt;&lt;/poi&gt;
+<span class="fc bfc" id="L137" title="All 2 branches covered.">        if (description != null) {</span>
+<span class="pc bpc" id="L138" title="7 of 8 branches missed.">            if (description.length() &gt; 30 || description.contains(&quot;\n&quot;) || description.contains(&quot;\'&quot;) || description.contains(&quot;\&quot;&quot;)) {</span>
+<span class="fc" id="L139">                result.append(&quot;&gt;&lt;&quot;).append(GeoUriDef.DESCRIPTION).append(&quot;&gt;&quot;)</span>
+<span class="fc" id="L140">                        .append( XmlUtil.escapeXMLElement(description)).append(&quot;&lt;/&quot;).append(GeoUriDef.DESCRIPTION).append(&quot;&gt;&quot;)</span>
+<span class="fc" id="L141">                        .append(&quot;&lt;/&quot;).append(GeoUriDef.XML_ELEMENT_POI).append(&quot;&gt;&quot;);</span>
+<span class="fc" id="L142">                return result;</span>
+            } else {
+<span class="nc" id="L144">                addAttr(result,GeoUriDef.DESCRIPTION , description);</span>
+            }
+        }
+<span class="fc" id="L147">        result.append(&quot; /&gt;&quot;);</span>
+<span class="fc" id="L148">        return result;</span>
+    }
+
+    /** add (name&gt;value(/name&gt; to result */
+    private static void addAttr(StringBuilder result, String name, String value) {
+<span class="fc bfc" id="L153" title="All 2 branches covered.">        boolean condition = value != null;</span>
+<span class="fc" id="L154">        addAttr(result, name, value, condition);</span>
+<span class="fc" id="L155">    }</span>
+
+    private static void addAttr(StringBuilder result, String name, String value, boolean condition) {
+<span class="fc bfc" id="L158" title="All 2 branches covered.">        if (condition) {</span>
+<span class="fc" id="L159">            result.append(&quot; &quot;).append(name).append(&quot;='&quot;).append(XmlUtil.escapeXmlAttribute(value)).append(&quot;'&quot;);</span>
+        }
+<span class="fc" id="L161">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

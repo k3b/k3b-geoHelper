@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DownloadGpxKmlZipWithSymbolsService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io</a> &gt; <span class="el_source">DownloadGpxKmlZipWithSymbolsService.java</span></div><h1>DownloadGpxKmlZipWithSymbolsService.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2021 by k3b.
+ *
+ * This file is part of k3b-geoHelper library.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.k3b.geo.io;
+
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.zip.ZipOutputStream;
+
+import de.k3b.geo.GeoConfig;
+import de.k3b.geo.api.IGeoPointInfo;
+import de.k3b.geo.io.DownloadSymbolsBaseService.ITranslateSymbolUri;
+import de.k3b.geo.io.gpx.GpxFormatter;
+import de.k3b.geo.io.kml.KmlFormatter;
+import de.k3b.geo.io.poi.PoiFormatter;
+
+/** Dowloads List&lt;IGeoPointInfo&gt; points including referenced Symbols and saves result
+ * either to local Zip/kmz/gpz-file or as gpx/kml file plus folder for symbols  */
+public class DownloadGpxKmlZipWithSymbolsService {
+    protected final String userAgent;
+    private final ITranslateSymbolUri translateSymbolUri;
+
+    /**
+     * @param userAgent a string identifying the calling app.
+     *                  i.e. &quot;MyHelloWikipediaApp/1.0 (https://github.com/MyName/MyHelloWikipediaApp)&quot;
+     *                  see https://meta.wikimedia.org/wiki/Special:MyLanguage/User-Agent_policy
+     * @param translateSymbolUri Under Android you can use this to translate File-Uris to Android-Content-uris
+     */
+<span class="nc" id="L49">    public DownloadGpxKmlZipWithSymbolsService(String userAgent, ITranslateSymbolUri translateSymbolUri) {</span>
+<span class="nc" id="L50">        this.userAgent = userAgent;</span>
+<span class="nc" id="L51">        this.translateSymbolUri = translateSymbolUri;</span>
+<span class="nc" id="L52">    }</span>
+
+    /**
+     * Examples use of {@link #saveAs(List, File)}
+     * * saveAs(pints, new File(&quot;/path/to/GrandCanaria.kml&quot;))
+     * ** also generates symbols like /path/to/GrandCanaria/aeropuerto.jpg
+     * * saveAs(pints, new File(&quot;/path/to/GrandCanaria.kmz&quot;))
+     * ** the generated kmz-zip file caontains
+     * *** doc.kml
+     * *** some symbol file files/aeropuerto.jpg
+     *
+     * @param outFile : supported formats: .kml, .kml.zip, .kmz, .gpx, .gpx.zip, .gpz, .poi, .poi.zip, .poz
+     * */
+    public void saveAs(List&lt;IGeoPointInfo&gt; points, File outFile) throws IOException {
+<span class="nc" id="L66">        String outFileNameLowerCase = outFile.getName().toLowerCase();</span>
+<span class="nc" id="L67">        boolean isKmlFormat = GeoConfig.isOneOf(outFileNameLowerCase, GeoConfig.EXT_ALL_KML);</span>
+<span class="nc" id="L68">        boolean isPoiFormat = GeoConfig.isOneOf(outFileNameLowerCase, GeoConfig.EXT_ALL_POI);</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        if (GeoConfig.isOneOf(outFileNameLowerCase, GeoConfig.EXT_ALL_ZIP)) {</span>
+            // kmz = kml in zip file
+            // see https://developers.google.com/kml/documentation/kmzarchives
+            // conventions: only first kml in zip is used (usually doc.kml)
+            // referenced relative local items in zip-folder &quot;files&quot;
+            // analog olso for gpz (gpx in zip) and poz (poi in zip)
+
+<span class="nc" id="L76">            DownloadSymbolsToZipService downloadService = new DownloadSymbolsToZipService(userAgent);</span>
+<span class="nc" id="L77">            downloadService.translateSymbolUri(translateSymbolUri);</span>
+
+<span class="nc" id="L79">            outFile.getParentFile().mkdirs();</span>
+<span class="nc" id="L80">            ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(outFile));</span>
+
+<span class="nc" id="L82">            points = downloadService.zipOutputStream(zip, &quot;files&quot;).convert(points);</span>
+
+<span class="nc bnc" id="L84" title="All 2 branches missed.">            if (isKmlFormat) {</span>
+<span class="nc" id="L85">                KmlFormatter.export(points, new PrintWriter(downloadService.createOutputStream(&quot;doc.kml&quot;, null, 0)));</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">            } else if (isPoiFormat) {</span>
+<span class="nc" id="L87">                PoiFormatter.export(points, new PrintWriter(downloadService.createOutputStream(&quot;doc.poi&quot;, null, 0)));</span>
+            } else {
+<span class="nc" id="L89">                GpxFormatter.export(points, new PrintWriter(downloadService.createOutputStream(&quot;doc.gpx&quot;, null, 0)));</span>
+            }
+<span class="nc" id="L91">            zip.close();</span>
+<span class="nc" id="L92">        } else {</span>
+<span class="nc" id="L93">            DownloadSymbolsToDirService downloadService = new DownloadSymbolsToDirService(userAgent);</span>
+<span class="nc" id="L94">            downloadService.translateSymbolUri(translateSymbolUri);</span>
+
+<span class="nc" id="L96">            String baseName = FilenameUtils.getBaseName(outFile.getPath());</span>
+<span class="nc" id="L97">            File dir = new File(outFile.getParentFile(), baseName);</span>
+<span class="nc" id="L98">            dir.mkdirs();</span>
+
+<span class="nc" id="L100">            points = downloadService.dir(dir).convert(points);</span>
+<span class="nc" id="L101">            PrintWriter printWriter = new PrintWriter(new FileOutputStream(outFile));</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">            if (isKmlFormat) {</span>
+<span class="nc" id="L103">                KmlFormatter.export(points, printWriter);</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            } if (isPoiFormat) {</span>
+<span class="nc" id="L105">                PoiFormatter.export(points, printWriter);</span>
+            } else {
+<span class="nc" id="L107">                GpxFormatter.export(points, printWriter);</span>
+            }
+        }
+<span class="nc" id="L110">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DownloadSymbolsBaseService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io</a> &gt; <span class="el_source">DownloadSymbolsBaseService.java</span></div><h1>DownloadSymbolsBaseService.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2021 by k3b.
+ *
+ * This file is part of k3b-geoHelper library.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package de.k3b.geo.io;
+
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.List;
+
+import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.api.IGeoInfoConverter;
+import de.k3b.geo.api.IGeoPointInfo;
+
+public abstract class DownloadSymbolsBaseService implements IGeoInfoConverter&lt;IGeoPointInfo&gt; {
+<span class="nc" id="L36">    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadSymbolsBaseService.class);</span>
+
+    protected final String userAgent;
+<span class="nc" id="L39">    protected URLConnection lastConnection = null;</span>
+<span class="nc" id="L40">    protected ITranslateSymbolUri translateSymbolUri = null;</span>
+
+    /**
+     * @param userAgent a string identifying the calling app.
+     *                  i.e. &quot;MyHelloWikipediaApp/1.0 (https://github.com/MyName/MyHelloWikipediaApp)&quot;
+     *                  see https://meta.wikimedia.org/wiki/Special:MyLanguage/User-Agent_policy
+     */
+<span class="nc" id="L47">    public DownloadSymbolsBaseService(String userAgent) {</span>
+<span class="nc" id="L48">        this.userAgent = userAgent;</span>
+<span class="nc" id="L49">    }</span>
+
+    /**
+     * @param translateSymbolUri Under Android you can use this to translate File-Uris to Android-Content-uris
+     */
+    public DownloadSymbolsBaseService translateSymbolUri(ITranslateSymbolUri translateSymbolUri) {
+<span class="nc" id="L55">        this.translateSymbolUri = translateSymbolUri;</span>
+<span class="nc" id="L56">        return this;</span>
+    }
+
+    @Override
+    public List&lt;IGeoPointInfo&gt; convert(List&lt;IGeoPointInfo&gt; points) {
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (points != null) {</span>
+            try {
+<span class="nc" id="L63">                downloadSymbols(points);</span>
+<span class="nc" id="L64">            } catch (IOException e) {</span>
+<span class="nc" id="L65">                LOGGER.error(&quot;Cannot Save Sybols:&quot; + e.getMessage(), e);</span>
+<span class="nc" id="L66">                return null;</span>
+<span class="nc" id="L67">            }</span>
+        }
+<span class="nc" id="L69">        return points;</span>
+    }
+
+    protected void downloadSymbols(List&lt;IGeoPointInfo&gt; points) throws IOException {
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        for (IGeoPointInfo geo : points) {</span>
+<span class="nc" id="L74">            String icon = geo.getSymbol();</span>
+<span class="nc bnc" id="L75" title="All 6 branches missed.">            if (icon != null &amp;&amp; icon.contains(&quot;.&quot;) &amp;&amp; icon.toLowerCase().startsWith(&quot;http&quot;)) {</span>
+<span class="nc" id="L76">                ((GeoPointDto) geo).setSymbol(saveIcon(icon));</span>
+            }
+<span class="nc" id="L78">        }</span>
+<span class="nc" id="L79">    }</span>
+
+    protected String saveIcon(String icon) throws IOException {
+<span class="nc" id="L82">        String iconName = FilenameUtils.getName(icon);</span>
+<span class="nc" id="L83">        InputStream inputStream = null;</span>
+<span class="nc" id="L84">        OutputStream outputStream = null;</span>
+        try {
+<span class="nc" id="L86">            inputStream = getInputStream(icon);</span>
+<span class="nc" id="L87">            outputStream = createOutputStream(iconName);</span>
+<span class="nc" id="L88">            byte[] buffer = new byte[1024];</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">            for (int read = inputStream.read(buffer); read &gt; -1; read = inputStream</span>
+<span class="nc" id="L90">                    .read(buffer)) {</span>
+<span class="nc" id="L91">                outputStream.write(buffer, 0, read);</span>
+            }
+<span class="nc" id="L93">            return createSymbolUri(iconName);</span>
+<span class="nc" id="L94">        } catch (Exception e) {</span>
+<span class="nc" id="L95">            return icon;</span>
+        } finally {
+<span class="nc bnc" id="L97" title="All 2 branches missed.">            if (outputStream != null) closeSymbolOutputStream(outputStream);</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">            if (inputStream != null) inputStream.close();</span>
+        }
+    }
+
+    protected void closeSymbolOutputStream(OutputStream outputStream) throws IOException {
+<span class="nc" id="L103">        outputStream.close();</span>
+<span class="nc" id="L104">    }</span>
+
+    public InputStream getInputStream(String urlString) throws IOException {
+<span class="nc" id="L107">        return getInputStream(new URL(urlString));</span>
+    }
+
+    public InputStream getInputStream(URL url) throws IOException {
+<span class="nc" id="L111">        lastConnection = url.openConnection();</span>
+
+        // see https://meta.wikimedia.org/wiki/Special:MyLanguage/User-Agent_policy
+<span class="nc" id="L114">        lastConnection.setRequestProperty(&quot;User-Agent&quot;,userAgent);</span>
+
+<span class="nc" id="L116">        return lastConnection.getInputStream();</span>
+    }
+
+    protected String createSymbolUri(String iconName) {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if (translateSymbolUri != null) {</span>
+<span class="nc" id="L121">            return translateSymbolUri.translate(iconName);</span>
+        }
+<span class="nc" id="L123">        return iconName;</span>
+    }
+
+    protected abstract OutputStream createOutputStream(String iconName) throws IOException;
+
+    public interface ITranslateSymbolUri {
+        String translate(String symbolUri);
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

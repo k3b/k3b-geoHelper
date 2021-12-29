@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GeoXmlOrTextParser.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io.gpx</a> &gt; <span class="el_source">GeoXmlOrTextParser.java</span></div><h1>GeoXmlOrTextParser.java</h1><pre class="source lang-java linenums">/*
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GeoXmlOrTextParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io.gpx</a> &gt; <span class="el_source">GeoXmlOrTextParser.java</span></div><h1>GeoXmlOrTextParser.java</h1><pre class="source lang-java linenums">/*
  * Copyright (c) 2015-2016 by k3b.
  *
  * This file is part of k3b-geoHelper library.
@@ -21,7 +21,6 @@ package de.k3b.geo.io.gpx;
 import org.xml.sax.InputSource;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,49 +31,58 @@ import de.k3b.geo.io.GeoFileRepository;
 import de.k3b.geo.io.GeoUri;
 
 /**
- * gets geoItems from text.
+ * Parser to extract {@link IGeoPointInfo} items from {@link String}.
+ *
  * Created by k3b on 20.04.2015.
  */
 <span class="fc" id="L38">public class GeoXmlOrTextParser&lt;T extends IGeoPointInfo&gt; {</span>
-    public List&lt;T&gt; get(GeoPointDto baseItem, String src) {
-<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        if (src == null) return null;</span>
 
-<span class="pc bpc" id="L42" title="1 of 4 branches missed.">        if (src.startsWith(GeoFileRepository.COMMENT) || src.startsWith(GeoUri.GEO_SCHEME)) {</span>
+    /** Get {@link IGeoPointInfo} items from cr/lf delimited Text lines or from xml fragments. */
+    public List&lt;T&gt; get(String textLinesOrXml) {
+<span class="fc" id="L42">        return get(new GeoPointDto(), textLinesOrXml);</span>
+    }
+
+    /** Get {@link IGeoPointInfo} items from cr/lf delimited Text lines or from xml fragments. */
+    public List&lt;T&gt; get(GeoPointDto geoPointDtoFactoryItem, String textLinesOrXml) {
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">        if (textLinesOrXml == null) return null;</span>
+
+<span class="fc bfc" id="L49" title="All 4 branches covered.">        if (textLinesOrXml.startsWith(GeoFileRepository.COMMENT) || textLinesOrXml.startsWith(GeoUri.GEO_SCHEME)) {</span>
             // lines of comments &quot;#..&quot; or geo-uris seperated by cr/lf
-<span class="fc" id="L44">            GeoFileRepository&lt;T&gt; parser = new GeoFileRepository&lt;T&gt;(null, baseItem) {</span>
+<span class="fc" id="L51">            GeoFileRepository&lt;T&gt; parser = new GeoFileRepository&lt;T&gt;(null, geoPointDtoFactoryItem) {</span>
                 @Override
                 protected boolean isValid(IGeoPointInfo geo) {
-<span class="fc" id="L47">                    return true;</span>
+<span class="fc" id="L54">                    return true;</span>
                 }
             };
-<span class="fc" id="L50">            StringReader rd = new StringReader(src);</span>
-<span class="fc" id="L51">            ArrayList&lt;T&gt; result = new ArrayList&lt;T&gt;();</span>
+<span class="fc" id="L57">            StringReader rd = new StringReader(textLinesOrXml);</span>
+<span class="fc" id="L58">            ArrayList&lt;T&gt; result = new ArrayList&lt;T&gt;();</span>
 
             try {
-<span class="fc" id="L54">                parser.load(result, rd);</span>
-<span class="fc" id="L55">                rd.close();</span>
-<span class="nc" id="L56">            } catch (IOException e) {</span>
-<span class="nc" id="L57">                e.printStackTrace();</span>
-<span class="fc" id="L58">            }</span>
-<span class="fc" id="L59">            return result;</span>
+<span class="fc" id="L61">                parser.load(result, rd);</span>
+<span class="fc" id="L62">                rd.close();</span>
+<span class="nc" id="L63">            } catch (IOException e) {</span>
+<span class="nc" id="L64">                e.printStackTrace();</span>
+<span class="fc" id="L65">            }</span>
+<span class="fc" id="L66">            return result;</span>
         } else {
-<span class="fc bfc" id="L61" title="All 2 branches covered.">            if (!src.startsWith(&quot;&lt;?xml&quot;)) {</span>
+<span class="fc" id="L68">            String textXml = textLinesOrXml;</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">            if (!textLinesOrXml.startsWith(&quot;&lt;?xml&quot;)) {</span>
                 // to allow xml-fragments without xml-root element
-<span class="fc" id="L63">                src = &quot;&lt;xml&gt;&quot; + src + &quot;&lt;/xml&gt;&quot;;</span>
+<span class="fc" id="L71">                textXml = &quot;&lt;xml&gt;&quot; + textLinesOrXml + &quot;&lt;/xml&gt;&quot;;</span>
             }
-<span class="fc" id="L65">            GpxReader&lt;T&gt; parser = new GpxReader&lt;T&gt;(baseItem);</span>
-<span class="fc" id="L66">            StringReader rd = new StringReader(src);</span>
-<span class="fc" id="L67">            List&lt;T&gt; result = null;</span>
+<span class="fc" id="L73">            GpxReader&lt;T&gt; parser = new GpxReader&lt;T&gt;(geoPointDtoFactoryItem);</span>
+<span class="fc" id="L74">            StringReader rd = new StringReader(textXml);</span>
+<span class="fc" id="L75">            List&lt;T&gt; result = null;</span>
 
             try {
-<span class="fc" id="L70">                result = parser.getTracks(new InputSource(rd));</span>
-<span class="nc" id="L71">            } catch (IOException e) {</span>
-<span class="nc" id="L72">                e.printStackTrace();</span>
-<span class="fc" id="L73">            }</span>
-<span class="fc" id="L74">            rd.close();</span>
-<span class="fc" id="L75">            return result;</span>
+<span class="fc" id="L78">                result = parser.getTracks(new InputSource(rd));</span>
+<span class="nc" id="L79">            } catch (IOException e) {</span>
+<span class="nc" id="L80">                e.printStackTrace();</span>
+<span class="fc" id="L81">            }</span>
+<span class="fc" id="L82">            rd.close();</span>
+<span class="fc" id="L83">            return result;</span>
         }
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

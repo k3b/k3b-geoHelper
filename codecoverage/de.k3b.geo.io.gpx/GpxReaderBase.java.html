@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GpxReaderBase.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io.gpx</a> &gt; <span class="el_source">GpxReaderBase.java</span></div><h1>GpxReaderBase.java</h1><pre class="source lang-java linenums">/*
- * Copyright (c) 2015-2016 by k3b.
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GpxReaderBase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io.gpx</a> &gt; <span class="el_source">GpxReaderBase.java</span></div><h1>GpxReaderBase.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2015-2021 by k3b.
  *
  * This file is part of k3b-geoHelper library.
  *
@@ -27,6 +27,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -40,224 +42,347 @@ import de.k3b.geo.io.GeoUriDef;
 import de.k3b.util.IsoDateTimeParser;
 
 /**
- * Parser for xml-geo formats implemented for
- *  - gpx-1.1 http://www.topografix.com/GPX/1/1/ and
- *  - gpx-1.0 http://www.topografix.com/GPX/1/0/ and
- *  - poi (de.k3b.geo internal format compatible with geo-uri format)
- *  - kml-2.2 (a little bit of http://www.opengis.net/kml/2.2).
+ * A parser for xml-geo formats.
+ *
+ * ![GpxReaderBase-parse](GpxReaderBase-parse.png)
+ *
+ * ```java
+ *    GpxReaderBase parser = new GpxReaderBase(new IGeoInfoHandler() {
+ *         public boolean onGeoInfo(IGeoPointInfo geo) {
+ *           System.out.print(String.format(&quot;got lat=%f lon=%f\n&quot;, geo.getLatitude(),geo.getLongitude()));
+ *           return true;
+ *         }
+ *      });
+ *
+ *    parser.parse(new InputSource(new FileReader( &quot;test.gpx&quot;)));
+ *
+ * ```
+ *
+ * ---
+ *
+ * Supported formats:
+ *
+ * * [gpx-1.0](https://github.com/k3b/androFotoFinder/wiki/data#gpx10) and [gpx-1.1](https://github.com/k3b/androFotoFinder/wiki/data#gpx) files
+ * * [kml-2.2](https://github.com/k3b/androFotoFinder/wiki/data#kml) files used by google
+ * * [wikimedia](https://github.com/k3b/androFotoFinder/wiki/data#wikimedia) that is used by web-apis of wikipedia and wikivoyage
+ * * [poi](https://github.com/k3b/androFotoFinder/wiki/data#poi) files, k3b-s internal xml format
  *
  * This parser is not acurate: it might pick elements from wrong namespaces.
  *
  * Note: if you change/add features to this xml parser
- * ...\LocationMapViewer\k3b-geoHelper\src\main\java\de.k3b.geo.io.gpx.GpxReaderBase.java
  * please also update regression test-data and prog at
- * ...\LocationMapViewer\k3b-geoHelper\src\test\resources\de\k3b\geo\io\regressionTests\*.*
- * ...\LocationMapViewer\k3b-geoHelper\src\test\java\de.k3b.geo.io.GeoPointDtoRegressionTests.java
+ *
+ * * ...\LocationMapViewer\k3b-geoHelper\src\test\resources\de\k3b\geo\io\regressionTests\*.*
+ * * ...\LocationMapViewer\k3b-geoHelper\src\test\java\de.k3b.geo.io.GeoPointDtoRegressionTests.java
  *
  * Created by k3b on 20.01.2015.
  */
 public class GpxReaderBase extends DefaultHandler {
-<span class="fc" id="L60">    private static final Logger logger = LoggerFactory.getLogger(GpxReaderBase.class);</span>
+<span class="fc" id="L81">    private static final Logger logger = LoggerFactory.getLogger(GpxReaderBase.class);</span>
 
+    /** Callback to process every point received */
     protected IGeoInfoHandler onGotNewWaypoint;
 
-    /** if not null this instance is cleared and then reused for every new gpx found */
+    /** If not null this instance is cleared and then reused for every new gpx found */
     protected final GeoPointDto mReuse;
 
-    /** if not null gpx-v11: &quot;trkpt&quot; parsing is active */
-    protected GeoPointDto current;
-	
-<span class="fc" id="L70">    private StringBuffer buf = new StringBuffer();</span>
+    /** If not null geo-parsing parsing is active */
+    protected GeoPointDto currentGeoPoint;
 
-    // used by &lt;poi geoUri='geo:...' /&gt;. created on demand.
-<span class="fc" id="L73">    private GeoUri geoUriParser = null;</span>
+    /** This member will receive value of current xml-element while parsing */
+<span class="fc" id="L93">    private StringBuilder currentXmlElementBufer = new StringBuilder();</span>
 
-<span class="fc" id="L75">    public GpxReaderBase(final IGeoInfoHandler onGotNewWaypoint, final GeoPointDto reuse) {</span>
-<span class="fc" id="L76">        this.onGotNewWaypoint = onGotNewWaypoint;</span>
-<span class="fc" id="L77">        this.mReuse = reuse;</span>
-<span class="fc" id="L78">    }</span>
+    /** Used if xml contains geoUri attribute &lt;poi geoUri='geo:...' /&gt; to parse contained geo-uris..
+     * it is Created on demand. */
+<span class="fc" id="L97">    private GeoUri geoUriParser = null;</span>
 
-    /** processes in and calls onGotNewWaypoint for every waypoint found */
+    /** for seperate kml-symbol processing : current symbol id */
+    private String currentIconDefinitionId;
+
+    /** for seperate kml-symbol processing : all known symbols: id to url */
+<span class="fc" id="L103">    private Map&lt;String,String&gt; id2Symbol = new HashMap&lt;&gt;();</span>
+
+    /**
+     * Creates a new parser.
+     *
+     * @param onGotNewWaypoint callback to process every point received
+     */
+    public GpxReaderBase(final IGeoInfoHandler onGotNewWaypoint) {
+<span class="nc" id="L111">        this(onGotNewWaypoint, new GeoPointDto());</span>
+<span class="nc" id="L112">    }</span>
+    /**
+     * Creates a new parser.
+     *
+     * @param onGotNewWaypoint callback to process every point received
+     * @param reuse  if not null this instance is cleared and then reused for every new gpx found. This way the reader can load different implementations of {@link de.k3b.geo.api.IGeoPointInfo}
+     */
+<span class="fc" id="L119">    public GpxReaderBase(final IGeoInfoHandler onGotNewWaypoint, final GeoPointDto reuse) {</span>
+<span class="fc" id="L120">        this.onGotNewWaypoint = onGotNewWaypoint;</span>
+<span class="fc" id="L121">        this.mReuse = reuse;</span>
+<span class="fc" id="L122">    }</span>
+
+    /**
+     * Processes gpx/kml/poi/xml data and calls [@link IGeoInfoHandler#onGeoInfo} for every
+     * {@link de.k3b.geo.api.IGeoPointInfo} found.
+     *
+     * ![GpxReaderBase-parse](GpxReaderBase-parse.png)
+     *
+     * @startuml GpxReaderBase-parse.png
+     * title process gpx/kml/poi/xml data
+     * interface IGeoInfoHandler
+     * IGeoInfoHandler : onGeoInfo(IGeoPointInfo)
+     * IGeoInfoHandler &lt;|-- GeoInfoHandlerImpl
+     * GeoInfoHandlerImpl : onGeoInfo(IGeoPointInfo)
+     *
+     * class GpxReaderBase
+     * GpxReaderBase : parse
+     *
+     * GpxReaderBase -&gt; IGeoInfoHandler
+     * InputSource -&gt; GpxReaderBase : &quot;file:points.gpx&quot;
+     * InputSource -&gt; GpxReaderBase : &quot;file:points.kml&quot;
+     * InputSource -&gt; GpxReaderBase : &quot;file:points.poi&quot;
+     * InputSource -&gt; GpxReaderBase : &quot;https://de.wikivoyage.org/w/api.php?...&quot;
+     * @enduml
+     *
+     */
     public void parse(InputSource in) throws IOException {
         try {
-<span class="fc" id="L83">            SAXParserFactory factory = SAXParserFactory.newInstance();</span>
+<span class="fc" id="L150">            SAXParserFactory factory = SAXParserFactory.newInstance();</span>
             // factory.setValidating(true);
-<span class="fc" id="L85">            SAXParser parser = factory.newSAXParser();</span>
-<span class="fc" id="L86">            parser.parse(in, this);</span>
-<span class="nc" id="L87">        } catch (ParserConfigurationException e) {</span>
-<span class="nc" id="L88">            final String message = &quot;Error parsing xml from &quot; + in;</span>
-<span class="nc" id="L89">            logger.error(message, e);</span>
-<span class="nc" id="L90">            throw new IOException(message,e);</span>
-<span class="nc" id="L91">        } catch (SAXException e) {</span>
-<span class="nc" id="L92">            final String message = &quot;Error parsing xml from &quot; + in;</span>
-<span class="nc" id="L93">            logger.error(message, e);</span>
-<span class="nc" id="L94">            throw new IOException(message,e);</span>
-<span class="fc" id="L95">        }</span>
-<span class="fc" id="L96">    }</span>
+<span class="fc" id="L152">            SAXParser parser = factory.newSAXParser();</span>
+<span class="fc" id="L153">            parser.parse(in, this);</span>
+<span class="nc" id="L154">        } catch (ParserConfigurationException e) {</span>
+<span class="nc" id="L155">            final String message = &quot;Error parsing xml from &quot; + in;</span>
+<span class="nc" id="L156">            logger.error(message, e);</span>
+<span class="nc" id="L157">            throw new IOException(message,e);</span>
+<span class="nc" id="L158">        } catch (SAXException e) {</span>
+<span class="nc" id="L159">            final String message = &quot;Error parsing xml from &quot; + in;</span>
+<span class="nc" id="L160">            logger.error(message, e);</span>
+<span class="nc" id="L161">            throw new IOException(message,e);</span>
+<span class="fc" id="L162">        }</span>
+<span class="fc" id="L163">    }</span>
 
-    /** returns an instance of an empty {@link de.k3b.geo.api.GeoPointDto} */
+    /** Factory method: Returns an instance of an empty {@link de.k3b.geo.api.GeoPointDto} */
     protected GeoPointDto newInstance() {
-<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (mReuse != null) return mReuse.clear();</span>
-<span class="fc" id="L101">        return new GeoPointDto();</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">        if (mReuse != null) return mReuse.clear();</span>
+<span class="fc" id="L168">        return new GeoPointDto();</span>
     }
 
-    /** returns an instance of an empty {@link de.k3b.geo.api.GeoPointDto}
-     * and tries to find non standard attributes */
+    /** Returns an instance of {@link de.k3b.geo.api.GeoPointDto}
+     * and tries to data from the xml-attributes */
     protected GeoPointDto newInstance(Attributes attributes) {
-<span class="fc" id="L107">        GeoPointDto result = newInstance();</span>
+<span class="fc" id="L174">        GeoPointDto result = newInstance();</span>
 
-<span class="fc" id="L109">        String geoUri=attributes.getValue(GeoUriDef.XML_ATTR_GEO_URI);</span>
-<span class="fc bfc" id="L110" title="All 2 branches covered.">        if (geoUri != null) {</span>
-<span class="fc" id="L111">            String mode=attributes.getValue(GeoUriDef.XML_ATTR_GEO_URI_INFER_MISSING);</span>
-<span class="fc bfc" id="L112" title="All 4 branches covered.">            if ((mode != null) || (this.geoUriParser == null)) {</span>
-<span class="fc" id="L113">                int modes = GeoUri.OPT_DEFAULT;</span>
+<span class="fc" id="L176">        String geoUri=attributes.getValue(GeoUriDef.XML_ATTR_GEO_URI);</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">        if (geoUri != null) {</span>
+<span class="fc" id="L178">            String mode=attributes.getValue(GeoUriDef.XML_ATTR_GEO_URI_INFER_MISSING);</span>
+<span class="fc bfc" id="L179" title="All 4 branches covered.">            if ((mode != null) || (this.geoUriParser == null)) {</span>
+<span class="fc" id="L180">                int modes = GeoUri.OPT_DEFAULT;</span>
 
-<span class="fc bfc" id="L115" title="All 2 branches covered.">                if (mode != null) {</span>
-<span class="fc" id="L116">                    mode = mode.trim().toLowerCase();</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">                if (mode != null) {</span>
+<span class="fc" id="L183">                    mode = mode.trim().toLowerCase();</span>
 
-<span class="pc bpc" id="L118" title="2 of 4 branches missed.">                    if ((!mode.startsWith(&quot;0&quot;)) &amp;&amp; (!mode.startsWith(&quot;f&quot;))) {</span>
+<span class="pc bpc" id="L185" title="2 of 4 branches missed.">                    if ((!mode.startsWith(&quot;0&quot;)) &amp;&amp; (!mode.startsWith(&quot;f&quot;))) {</span>
                         // everything except &quot;0&quot; or &quot;false&quot; is infer
-<span class="fc" id="L120">                        modes |= GeoUri.OPT_PARSE_INFER_MISSING;</span>
+<span class="fc" id="L187">                        modes |= GeoUri.OPT_PARSE_INFER_MISSING;</span>
                     }
                 }
-<span class="fc" id="L123">                this.geoUriParser = new GeoUri(modes);</span>
+<span class="fc" id="L190">                this.geoUriParser = createGeoUriParser(modes);</span>
             }
-<span class="fc" id="L125">            geoUriParser.fromUri(geoUri, result);</span>
+<span class="fc" id="L192">            geoUriParser.fromUri(geoUri, result);</span>
         }
 
         // explicit attributes can overwrite values from geoUri=...
-<span class="fc" id="L129">        String value = attributes.getValue(GeoUriDef.LAT_LON);</span>
-<span class="fc bfc" id="L130" title="All 2 branches covered.">        if (value != null) GeoUri.parseLatOrLon(result, value);</span>
+<span class="fc" id="L196">        String value = attributes.getValue(GeoUriDef.LAT_LON);</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">        if (value != null) GeoUri.parseLatOrLon(result, value);</span>
 
-<span class="fc" id="L132">        value = attributes.getValue(GeoUriDef.NAME);</span>
-<span class="fc bfc" id="L133" title="All 2 branches covered.">        if (value != null) result.setName(value);</span>
+<span class="fc" id="L199">        value = attributes.getValue(GeoUriDef.NAME);</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">        if (value != null) result.setName(value);</span>
 
-<span class="fc" id="L135">        value = attributes.getValue(GeoUriDef.DESCRIPTION);</span>
-<span class="fc bfc" id="L136" title="All 2 branches covered.">        if (value != null) result.setDescription(value);</span>
+<span class="fc" id="L202">        value = attributes.getValue(GeoUriDef.DESCRIPTION);</span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">        if (value != null) result.setDescription(value);</span>
 
-<span class="fc" id="L138">        value = attributes.getValue(GeoUriDef.ID);</span>
-<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        if (value != null) result.setId(value);</span>
+<span class="fc" id="L205">        value = attributes.getValue(GeoUriDef.ID);</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">        if (value != null) result.setId(value);</span>
 
-<span class="fc" id="L141">        value = attributes.getValue(GeoUriDef.LINK);</span>
-<span class="fc bfc" id="L142" title="All 2 branches covered.">        if (value != null) result.setLink(value);</span>
+<span class="fc" id="L208">        value = attributes.getValue(GeoUriDef.LINK);</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">        if (value != null) result.setLink(value);</span>
 
-<span class="fc" id="L144">        value = attributes.getValue(GeoUriDef.SYMBOL);</span>
-<span class="fc bfc" id="L145" title="All 2 branches covered.">        if (value != null) result.setSymbol(value);</span>
+<span class="fc" id="L211">        value = attributes.getValue(GeoUriDef.SYMBOL);</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">        if (value != null) result.setSymbol(value);</span>
 
-<span class="fc" id="L147">        value = attributes.getValue(GeoUriDef.ZOOM);</span>
-<span class="fc bfc" id="L148" title="All 2 branches covered.">        if (value != null) result.setZoomMin(GeoFormatter.parseZoom(value));</span>
+<span class="fc" id="L214">        value = attributes.getValue(GeoUriDef.ZOOM);</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">        if (value != null) result.setZoomMin(GeoFormatter.parseZoom(value));</span>
 
-<span class="fc" id="L150">        value = attributes.getValue(GeoUriDef.ZOOM_MAX);</span>
-<span class="fc bfc" id="L151" title="All 2 branches covered.">        if (value != null) result.setZoomMax(GeoFormatter.parseZoom(value));</span>
+<span class="fc" id="L217">        value = attributes.getValue(GeoUriDef.ZOOM_MAX);</span>
+<span class="fc bfc" id="L218" title="All 2 branches covered.">        if (value != null) result.setZoomMax(GeoFormatter.parseZoom(value));</span>
 
-<span class="fc" id="L153">        value = attributes.getValue(GeoUriDef.TIME);</span>
-<span class="fc bfc" id="L154" title="All 2 branches covered.">        if (value != null) result.setTimeOfMeasurement(IsoDateTimeParser.parse(value));</span>
+<span class="fc" id="L220">        value = attributes.getValue(GeoUriDef.TIME);</span>
+<span class="fc bfc" id="L221" title="All 2 branches covered.">        if (value != null) result.setTimeOfMeasurement(IsoDateTimeParser.parse(value));</span>
 
-<span class="fc" id="L156">        return result;</span>
+<span class="fc" id="L223">        return result;</span>
     }
 
+    protected GeoUri createGeoUriParser(int modes) {
+<span class="nc" id="L227">        return new GeoUri(modes);</span>
+    }
+
+    /** Java sax api implementation: Element name inspection/processig */
     @Override
     public void startElement(String uri, String localName, String qName,
             Attributes attributes) throws SAXException {
-<span class="fc" id="L162">        String name = getElementName(localName, qName);</span>
+<span class="fc" id="L234">        String name = getElementName(localName, qName);</span>
         
-<span class="fc" id="L164">        logger.debug(&quot;startElement {}-{}&quot;, localName, qName);</span>
-<span class="fc bfc" id="L165" title="All 4 branches covered.">        if (name.equals(GpxDef_11.TRKPT) || name.equals(GpxDef_10.WPT)) {</span>
-<span class="fc" id="L166">            this.current = this.newInstance(attributes);</span>
-<span class="fc" id="L167">            final String lat = attributes.getValue(GpxDef_11.ATTR_LAT);</span>
-<span class="fc bfc" id="L168" title="All 2 branches covered.">            if (lat != null) this.current.setLatitude(Double.parseDouble(lat));</span>
-<span class="fc" id="L169">            final String lon = attributes.getValue(GpxDef_11.ATTR_LON);</span>
-<span class="fc bfc" id="L170" title="All 2 branches covered.">            if (lon != null) this.current.setLongitude(Double.parseDouble(lon));</span>
-<span class="fc bfc" id="L171" title="All 2 branches covered.">        } else if (name.equals(WikimediaDef.COORDINATE)) {</span>
-<span class="fc" id="L172">            final String lat = attributes.getValue(GpxDef_11.ATTR_LAT);</span>
-<span class="pc bpc" id="L173" title="1 of 2 branches missed.">            if (lat != null) this.current.setLatitude(Double.parseDouble(lat));</span>
-<span class="fc" id="L174">            final String lon = attributes.getValue(GpxDef_11.ATTR_LON);</span>
-<span class="pc bpc" id="L175" title="1 of 2 branches missed.">            if (lon != null) this.current.setLongitude(Double.parseDouble(lon));</span>
-<span class="fc bfc" id="L176" title="All 2 branches covered.">        } else if (name.equals(WikimediaDef.IMAGE)) {</span>
-<span class="fc" id="L177">            final String symbol = attributes.getValue(WikimediaDef.ATTR_IMAGE);</span>
-<span class="pc bpc" id="L178" title="1 of 2 branches missed.">            if (symbol != null) this.current.setSymbol(symbol);</span>
-<span class="fc bfc" id="L179" title="All 4 branches covered.">        } else if ((name.equals(KmlDef_22.PLACEMARK)) || (name.equals(GeoUriDef.XML_ELEMENT_POI))) {</span>
-<span class="fc" id="L180">            this.current = this.newInstance(attributes);</span>
-<span class="fc bfc" id="L181" title="All 2 branches covered.">        } else if (name.equals(WikimediaDef.PAGE)) {</span>
-<span class="fc" id="L182">            this.current = this.newInstance(attributes);</span>
-<span class="fc" id="L183">            this.current.setId(attributes.getValue(WikimediaDef.ATTR_ID));</span>
-<span class="fc" id="L184">            this.current.setName(attributes.getValue(WikimediaDef.ATTR_TITLE));</span>
-<span class="fc" id="L185">            this.current.setLink(attributes.getValue(WikimediaDef.ATTR_LINK));</span>
-<span class="fc" id="L186">            final Date dateTime = IsoDateTimeParser.parse(attributes.getValue(WikimediaDef.ATTR_TIME));</span>
-<span class="pc bpc" id="L187" title="1 of 2 branches missed.">            if (dateTime != null) {</span>
-<span class="fc" id="L188">                this.current.setTimeOfMeasurement(dateTime);</span>
+<span class="fc" id="L236">        logger.debug(&quot;startElement {}-{}&quot;, localName, qName);</span>
+<span class="fc bfc" id="L237" title="All 4 branches covered.">        if (name.equals(XmlDefinitions.GpxDef_11.TRKPT) || name.equals(XmlDefinitions.GpxDef_10.WPT)) {</span>
+<span class="fc" id="L238">            this.currentGeoPoint = this.newInstance(attributes);</span>
+<span class="fc" id="L239">            final Double lat = getLatOrLong(attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LAT));</span>
+<span class="fc" id="L240">            final Double lon = getLatOrLong(attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LON));</span>
+<span class="pc bpc" id="L241" title="1 of 4 branches missed.">            if (lat != null &amp;&amp; lon != null) this.currentGeoPoint.setLatLon(lat, lon);</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">        } else if (name.equals(XmlDefinitions.WikimediaDef.COORDINATE)) {</span>
+<span class="fc" id="L243">            final Double lat = getLatOrLong(attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LAT));</span>
+<span class="fc" id="L244">            final Double lon = getLatOrLong(attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LON));</span>
+<span class="pc bpc" id="L245" title="2 of 4 branches missed.">            if (lat != null &amp;&amp; lon != null) this.currentGeoPoint.setLatLon(lat, lon);</span>
+<span class="fc bfc" id="L246" title="All 2 branches covered.">        } else if (name.equals(XmlDefinitions.WikimediaDef.IMAGE)) {</span>
+<span class="fc" id="L247">            final String symbol = attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_IMAGE);</span>
+<span class="pc bpc" id="L248" title="1 of 2 branches missed.">            if (symbol != null) this.currentGeoPoint.setSymbol(symbol);</span>
+<span class="fc bfc" id="L249" title="All 2 branches covered.">        } else if (name.equals(XmlDefinitions.KmlDef_22.ICON_DEFINITION)) {</span>
+<span class="fc" id="L250">            currentIconDefinitionId = attributes.getValue(XmlDefinitions.KmlDef_22.ATTR_DEFINITION_ID);</span>
+<span class="fc bfc" id="L251" title="All 4 branches covered.">        } else if ((name.equals(XmlDefinitions.KmlDef_22.PLACEMARK)) || (name.equals(GeoUriDef.XML_ELEMENT_POI))) {</span>
+            // start a new kml geo-item
+<span class="fc" id="L253">            this.currentGeoPoint = this.newInstance(attributes);</span>
+<span class="fc bfc" id="L254" title="All 2 branches covered.">        } else if (name.equals(XmlDefinitions.WikimediaDef.PAGE)) {</span>
+            // start a new wikipedia geo-item
+<span class="fc" id="L256">            this.currentGeoPoint = this.newInstance(attributes);</span>
+<span class="fc" id="L257">            this.currentGeoPoint.setId(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_ID));</span>
+<span class="fc" id="L258">            this.currentGeoPoint.setName(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_TITLE));</span>
+<span class="fc" id="L259">            this.currentGeoPoint.setLink(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_LINK));</span>
+<span class="fc" id="L260">            final Date dateTime = IsoDateTimeParser.parse(attributes.getValue(XmlDefinitions.WikimediaDef.ATTR_TIME));</span>
+<span class="pc bpc" id="L261" title="1 of 2 branches missed.">            if (dateTime != null) {</span>
+<span class="fc" id="L262">                this.currentGeoPoint.setTimeOfMeasurement(dateTime);</span>
             }
-<span class="fc bfc" id="L190" title="All 6 branches covered.">        } else if ((this.current != null) &amp;&amp; (name.equals(GpxDef_11.LINK) || name.equals(GpxDef_10.URL))) {</span>
-<span class="fc" id="L191">            this.current.setLink(attributes.getValue(GpxDef_11.ATTR_LINK));</span>
+<span class="fc bfc" id="L264" title="All 6 branches covered.">        } else if ((this.currentGeoPoint != null) &amp;&amp; (name.equals(XmlDefinitions.GpxDef_11.LINK) || name.equals(XmlDefinitions.GpxDef_10.URL))) {</span>
+<span class="fc" id="L265">            this.currentGeoPoint.setLink(attributes.getValue(XmlDefinitions.GpxDef_11.ATTR_LINK));</span>
         }
-<span class="fc bfc" id="L193" title="All 2 branches covered.">		if (this.current != null) {</span>
-<span class="fc" id="L194">			buf.setLength(0);</span>
+<span class="fc bfc" id="L267" title="All 2 branches covered.">		if (this.currentGeoPoint != null) {</span>
+<span class="fc" id="L268">			currentXmlElementBufer.setLength(0);</span>
 		}
-<span class="fc" id="L196">    }</span>
+<span class="fc" id="L270">    }</span>
 
+    /** Java sax api implementation: Element value and attribut inspection/processig */
     @Override
     public void endElement(String uri, String localName, String qName)
             throws SAXException {
-<span class="fc" id="L201">        String name = getElementName(localName, qName);</span>
-<span class="fc" id="L202">        logger.debug(&quot;endElement {} {}&quot;, localName, qName);</span>
-<span class="fc bfc" id="L203" title="All 10 branches covered.">        if (name.equals(GpxDef_11.TRKPT) || name.equals(GpxDef_10.WPT) || name.equals(KmlDef_22.PLACEMARK) || name.equals(GeoUriDef.XML_ELEMENT_POI) || name.equals(WikimediaDef.PAGE)) {</span>
-<span class="fc" id="L204">            GeoUri.inferMissing(this.current, this.current.getDescription());</span>
-<span class="fc" id="L205">            this.onGotNewWaypoint.onGeoInfo(this.current);</span>
-<span class="fc" id="L206">            this.current = null;</span>
-<span class="fc bfc" id="L207" title="All 2 branches covered.">        } else if (this.current != null) {</span>
-<span class="fc bfc" id="L208" title="All 2 branches covered.">            if (name.equals(GpxDef_11.NAME)) {</span>
-<span class="fc" id="L209">                this.current.setName(buf.toString());</span>
-<span class="fc bfc" id="L210" title="All 4 branches covered.">            } else if (name.equals(GpxDef_11.DESC) || name.equals(KmlDef_22.DESCRIPTION)) {</span>
-<span class="fc" id="L211">                this.current.setDescription(buf.toString());</span>
-<span class="fc bfc" id="L212" title="All 6 branches covered.">            } else if ((null == this.current.getLink()) &amp;&amp; (name.equals(GpxDef_11.LINK) || name.equals(GpxDef_10.URL))) {</span>
-<span class="fc" id="L213">                this.current.setLink(buf.toString());</span>
-<span class="fc bfc" id="L214" title="All 2 branches covered.">            } else if (name.equals(GeoUriDef.ID)) {</span>
-<span class="fc" id="L215">                this.current.setId(buf.toString());</span>
-<span class="pc bpc" id="L216" title="1 of 6 branches missed.">            } else if (name.equals(GpxDef_11.TIME) || name.equals(KmlDef_22.TIMESTAMP_WHEN) || name.equals(KmlDef_22.TIMESPAN_BEGIN)) {</span>
-<span class="fc" id="L217">                final Date dateTime = IsoDateTimeParser.parse(buf.toString());</span>
-<span class="pc bpc" id="L218" title="1 of 2 branches missed.">                if (dateTime != null) {</span>
-<span class="fc" id="L219">                    this.current.setTimeOfMeasurement(dateTime);</span>
+<span class="fc" id="L276">        String name = getElementName(localName, qName);</span>
+<span class="fc" id="L277">        String currentXmlElementContent = currentXmlElementBufer.toString();</span>
+
+<span class="fc" id="L279">        logger.debug(&quot;endElement {} {} {}&quot;, localName, qName, currentXmlElementContent);</span>
+
+<span class="fc bfc" id="L281" title="All 2 branches covered.">        if (name.equals(XmlDefinitions.GpxDef_11.TRKPT)</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">                || name.equals(XmlDefinitions.GpxDef_10.WPT)</span>
+<span class="fc bfc" id="L283" title="All 2 branches covered.">                || name.equals(XmlDefinitions.KmlDef_22.PLACEMARK)</span>
+<span class="fc bfc" id="L284" title="All 2 branches covered.">                || name.equals(GeoUriDef.XML_ELEMENT_POI)</span>
+<span class="fc bfc" id="L285" title="All 2 branches covered.">                || name.equals(XmlDefinitions.WikimediaDef.PAGE)) {</span>
+            // end of new geo point
+<span class="fc" id="L287">            GeoUri.inferMissing(this.currentGeoPoint, this.currentGeoPoint.getDescription());</span>
+<span class="fc" id="L288">            this.onGotNewWaypoint.onGeoInfo(this.currentGeoPoint);</span>
+<span class="fc" id="L289">            this.currentGeoPoint = null;</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">        } else if (name.equals(XmlDefinitions.KmlDef_22.ICON_DEFINITION)) {</span>
+            // now outside of kml icon definition
+<span class="fc" id="L292">            currentIconDefinitionId = null;</span>
+<span class="fc bfc" id="L293" title="All 4 branches covered.">        } else if (currentIconDefinitionId != null &amp;&amp; (name.equals(XmlDefinitions.KmlDef_22.ICON_DEFINITION_URL))) {</span>
+                // // icon url inside kml icon definition
+<span class="fc" id="L295">            id2Symbol.put(&quot;#&quot; + currentIconDefinitionId, currentXmlElementContent.trim() );</span>
+<span class="fc bfc" id="L296" title="All 2 branches covered.">        } else if (this.currentGeoPoint != null) {</span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">            if (name.equals(XmlDefinitions.GpxDef_11.NAME)) {</span>
+<span class="fc" id="L298">                this.currentGeoPoint.setName(currentXmlElementContent);</span>
+<span class="fc bfc" id="L299" title="All 6 branches covered.">            } else if (name.equals(XmlDefinitions.GpxDef_11.DESC) || name.equals(XmlDefinitions.KmlDef_22.DESCRIPTION) || name.equals(XmlDefinitions.WikimediaDef.DESCRIPTION)) {</span>
+<span class="fc" id="L300">                this.currentGeoPoint.setDescription(currentXmlElementContent.trim());</span>
+<span class="fc bfc" id="L301" title="All 4 branches covered.">            } else if (this.currentGeoPoint.getDescription() == null &amp;&amp; name.equals(GeoUriDef.DESCRIPTION)) {</span>
+                // &lt;poi&gt;&lt;d&gt;theDescr with lowest priority&lt;/d&gt;&lt;/poi&gt;
+<span class="fc" id="L303">                this.currentGeoPoint.setDescription(currentXmlElementContent.trim());</span>
+<span class="fc bfc" id="L304" title="All 6 branches covered.">            } else if ((null == this.currentGeoPoint.getLink()) &amp;&amp; (name.equals(XmlDefinitions.GpxDef_11.LINK) || name.equals(XmlDefinitions.GpxDef_10.URL))) {</span>
+<span class="fc" id="L305">                this.currentGeoPoint.setLink(currentXmlElementContent);</span>
+<span class="fc bfc" id="L306" title="All 2 branches covered.">            } else if (name.equals(XmlDefinitions.GpxDef_11.IMAGE)) {</span>
+<span class="fc" id="L307">                this.currentGeoPoint.setSymbol(currentXmlElementContent);</span>
+<span class="fc bfc" id="L308" title="All 2 branches covered.">            } else if (name.equals(XmlDefinitions.KmlDef_22.ICON_REFERENCE_ID)) {</span>
+                // kml icon reference
+<span class="fc" id="L310">                String symbol = id2Symbol.get(currentXmlElementContent);</span>
+<span class="pc bpc" id="L311" title="1 of 4 branches missed.">                if (symbol == null &amp;&amp; !currentXmlElementContent.startsWith(&quot;#&quot;)) {</span>
+                    // no predefined symbol found: assume the referencce is the symbol
+<span class="fc" id="L313">                    symbol = currentXmlElementContent;</span>
+                }
+<span class="pc bpc" id="L315" title="1 of 2 branches missed.">                if (symbol != null) {</span>
+<span class="fc" id="L316">                    this.currentGeoPoint.setSymbol(symbol);</span>
+                }
+<span class="fc bfc" id="L318" title="All 2 branches covered.">            } else if (name.equals(GeoUriDef.ID)) {</span>
+<span class="fc" id="L319">                this.currentGeoPoint.setId(currentXmlElementContent);</span>
+<span class="pc bpc" id="L320" title="1 of 6 branches missed.">            } else if (name.equals(XmlDefinitions.GpxDef_11.TIME) || name.equals(XmlDefinitions.KmlDef_22.TIMESTAMP_WHEN) || name.equals(XmlDefinitions.KmlDef_22.TIMESPAN_BEGIN)) {</span>
+<span class="fc" id="L321">                final Date dateTime = IsoDateTimeParser.parse(currentXmlElementContent);</span>
+<span class="pc bpc" id="L322" title="1 of 2 branches missed.">                if (dateTime != null) {</span>
+<span class="fc" id="L323">                    this.currentGeoPoint.setTimeOfMeasurement(dateTime);</span>
                 } else {
-<span class="nc" id="L221">                    saxError(&quot;/gpx//time or /kml//when or /kml//begin: invalid time &quot;</span>
-                            + name +&quot;=&quot; + buf.toString());
+<span class="nc" id="L325">                    saxError(&quot;/gpx//time or /kml//when or /kml//begin: invalid time &quot;</span>
+                            + name +&quot;=&quot; + currentXmlElementContent);
                 }
 
-<span class="pc bpc" id="L225" title="1 of 6 branches missed.">            } else if ((name.equals(KmlDef_22.COORDINATES) || name.equals(KmlDef_22.COORDINATES2)) &amp;&amp; buf.length() &gt; 0) {</span>
+<span class="pc bpc" id="L329" title="1 of 6 branches missed.">            } else if ((name.equals(XmlDefinitions.KmlDef_22.COORDINATES) || name.equals(XmlDefinitions.KmlDef_22.COORDINATES2)) &amp;&amp; currentXmlElementContent.length() &gt; 0) {</span>
                 // &lt;coordinates&gt;lon,lat,height blank lon,lat,height ...&lt;/coordinates&gt;
                 try {
-<span class="fc" id="L228">                    String parts[] = buf.toString().split(&quot;[,\\s]&quot;);</span>
-<span class="pc bpc" id="L229" title="1 of 4 branches missed.">                    if ((parts != null) &amp;&amp; (parts.length &gt;= 2)) {</span>
-<span class="fc" id="L230">                        this.current.setLatitude(Double.parseDouble(parts[1]));</span>
-<span class="fc" id="L231">                        this.current.setLongitude(Double.parseDouble(parts[0]));</span>
+<span class="fc" id="L332">                    String parts[] = currentXmlElementContent.split(&quot;[,\\s]&quot;);</span>
+<span class="pc bpc" id="L333" title="1 of 4 branches missed.">                    if ((parts != null) &amp;&amp; (parts.length &gt;= 2)) {</span>
+                        // note KmlDef_22.COORDINATES use lon,lat reverse order
+<span class="fc" id="L335">                        Double lat = getLatOrLong(parts[1]);</span>
+<span class="fc" id="L336">                        Double lon= getLatOrLong(parts[0]);</span>
+<span class="pc bpc" id="L337" title="2 of 4 branches missed.">                        if (!GeoPointDto.isEmpty(lat) &amp;&amp; !GeoPointDto.isEmpty(lon)) {</span>
+<span class="fc" id="L338">                            this.currentGeoPoint.setLatLon(lat, lon);</span>
+                        }
                     }
-<span class="nc" id="L233">                } catch (NumberFormatException e) {</span>
-<span class="nc" id="L234">                    saxError(&quot;/kml//Placemark/Point/coordinates&gt;Expected: 'lon,lat,...' but got &quot;</span>
-                            + name +&quot;=&quot; + buf.toString());
-<span class="fc" id="L236">                }</span>
+<span class="nc" id="L341">                } catch (NumberFormatException e) {</span>
+<span class="nc" id="L342">                    saxError(&quot;/kml//Placemark/Point/coordinates&gt;Expected: 'lon,lat,...' but got &quot;</span>
+                            + name +&quot;=&quot; + currentXmlElementContent);
+<span class="pc" id="L344">                }</span>
+<span class="pc bpc" id="L345" title="2 of 6 branches missed.">            } else if (name.equals(GeoUriDef.ZOOM) &amp;&amp; currentGeoPoint.getZoomMin() &lt;= 0  &amp;&amp; currentXmlElementContent.length() &gt; 0) {</span>
+<span class="fc" id="L346">                currentGeoPoint.setZoomMin(Integer.parseInt(currentXmlElementContent));</span>
+<span class="pc bpc" id="L347" title="2 of 6 branches missed.">            } else if (name.equals(GeoUriDef.ZOOM_MAX) &amp;&amp; currentGeoPoint.getZoomMax() &lt;= 0  &amp;&amp; currentXmlElementContent.length() &gt; 0) {</span>
+<span class="fc" id="L348">                currentGeoPoint.setZoomMax(Integer.parseInt(currentXmlElementContent));</span>
             }
+
         }
-<span class="fc" id="L239">    }</span>
+<span class="fc" id="L352">    }</span>
 
+    protected Double getLatOrLong(String strLatOrLong) {
+<span class="fc" id="L355">        Double result = null;</span>
+<span class="fc bfc" id="L356" title="All 2 branches covered.">        if (strLatOrLong != null) {</span>
+<span class="fc" id="L357">            result = Double.parseDouble(strLatOrLong);</span>
+        }
+<span class="fc" id="L359">        return result;</span>
+    }
+
+    /** Called for every xml-sax-parser-error */
     private void saxError(String message) throws SAXException {
-<span class="nc" id="L242">        throw new SAXException(message);</span>
+<span class="nc" id="L364">        throw new SAXException(message);</span>
     }
+
+    /** Get element-name removing possible namespace prefix */
     private String getElementName(String localName, String qName) {
-<span class="pc bpc" id="L245" title="2 of 4 branches missed.">        if ((localName != null) &amp;&amp; (localName.length() &gt; 0))</span>
-<span class="nc" id="L246">            return localName;</span>
-<span class="pc bpc" id="L247" title="1 of 2 branches missed.">        if (qName == null) return &quot;&quot;;</span>
+<span class="pc bpc" id="L369" title="2 of 4 branches missed.">        if ((localName != null) &amp;&amp; (localName.length() &gt; 0))</span>
+<span class="nc" id="L370">            return localName;</span>
+<span class="pc bpc" id="L371" title="1 of 2 branches missed.">        if (qName == null) return &quot;&quot;;</span>
 
-<span class="fc" id="L249">        int delim = qName.indexOf(&quot;:&quot;);</span>
-<span class="fc bfc" id="L250" title="All 2 branches covered.">        if (delim &lt; 0) return qName;</span>
+<span class="fc" id="L373">        int delim = qName.indexOf(&quot;:&quot;);</span>
+<span class="fc bfc" id="L374" title="All 2 branches covered.">        if (delim &lt; 0) return qName;</span>
 
-<span class="fc" id="L252">        return qName.substring(delim+1);</span>
+<span class="fc" id="L376">        return qName.substring(delim+1);</span>
     }
 
+    /** Java sax api implementation: Collect value while between start-element and end-element */
     @Override
     public void characters(char[] chars, int start, int length)
             throws SAXException {
-<span class="fc bfc" id="L258" title="All 2 branches covered.">		if (this.current != null) {</span>
-<span class="fc" id="L259">			buf.append(chars, start, length);</span>
+<span class="fc bfc" id="L383" title="All 4 branches covered.">		if (this.currentGeoPoint != null || currentIconDefinitionId != null) {</span>
+<span class="fc" id="L384">			currentXmlElementBufer.append(chars, start, length);</span>
 		}
-<span class="fc" id="L261">    }</span>
+<span class="fc" id="L386">    }</span>
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

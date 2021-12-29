@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SymbolConverterBase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo</a> &gt; <span class="el_source">SymbolConverterBase.java</span></div><h1>SymbolConverterBase.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (c) 2021 by k3b.
+ *
+ * This file is part of of k3b-geoHelper library and LocationMapViewer.
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program. If not, see &lt;http://www.gnu.org/licenses/&gt;
+ */
+
+package de.k3b.geo;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import de.k3b.geo.api.GeoPointDto;
+import de.k3b.geo.api.IGeoInfoHandler;
+import de.k3b.geo.api.IGeoPointInfo;
+
+/**
+ * A {@link IGeoInfoHandler} in a chain of {@link IGeoInfoHandler}s that converts
+ * {@link IGeoPointInfo#getSymbol()}s from &quot;relative to the containing geo-file&quot; to absolute.
+ *
+ * @param &lt;T&gt; OS-Specific File-Translations system
+ */
+public abstract class SymbolConverterBase&lt;T&gt;  implements IGeoInfoHandler {
+    @NonNull protected final T rootDir;
+    @NonNull protected final Map&lt;String, T&gt; name2file;
+    @Nullable protected final IGeoInfoHandler nextConverter;
+
+    /**
+     * @param rootDir where all relative paths refer to
+     * @param name2file a map that translates relative items to absolute items
+     * @param nextConverter if not null: next converter in a chain to be executed
+     */
+<span class="nc" id="L48">    protected SymbolConverterBase(@NonNull final T rootDir, @Nullable final Map&lt;String, T&gt; name2file, @Nullable IGeoInfoHandler nextConverter) {</span>
+<span class="nc" id="L49">        this.rootDir = rootDir;</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        this.name2file = name2file != null ? name2file : new HashMap&lt;String, T&gt;();</span>
+<span class="nc" id="L51">        this.nextConverter = nextConverter;</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        if (this.name2file.size() == 0) {</span>
+<span class="nc" id="L53">            addFiles(&quot;&quot;, rootDir);</span>
+        }
+<span class="nc" id="L55">    }</span>
+
+    // IGeoInfoHandler
+    @Override
+    public boolean onGeoInfo(IGeoPointInfo aGeoPoint) {
+<span class="nc" id="L60">        String symbol = convertSymbol(aGeoPoint);</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (symbol != null) {</span>
+<span class="nc" id="L62">            ((GeoPointDto) aGeoPoint).setSymbol(symbol);</span>
+        }
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        if (nextConverter != null) nextConverter.onGeoInfo(aGeoPoint);</span>
+<span class="nc" id="L65">        return true;</span>
+    }
+
+    private String convertSymbol(final IGeoPointInfo aGeoPoint) {
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        String symbol = aGeoPoint != null ? aGeoPoint.getSymbol() : null;</span>
+<span class="nc bnc" id="L70" title="All 6 branches missed.">        if (symbol != null &amp;&amp; !symbol.contains(&quot;:&quot;) &amp;&amp; symbol.contains(&quot;.&quot;)) {</span>
+<span class="nc" id="L71">            symbol = symbol.toLowerCase();</span>
+<span class="nc" id="L72">            T doc = name2file.get(symbol);</span>
+<span class="nc bnc" id="L73" title="All 4 branches missed.">            if (doc == null &amp;&amp; symbol.contains(&quot;/&quot;)) {</span>
+<span class="nc" id="L74">                doc = addFiles(symbol.split(&quot;/&quot;));</span>
+            }
+<span class="nc bnc" id="L76" title="All 2 branches missed.">            if (doc != null) return getUri(doc);</span>
+        }
+<span class="nc" id="L78">        return null;</span>
+    }
+
+    private T addFiles(String[] pathElements) {
+<span class="nc" id="L82">        T currentdir = rootDir;</span>
+<span class="nc" id="L83">        StringBuilder path = new StringBuilder();</span>
+<span class="nc" id="L84">        T doc = null;</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        for (String pathElement : pathElements) {</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">            if (path.length() &gt; 0) path.append(&quot;/&quot;);</span>
+<span class="nc" id="L87">            String parentPath = path.toString();</span>
+<span class="nc" id="L88">            path.append(pathElement);</span>
+<span class="nc" id="L89">            String pathLowerCase = path.toString();</span>
+<span class="nc" id="L90">            doc = name2file.get(pathLowerCase);</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            if (doc == null) {</span>
+<span class="nc" id="L92">                addFiles(parentPath, currentdir);</span>
+<span class="nc" id="L93">                doc = name2file.get(pathLowerCase);</span>
+            }
+<span class="nc" id="L95">            currentdir = doc;</span>
+        }
+<span class="nc" id="L97">        return doc;</span>
+    }
+
+    private void addFiles(String parentPath, T currentdir) {
+<span class="nc" id="L101">        T[] children = listFiles(currentdir);</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (children != null) {</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">            for (T child : children) {</span>
+<span class="nc" id="L104">                name2file.put(parentPath + getName(child).toLowerCase(), child);</span>
+            }
+        }
+<span class="nc" id="L107">    }</span>
+
+    public static boolean isGeo(String nameLower) {
+<span class="nc" id="L110">        return GeoConfig.isOneOf(nameLower, GeoConfig.EXT_ALL);</span>
+    }
+
+    public static boolean iszip(String nameLower) {
+<span class="nc" id="L114">        return GeoConfig.isOneOf(nameLower, GeoConfig.EXT_ALL_ZIP);</span>
+    }
+
+    // Abstract OS-Specific methods
+    @NonNull protected abstract String getName(@NonNull T child);
+
+    @Nullable protected abstract T[] listFiles(@Nullable T currentdir);
+
+    @NonNull protected abstract String getUri(@NonNull T doc);
+
+    protected abstract boolean isExistingDirectory(@Nullable T dir);
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GeoUri.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io</a> &gt; <span class="el_source">GeoUri.java</span></div><h1>GeoUri.java</h1><pre class="source lang-java linenums">/*
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GeoUri.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">k3b-geoHelper</a> &gt; <a href="index.source.html" class="el_package">de.k3b.geo.io</a> &gt; <span class="el_source">GeoUri.java</span></div><h1>GeoUri.java</h1><pre class="source lang-java linenums">/*
  * Copyright (c) 2015-2016 by k3b.
  *
  * This file is part of k3b-geoHelper library.
@@ -18,11 +18,14 @@
 
 package de.k3b.geo.io;
 
+import static de.k3b.geo.api.IGeoPointInfo.NO_ZOOM;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,28 +37,84 @@ import de.k3b.geo.api.IGeoPointInfo;
 import de.k3b.util.IsoDateTimeParser;
 
 /**
- * Converts between a {@link de.k3b.geo.api.IGeoPointInfo} and a uri string.&lt;br/&gt;
- * Format:&lt;br/&gt;
- * geo:{lat}{,lon{,hight_ignore}}}{?q={lat}{,lon}{,hight_ignore}{(name)}}{&amp;uri=uri}{&amp;id=id}{&amp;d=description}{&amp;z=zmin{&amp;z2=zmax}}{&amp;t=timeOfMeasurement}
- * Example (with {@link de.k3b.geo.io.GeoUri#OPT_FORMAT_REDUNDANT_LAT_LON} set):&lt;br/&gt;
- * geo:12.345,-56.7890123?q=12.345,-56.7890123(name)&amp;z=5&amp;z2=7&amp;uri=uri&amp;d=description&amp;id=id&amp;t=1991-03-03T04:05:06Z
- * &lt;p/&gt;
+ * Converts between a {@link IGeoPointInfo} and a uri {@link String}.
+ *
+ * ---
+ *
+ * ![GeoUri-fromUri](GeoUri-fromUri.png)
+ *
+ * ```java
+ * GeoUri parser = new GeoUri(GeoUri.OPT_DEFAULT);
+ *
+ * IGeoPointInfo geo = parser.fromUri(&quot;geo:52.1,9.2?z=14&quot;);
+ *
+ * System.out.print(String.format(&quot;got lat=%f lon=%f&quot;, geo.getLatitude(),geo.getLongitude()));
+ * ```
+ *
+ * ---
+ *
+ * ![GeoUri-toUriString](GeoUri-toUriString.png)
+ *
+ * ```java
+ * GeoUri formater = new GeoUri(GeoUri.OPT_DEFAULT);
+ * GeoPointDto geo = new GeoPointDto()
+ *      .setLatitude(52.1)
+ *      .setLongitude(9.2)
+ *      .setZoomMin(14);
+ * String geoUri = formater.toUriString(geo);
+ * ```
+ *
+ * ---
+ *
+ * Format:
+ *
+ * * geo:{lat}{,lon{,hight_ignore}}}{?q={lat}{,lon}{,hight_ignore}{(name)}}{&amp;uri=uri}{&amp;id=id}{&amp;d=description}{&amp;z=zmin{&amp;z2=zmax}}{&amp;t=timeOfMeasurement}
+ *
+ * Example (with {@link de.k3b.geo.io.GeoUri#OPT_FORMAT_REDUNDANT_LAT_LON} set):
+ *
+ * * geo:52.1,9.2?q=52.1,9.2(name)&amp;z=5&amp;z2=7&amp;uri=uri&amp;d=description&amp;id=id&amp;t=1991-03-03T04:05:06Z
+ *
  * This should be compatible with standard http://tools.ietf.org/html/draft-mayrhofer-geo-uri-00
- * and with googlemap for android. This implementation has aditional non-standard parameters
- * for LocationViewer clients.&lt;br/&gt;
- * &lt;br/&gt;
+ * and with googlemap for android.
+ *
+ * This implementation has aditional non-standard parameters for LocationViewer clients.
+ * 
+ * For details see [supported geo uri formats](https://github.com/k3b/k3b-geoHelper/wiki/data#geo)
+ *
+ *
  * Created by k3b on 13.01.2015.
  */
 public class GeoUri {
     /* constants that define behaviour of fromUri and toUri */
 
+    /** Option for {@link GeoUri#GeoUri(int)}: */
     public static final int OPT_DEFAULT = 0;
-    /** In toUriString: If set lat/lon is inserted twice: in q= parameter and in geo. &lt;br/&gt;
-     * If not lat/lon is only in geo part but not in the q= part*/
+
+    /** Option for {@link GeoUri#GeoUri(int)} to influence {@link #toUriString(IGeoPointInfo)}: Add lat/long twice.
+     *
+     * Example with opton set (and understood by google):
+     *
+     * * geo:52.1,9.2?q=52.1,9.2
+     *
+     * Example with opton not set (and not understood by google):
+     *
+     * * geo:52.1,9.2
+     *
+     */
     public static final int OPT_FORMAT_REDUNDANT_LAT_LON = 1;
-    /** In fromUri: if set tries to get time, location, name for everywhere.&lt;br/&gt;
-     * Example: &quot;geo:?d=I was in (Hamburg) located at 53,10 on 1991-03-03T04:05:06Z&quot; would set
-     * name, location and time from the description text.
+
+    /** Option for {@link GeoUri#GeoUri(int)} for {@link #fromUri(String)} :
+     * If set try to get {@link IGeoPointInfo#getTimeOfMeasurement()},
+     * {@link IGeoPointInfo#getLatitude()}, {@link IGeoPointInfo#getLongitude()},
+     * {@link IGeoPointInfo#getName()} from other fields.
+     *
+     * Example:
+     *
+     * * &quot;geo:?d=I was in (Hamburg) located at 53,10 on 1991-03-03T04:05:06Z&quot;
+     *
+     * would set {@link IGeoPointInfo#getTimeOfMeasurement()},
+     * {@link IGeoPointInfo#getLatitude()}, {@link IGeoPointInfo#getLongitude()},
+     * {@link IGeoPointInfo#getName()} from {@link IGeoPointInfo#getDescription()} .
      */
     public static final int OPT_PARSE_INFER_MISSING = 0x100;
 
@@ -65,333 +124,503 @@ public class GeoUri {
     private static final String DEFAULT_ENCODING = &quot;UTF-8&quot;;
     public static final String GEO_SCHEME = &quot;geo:&quot;;
     public static final String AREA_SCHEME = &quot;geoarea:&quot;;
+    public static final java.lang.String HTTPS_SCHEME = &quot;https:&quot;;
+    public static final java.lang.String HTTP_SCHEME = &quot;http:&quot;;
 
-    /* regular expressions used by the parser.&lt;br/&gt;
+    /* Regular expressions used by the parser.&lt;br/&gt;
        '(?:&quot;+something+&quot;)&quot;' is a non capturing group; &quot;\s&quot; white space */
-    private final static String regexpName = &quot;(?:\\s*\\(([^\\(\\)]+)\\))&quot;; // i.e. &quot; (hallo world)&quot;
-<span class="fc" id="L72">    private final static Pattern patternName = Pattern.compile(regexpName);</span>
-    private final static String regexpDouble = &quot;([+\\-]?[0-9\\.]+)&quot;; // i.e. &quot;-123.456&quot;
-    private final static String regexpDoubleOptional = regexpDouble + &quot;?&quot;;
-    private final static String regexpCommaDouble = &quot;(?:\\s*,\\s*&quot; + regexpDouble + &quot;)&quot;; // i.e. &quot; , +123.456&quot;
-    private final static String regexpCommaDoubleOptional = regexpCommaDouble + &quot;?&quot;;
-    private final static String regexpLatLonAlt = regexpDouble + regexpCommaDouble + regexpCommaDoubleOptional;
-    private final static String regexpLatLonLatLon = regexpDouble + regexpCommaDouble + regexpCommaDouble + regexpCommaDouble;
-<span class="fc" id="L79">    private final static Pattern patternLatLonAlt = Pattern.compile(regexpLatLonAlt);</span>
-<span class="fc" id="L80">    private final static Pattern patternLatLonLatLon = Pattern.compile(regexpLatLonLatLon);</span>
-<span class="fc" id="L81">    private final static Pattern patternTime = Pattern.compile(&quot;([12]\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ)&quot;);</span>
+    private static final String REGEXP_NAME = &quot;(?:\\s*\\(([^()]+)\\))&quot;; // i.e. &quot; (hallo world)&quot;
+<span class="fc" id="L133">    private static final Pattern PATTERN_NAME = Pattern.compile(REGEXP_NAME);</span>
+    private static final String REGEXP_DOUBLE = &quot;([+\\-&quot; + GeoFormatter.PREFIX_LAT_LON +
+            &quot;]?[0-9.]+)&quot;; // i.e. &quot;-123.456&quot; or &quot;S123.456&quot;
+    // private static final String regexpDoubleOptional = regexpDouble + &quot;?&quot;;
+    private static final String REGEXP_COMMA_DOUBLE = &quot;(?:\\s*,\\s*&quot; + REGEXP_DOUBLE + &quot;)&quot;; // i.e. &quot; , +123.456&quot;
+    private static final String REGEXP_COMMA_DOUBLE_OPTIONAL = REGEXP_COMMA_DOUBLE + &quot;?&quot;;
+    private static final String REGEXP_VALID_PREFIX = &quot;&quot;; //  &quot;^(?:[^a-mo-rt-zA-MO-RT-Z])*&quot;; // no chars except nsew
+    private static final String REGEXP_LAT_LON_ALT = REGEXP_VALID_PREFIX + REGEXP_DOUBLE + REGEXP_COMMA_DOUBLE + REGEXP_COMMA_DOUBLE_OPTIONAL;
+    private static final String REGEXP_LAT_LON_LAT_LON = REGEXP_DOUBLE + REGEXP_COMMA_DOUBLE + REGEXP_COMMA_DOUBLE + REGEXP_COMMA_DOUBLE;
+<span class="fc" id="L142">    private static final Pattern PATTERN_LAT_LON_ALT = Pattern.compile(REGEXP_LAT_LON_ALT);</span>
+<span class="fc" id="L143">    private static final Pattern PATTERN_LAT_LON_LAT_LON = Pattern.compile(REGEXP_LAT_LON_LAT_LON);</span>
+    // private static final Pattern patternTime = Pattern.compile(&quot;([12]\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ)&quot;);
 
-    private final static String regexpHref = &quot;(?:\\s*href\\s?\\=\\s?['\&quot;]([^'\&quot;]*)['\&quot;])&quot;; // i.e. href='hallo'
-<span class="fc" id="L84">    private final static Pattern patternHref = Pattern.compile(regexpHref);</span>
+    private static final String REGEXP_HREF = &quot;(?:\\s*href\\s?=\\s?['\&quot;]([^'\&quot;]*)['\&quot;])&quot;; // i.e. href='hallo'
+<span class="fc" id="L147">    private static final Pattern PATTERN_HREF = Pattern.compile(REGEXP_HREF);</span>
 
-    private final static String regexpSrc = &quot;(?:\\s*src\\s?\\=\\s?['\&quot;]([^'\&quot;]*)['\&quot;])&quot;; // i.e. src='hallo'
-<span class="fc" id="L87">    private final static Pattern patternSrc = Pattern.compile(regexpSrc);</span>
+    private static final String REGEXP_SRC = &quot;(?:\\s*src\\s?=\\s?['\&quot;]([^'\&quot;]*)['\&quot;])&quot;; // i.e. src='hallo'
+<span class="fc" id="L150">    private static final Pattern PATTERN_SRC = Pattern.compile(REGEXP_SRC);</span>
 
-    /* current state */
+    /* Current state */
 
-    /** formating/parsing options */
+    /** Formating/parsing options */
     private final int options;
 
-    /** for uri-formatter: next delimiter for a parameter. can be &quot;?&quot; or &quot;&amp;&quot;  */
+    /** For uri-formatter: Next delimiter for a parameter. can be &quot;?&quot; or &quot;&amp;&quot;  */
     private String delim;
 
-    /** create wit options from OPT_xxx */
-<span class="fc" id="L98">    public GeoUri(int options) {</span>
-<span class="fc" id="L99">        this.options = options;</span>
-<span class="fc" id="L100">    }</span>
+    /** Create with options from OPT_xxx */
+<span class="fc" id="L161">    public GeoUri(int options) {</span>
+<span class="fc" id="L162">        this.options = options;</span>
+<span class="fc" id="L163">    }</span>
 
-    /** load IGeopoint from uri-string */
+    /**
+     * Load {@link IGeoPointInfo} from uri-{@link String}.&lt;br/&gt;
+     *
+     * ![GeoUri-fromUri](GeoUri-fromUri.png)
+     *
+	 * For details see [supported geo uri formats](https://github.com/k3b/k3b-geoHelper/wiki/data#geo)
+	 *
+     * @startuml GeoUri-fromUri.png
+     * title Convert uri string to geo-point 
+     * interface IGeoPointInfo
+     *
+     * class GeoUri
+     * GeoUri : fromUri
+     *
+     * GeoUri -&gt; IGeoPointInfo
+     * String -&gt; GeoUri : &quot;geo:52.1,9.2?...&quot;
+     * String -&gt; GeoUri : &quot;http://maps.google...&quot;
+     * @enduml
+     *
+     * 
+     */
     public IGeoPointInfo fromUri(String uri) {
-<span class="fc" id="L104">        return fromUri(uri, new GeoPointDto());</span>
+<span class="fc" id="L187">        return fromUri(uri, new GeoPointDto());</span>
     }
 
-    /** load IGeopoint from uri-string into parseResult. */
+    /** Load {@link IGeoPointInfo} from uri-{@link String} into parseResult. 
+     *
+     * ![GeoUri-fromUri](GeoUri-fromUri.png)
+	 *
+	 * For details see [supported geo uri formats](https://github.com/k3b/k3b-geoHelper/wiki/data#geo)
+	 */
     public &lt;TGeo extends GeoPointDto&gt;  TGeo fromUri(String uri, TGeo parseResult) {
-<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        if (uri == null) return null;</span>
-<span class="pc bpc" id="L110" title="1 of 2 branches missed.">        if (!uri.startsWith(GEO_SCHEME)) return null;</span>
+<span class="pc bpc" id="L197" title="1 of 2 branches missed.">        if (uri == null) return null;</span>
 
-<span class="fc" id="L112">        int queryOffset = uri.indexOf(&quot;?&quot;);</span>
+<span class="fc bfc" id="L199" title="All 4 branches covered.">        if (uri.startsWith(HTTP_SCHEME) || uri.startsWith(HTTPS_SCHEME)) {</span>
+<span class="fc" id="L200">            String uriLowercase = uri.toLowerCase();</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">            if (uriLowercase.indexOf(&quot;yandex.&quot;) &gt;= 0) return getYandexUri(uri, parseResult);</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">            if (uriLowercase.indexOf(&quot;openstreetmap.&quot;) &gt;= 0) return getOpenstreetmapUri(uri, parseResult);</span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">            if (uriLowercase.indexOf(&quot;.here.&quot;) &gt;= 0) return getHereUri(uri, parseResult);</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">            if (uriLowercase.indexOf(&quot;.google.&quot;) &gt;= 0) return getGoogleUri(uri, parseResult);</span>
 
-<span class="fc bfc" id="L114" title="All 2 branches covered.">        if (queryOffset &gt;= 0) {</span>
-<span class="fc" id="L115">            String query = uri.substring(queryOffset+1);</span>
-<span class="fc" id="L116">            uri = uri.substring(0, queryOffset);</span>
-<span class="fc" id="L117">            HashMap&lt;String, String&gt; parmLookup = new HashMap&lt;String, String&gt;();</span>
-<span class="fc" id="L118">            String[] params = query.split(&quot;&amp;&quot;);</span>
-<span class="fc bfc" id="L119" title="All 2 branches covered.">            for (String param : params) {</span>
-<span class="fc" id="L120">                parseAddQueryParamToMap(parmLookup, param);</span>
+            // unknown. try default
+<span class="fc" id="L207">            return uriParamParse(uri, parseResult);</span>
+
+        }
+<span class="pc bpc" id="L210" title="2 of 6 branches missed.">        if (uri.startsWith(HTTP_SCHEME) || uri.startsWith(HTTPS_SCHEME) || uri.startsWith(GEO_SCHEME)) {</span>
+<span class="fc" id="L211">            return uriParamParse(uri, parseResult);</span>
+        }
+
+        // unknown format
+<span class="fc" id="L215">        return null;</span>
+    }
+
+    private &lt;TGeo extends GeoPointDto&gt; TGeo getYandexUri(String uri, TGeo parseResult) {
+        // https://www.yandex.com/maps/?ll=9.2,52.1&amp;z=14
+        // special ll= handling lat / lon are spwapped
+<span class="fc" id="L221">        int dataStart = contentIndexBehind(uri, &quot;ll=&quot;);</span>
+<span class="fc" id="L222">        String[] parts = getParts(uri, dataStart, &quot;[,?&amp;]&quot;, 2);</span>
+<span class="pc bpc" id="L223" title="1 of 2 branches missed.">        if (parts != null) {</span>
+<span class="fc" id="L224">            setLatLonZoom(parseResult, parts[1], parts[0], null);</span>
+        }
+<span class="fc" id="L226">        return uriParamParse(uri, parseResult);</span>
+    }
+
+    private static void setLatLonZoom(GeoPointDto parseResult, String latString, String lonString, String zoom) {
+<span class="fc bfc" id="L230" title="All 4 branches covered.">        if ((parseResult.getZoomMin() == NO_ZOOM) &amp;&amp; (zoom != null)) {</span>
+<span class="fc" id="L231">            parseResult.setZoomMin(GeoFormatter.parseZoom(zoom));</span>
+        }
+
+        try {
+
+<span class="fc" id="L236">            Double lat = null;</span>
+<span class="fc" id="L237">            Double lon = null;</span>
+            // !!! isNaN does not work
+<span class="fc bfc" id="L239" title="All 4 branches covered.">            if ((latString != null) &amp;&amp; GeoPointDto.isEmpty(parseResult.getLatitude())) {</span>
+<span class="fc" id="L240">                lat = GeoFormatter.parseLatOrLon(latString);</span>
             }
-<span class="fc" id="L122">            parseResult.setDescription(parmLookup.get(GeoUriDef.DESCRIPTION));</span>
-<span class="fc" id="L123">            parseResult.setLink(parmLookup.get(GeoUriDef.LINK));</span>
-<span class="fc" id="L124">            parseResult.setSymbol(parmLookup.get(GeoUriDef.SYMBOL));</span>
-<span class="fc" id="L125">            parseResult.setId(parmLookup.get(GeoUriDef.ID));</span>
-<span class="fc" id="L126">            parseResult.setZoomMin(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM)));</span>
-<span class="fc" id="L127">            parseResult.setZoomMax(GeoFormatter.parseZoom(parmLookup.get(GeoUriDef.ZOOM_MAX)));</span>
+<span class="fc bfc" id="L242" title="All 4 branches covered.">            if ((lonString != null) &amp;&amp; GeoPointDto.isEmpty(parseResult.getLongitude()))  {</span>
+<span class="fc" id="L243">                lon = GeoFormatter.parseLatOrLon(lonString);</span>
+            }
+
+<span class="pc bpc" id="L246" title="1 of 4 branches missed.">            if (isValid(lon,-180.0,+180.0) &amp;&amp; isValid(lat,-90.0,+90.0)) {</span>
+<span class="fc" id="L247">                parseResult.setLongitude(lon);</span>
+<span class="fc" id="L248">                parseResult.setLatitude(lat);</span>
+            }
+<span class="nc" id="L250">        } catch (ParseException e) {</span>
+<span class="nc" id="L251">            e.printStackTrace();</span>
+<span class="fc" id="L252">        }</span>
+<span class="fc" id="L253">    }</span>
+
+    private static boolean isValid(Double value, double min, double max) {
+<span class="pc bpc" id="L256" title="1 of 6 branches missed.">        return value != null &amp;&amp; value &gt;= min &amp;&amp; value &lt;= max;</span>
+    }
+
+    private &lt;TGeo extends GeoPointDto&gt; TGeo getOpenstreetmapUri(String uri, TGeo parseResult) {
+        // https://www.openstreetmap.org/?#map=14/52.1/9.2&quot;&gt;
+        // https://www.openstreetmap.org/#map=14/52.1/9.2&quot;&gt;
+        // https://www.openstreetmap.org/#14/52.1/9.2&quot;&gt;
+<span class="fc" id="L263">        int dataStart = contentIndexBehind(uri, &quot;#map=&quot;);</span>
+<span class="fc bfc" id="L264" title="All 2 branches covered.">        if (dataStart &lt; 0) dataStart = contentIndexBehind(uri, &quot;/#&quot;);</span>
+<span class="fc" id="L265">        String[] parts = getParts(uri, dataStart, &quot;[/?&amp;]&quot;, 3);</span>
+<span class="pc bpc" id="L266" title="1 of 2 branches missed.">        if (parts != null) {</span>
+<span class="fc" id="L267">            setLatLonZoom(parseResult, parts[1], parts[2], parts[0]);</span>
+        }
+<span class="fc" id="L269">        return uriParamParse(uri, parseResult);</span>
+    }
+
+    private String[] getParts(String stringToParse, int dataStart, String delimiter, int minPartCount) {
+<span class="fc bfc" id="L273" title="All 2 branches covered.">        if (dataStart &gt;= 1) {</span>
+<span class="fc" id="L274">            String[] parts = stringToParse.substring(dataStart).split(delimiter);</span>
+<span class="pc bpc" id="L275" title="2 of 4 branches missed.">            if ((parts != null) &amp;&amp; (parts.length &gt;= minPartCount)) return parts;</span>
+        }
+<span class="fc" id="L277">        return null;</span>
+    }
+
+    private &lt;TGeo extends GeoPointDto&gt; TGeo getHereUri(String uri, TGeo parseResult) {
+        // https://wego.here.com/?map=52.1,9.2,14
+        // https://share.here.com/52.1,9.2,14
+<span class="fc" id="L283">        int dataStart = contentIndexBehind(uri, &quot;map=&quot;);</span>
+<span class="fc bfc" id="L284" title="All 2 branches covered.">        if (dataStart &lt; 0) dataStart=uri.lastIndexOf(&quot;/&quot;) + 1;</span>
+<span class="fc" id="L285">        String[] parts = getParts(uri, dataStart, &quot;[,&amp;?]&quot;, 2);</span>
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">        if (parts != null) {</span>
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">            String zoom = (parts.length &lt;= 2) ? null : parts[2];</span>
+<span class="fc" id="L288">            setLatLonZoom(parseResult, parts[0], parts[1], zoom);</span>
+        }
+<span class="fc" id="L290">        return uriParamParse(uri, parseResult);</span>
+    }
+
+    private int contentIndexBehind(String uri, String search) {
+<span class="fc" id="L294">        int result = uri.indexOf(search);</span>
+<span class="fc bfc" id="L295" title="All 2 branches covered.">        if (result &gt;= 0) return result + search.length();</span>
+<span class="fc" id="L296">        return result;</span>
+    }
+
+    private &lt;TGeo extends GeoPointDto&gt; TGeo getGoogleUri(String uri, TGeo parseResult) {
+<span class="fc" id="L300">        String newUri = uri.replace(&quot;q=loc:&quot;, &quot;q=&quot;);</span>
+
+        // https://www.google.com/maps/@52.1,9.2,14z&quot;
+<span class="fc" id="L303">        int dataStart = contentIndexBehind(newUri, &quot;/@&quot;);</span>
+<span class="fc" id="L304">        String[] parts = getParts(newUri, dataStart, &quot;[,?&amp;(]&quot;, 2);</span>
+<span class="fc bfc" id="L305" title="All 2 branches covered.">        if (parts != null) {</span>
+<span class="pc bpc" id="L306" title="1 of 2 branches missed.">            String zoom = (parts.length &lt;= 2) ? null : parts[2];</span>
+<span class="pc bpc" id="L307" title="2 of 4 branches missed.">            if ((zoom != null) &amp;&amp; (zoom.toLowerCase().endsWith(&quot;z&quot;))) {</span>
+<span class="fc" id="L308">                setLatLonZoom(parseResult, null, null, zoom.substring(0, zoom.length()-1));</span>
+                // parseResult.setZoomMin(GeoFormatter.parseZoom(zoom.substring(0, zoom.length()-1)));
+            } else {
+<span class="nc" id="L311">                zoom = null;</span>
+            }
+<span class="fc" id="L313">            setLatLonZoom(parseResult, parts[0], parts[1], zoom);</span>
+        }
+<span class="fc" id="L315">        return uriParamParse(newUri, parseResult);</span>
+    }
+
+    private &lt;TGeo extends GeoPointDto&gt; TGeo uriParamParse(String uri, TGeo parseResult) {
+<span class="fc" id="L319">        int queryOffset = uri.indexOf(&quot;?&quot;);</span>
+
+<span class="fc bfc" id="L321" title="All 2 branches covered.">        if (queryOffset &gt;= 0) {</span>
+<span class="fc" id="L322">            String query = uri.substring(queryOffset + 1);</span>
+<span class="fc" id="L323">            String newUri = uri.substring(0, queryOffset);</span>
+<span class="fc" id="L324">            HashMap&lt;String, String&gt; parmLookup = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L325">            String[] params = query.split(&quot;&amp;&quot;);</span>
+<span class="fc bfc" id="L326" title="All 2 branches covered.">            for (String param : params) {</span>
+<span class="fc" id="L327">                parseAddQueryParamToMap(parmLookup, param);</span>
+            }
+<span class="fc" id="L329">            parseResult.setDescription(getParam(parmLookup, GeoUriDef.DESCRIPTION, parseResult.getDescription()));</span>
+<span class="fc" id="L330">            parseResult.setLink(getParam(parmLookup, GeoUriDef.LINK, parseResult.getLink()));</span>
+<span class="fc" id="L331">            parseResult.setSymbol(getParam(parmLookup, GeoUriDef.SYMBOL, parseResult.getSymbol()));</span>
+<span class="fc" id="L332">            parseResult.setId(getParam(parmLookup, GeoUriDef.ID, parseResult.getId()));</span>
+
+<span class="fc bfc" id="L334" title="All 2 branches covered.">            if (parseResult.getZoomMin() == NO_ZOOM) {</span>
+<span class="fc" id="L335">                setLatLonZoom(parseResult, null, null, getParam(parmLookup, GeoUriDef.ZOOM, null));</span>
+            }
+<span class="pc bpc" id="L337" title="1 of 2 branches missed.">            if (parseResult.getZoomMax() == NO_ZOOM) {</span>
+<span class="fc" id="L338">                parseResult.setZoomMax(GeoFormatter.parseZoom(getParam(parmLookup, GeoUriDef.ZOOM_MAX, null)));</span>
+            }
+
             // parameters from standard value and/or infered
-<span class="fc" id="L129">            ArrayList&lt;String&gt; whereToSearch = new ArrayList&lt;String&gt;();</span>
-<span class="fc" id="L130">            whereToSearch.add(parmLookup.get(GeoUriDef.QUERY)); // lat lon from q have precedence over url-path</span>
-<span class="fc" id="L131">            whereToSearch.add(uri);</span>
-<span class="fc" id="L132">            whereToSearch.add(parmLookup.get(GeoUriDef.LAT_LON));</span>
+<span class="fc" id="L342">            List&lt;String&gt; whereToSearch = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L343">            String queryParameter = getParam(parmLookup, GeoUriDef.QUERY, null);</span>
+<span class="fc" id="L344">            whereToSearch.add(queryParameter); // lat lon from q have precedence over url-path</span>
+<span class="fc" id="L345">            whereToSearch.add(newUri);</span>
+<span class="fc" id="L346">            whereToSearch.add(getParam(parmLookup, GeoUriDef.LAT_LON, null));</span>
 
-<span class="fc" id="L134">            final boolean inferMissing = isSet(GeoUri.OPT_PARSE_INFER_MISSING);</span>
-<span class="fc bfc" id="L135" title="All 2 branches covered.">            if (inferMissing) {</span>
-<span class="fc" id="L136">                whereToSearch.add(parseResult.getDescription());</span>
-<span class="fc" id="L137">                whereToSearch.addAll(parmLookup.values());</span>
+<span class="fc" id="L348">            final boolean inferMissing = isSet(GeoUri.OPT_PARSE_INFER_MISSING);</span>
+<span class="fc bfc" id="L349" title="All 2 branches covered.">            if (inferMissing) {</span>
+<span class="fc" id="L350">                whereToSearch.add(parseResult.getDescription());</span>
+<span class="fc" id="L351">                whereToSearch.addAll(parmLookup.values());</span>
             }
 
-<span class="fc" id="L140">            parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));</span>
-<span class="fc" id="L141">            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), parmLookup.get(GeoUriDef.TIME), whereToSearch));</span>
+<span class="fc" id="L354">            parseResult.setName(parseFindFromPattern(PATTERN_NAME, parseResult.getName(), whereToSearch));</span>
+<span class="fc" id="L355">            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), getParam(parmLookup, GeoUriDef.TIME, null), whereToSearch));</span>
 
-<span class="fc" id="L143">            parseLatOrLon(parseResult, whereToSearch);</span>
+<span class="fc" id="L357">            parseLatOrLon(parseResult, whereToSearch, inferMissing);</span>
 
-<span class="fc bfc" id="L145" title="All 2 branches covered.">            if (parseResult.getName() == null) {</span>
-<span class="fc" id="L146">                parseResult.setName(parmLookup.get(GeoUriDef.NAME));</span>
+<span class="fc bfc" id="L359" title="All 2 branches covered.">            if (parseResult.getName() == null) {</span>
+<span class="fc" id="L360">                parseResult.setName(getParam(parmLookup, GeoUriDef.NAME, null));</span>
             }
-<span class="fc bfc" id="L148" title="All 2 branches covered.">            if (inferMissing) {</span>
-<span class="fc" id="L149">                parseResult.setLink(parseFindFromPattern(patternHref, parseResult.getLink(), whereToSearch));</span>
-<span class="fc" id="L150">                parseResult.setSymbol(parseFindFromPattern(patternSrc, parseResult.getSymbol(), whereToSearch));</span>
+<span class="fc bfc" id="L362" title="All 2 branches covered.">            if (inferMissing) {</span>
+<span class="fc" id="L363">                parseResult.setLink(parseFindFromPattern(PATTERN_HREF, parseResult.getLink(), whereToSearch));</span>
+<span class="fc" id="L364">                parseResult.setSymbol(parseFindFromPattern(PATTERN_SRC, parseResult.getSymbol(), whereToSearch));</span>
             }
-<span class="fc" id="L152">        } else {</span>
+<span class="fc bfc" id="L366" title="All 6 branches covered.">            if (parseResult.getName() == null &amp;&amp; GeoPointDto.isEmpty(parseResult) &amp;&amp; queryParameter != null) {</span>
+<span class="fc" id="L367">                parseResult.setName(queryParameter);</span>
+            }
+<span class="fc" id="L369">        } else {</span>
             // no query parameter
-<span class="fc" id="L154">            ArrayList&lt;String&gt; whereToSearch = new ArrayList&lt;String&gt;();</span>
-<span class="fc" id="L155">            whereToSearch.add(uri);</span>
-<span class="fc" id="L156">            parseLatOrLon(parseResult, whereToSearch);</span>
+<span class="fc" id="L371">            List&lt;String&gt; whereToSearch = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L372">            whereToSearch.add(uri);</span>
+<span class="fc" id="L373">            parseLatOrLon(parseResult, whereToSearch, false);</span>
         }
-<span class="fc" id="L158">        return parseResult;</span>
+<span class="fc" id="L375">        return parseResult;</span>
     }
 
-    /** load IGeopoint from uri-string into parseResult. */
+    private String getParam(HashMap&lt;String, String&gt; parmLookup, String paramId, String currentValue) {
+<span class="pc bpc" id="L379" title="3 of 4 branches missed.">        if ((currentValue == null) || (currentValue.length() == 0)) {</span>
+<span class="fc" id="L380">            return parmLookup.get(paramId);</span>
+        }
+<span class="nc" id="L382">        return currentValue;</span>
+    }
+
+    /** Load {@link GeoPointDto}[2] from area-uri-{@link String} into parseResult. */
     public &lt;TGeo extends GeoPointDto&gt;  TGeo[] fromUri(String uri, TGeo[] parseResult) {
-<span class="pc bpc" id="L163" title="3 of 6 branches missed.">        if ((uri == null) || (parseResult == null) || (parseResult.length &lt; 2)) return null;</span>
-<span class="pc bpc" id="L164" title="1 of 2 branches missed.">        if (!uri.startsWith(AREA_SCHEME)) return null;</span>
+<span class="pc bpc" id="L387" title="3 of 6 branches missed.">        if ((uri == null) || (parseResult == null) || (parseResult.length &lt; 2)) return null;</span>
+<span class="pc bpc" id="L388" title="1 of 2 branches missed.">        if (!uri.startsWith(AREA_SCHEME)) return null;</span>
 
-<span class="fc" id="L166">        Matcher m = parseFindWithPattern(patternLatLonLatLon, uri);</span>
+<span class="fc" id="L390">        Matcher m = parseFindWithPattern(PATTERN_LAT_LON_LAT_LON, uri);</span>
 
-<span class="pc bpc" id="L168" title="1 of 2 branches missed.">        if (m != null) {</span>
-<span class="fc" id="L169">            int nextCoord = 1;</span>
-            try {
-<span class="fc" id="L171">                parseResult[0].setLatitude(GeoFormatter.parseLatOrLon(m.group(nextCoord++))).setLongitude(GeoFormatter.parseLatOrLon(m.group(nextCoord++)));</span>
-<span class="fc" id="L172">                parseResult[1].setLatitude(GeoFormatter.parseLatOrLon(m.group(nextCoord++))).setLongitude(GeoFormatter.parseLatOrLon(m.group(nextCoord++)));</span>
-<span class="fc" id="L173">                return parseResult;</span>
-<span class="nc" id="L174">            } catch (ParseException e) {</span>
-<span class="nc" id="L175">                e.printStackTrace();</span>
-            }
+<span class="pc bpc" id="L392" title="1 of 2 branches missed.">        if (m != null) {</span>
+<span class="fc" id="L393">            int nextCoord = 1;</span>
+<span class="fc" id="L394">            setLatLonZoom(parseResult[0], m.group(nextCoord++), m.group(nextCoord++), null);</span>
+<span class="fc" id="L395">            setLatLonZoom(parseResult[1], m.group(nextCoord++), m.group(nextCoord++), null);</span>
+<span class="fc" id="L396">            return parseResult;</span>
         }
-<span class="nc" id="L178">        return null;</span>
+<span class="nc" id="L398">        return null;</span>
     }
 
-    /** infer name,time,link,symbol from textToBeAnalysed if not already set. */
+    /** Infer name,time,link,symbol from textToBeAnalysed if the fields are not already filled. */
     public static GeoPointDto inferMissing(GeoPointDto parseResult, String textToBeAnalysed) {
 
-<span class="fc bfc" id="L184" title="All 2 branches covered.">        if (textToBeAnalysed != null) {</span>
-<span class="fc" id="L185">            ArrayList&lt;String&gt; whereToSearch = new ArrayList&lt;String&gt;();</span>
-<span class="fc" id="L186">            whereToSearch.add(textToBeAnalysed);</span>
+<span class="fc bfc" id="L404" title="All 2 branches covered.">        if (textToBeAnalysed != null) {</span>
+<span class="fc" id="L405">            List&lt;String&gt; whereToSearch = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L406">            whereToSearch.add(textToBeAnalysed);</span>
 
-<span class="fc" id="L188">            parseResult.setName(parseFindFromPattern(patternName, parseResult.getName(), whereToSearch));</span>
-<span class="fc" id="L189">            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), null, whereToSearch));</span>
-<span class="fc" id="L190">            parseResult.setLink(parseFindFromPattern(patternHref, parseResult.getLink(), whereToSearch));</span>
-<span class="fc" id="L191">            parseResult.setSymbol(parseFindFromPattern(patternSrc, parseResult.getSymbol(), whereToSearch));</span>
+<span class="fc" id="L408">            parseResult.setName(parseFindFromPattern(PATTERN_NAME, parseResult.getName(), whereToSearch));</span>
+<span class="fc" id="L409">            parseResult.setTimeOfMeasurement(parseTimeFromPattern(parseResult.getTimeOfMeasurement(), null, whereToSearch));</span>
+<span class="fc" id="L410">            parseResult.setLink(parseFindFromPattern(PATTERN_HREF, parseResult.getLink(), whereToSearch));</span>
+<span class="fc" id="L411">            parseResult.setSymbol(parseFindFromPattern(PATTERN_SRC, parseResult.getSymbol(), whereToSearch));</span>
         }
-<span class="fc" id="L193">        return parseResult;</span>
+<span class="fc" id="L413">        return parseResult;</span>
     }
 
-    private static ArrayList&lt;String&gt; toStringArray(String[] whereToSearch) {
-<span class="fc" id="L197">        ArrayList&lt;String&gt; arrayList = new ArrayList&lt;String&gt;();</span>
-<span class="fc bfc" id="L198" title="All 2 branches covered.">        for (String candidate : whereToSearch) {</span>
-<span class="fc" id="L199">            arrayList.add(candidate);</span>
-        }
-<span class="fc" id="L201">        return arrayList;</span>
+    /** Parsing helper: Convert array to list */
+    private static List&lt;String&gt; toStringArray(String... whereToSearch) {
+<span class="fc" id="L418">        return Arrays.asList(whereToSearch);</span>
     }
 
-    /** parsing helper: set first finding of lat and lon to parseResult */
+    /** Parsing helper: Set first finding of lat and lon to parseResult */
     public static void parseLatOrLon(GeoPointDto parseResult, String... whereToSearch) {
-<span class="fc" id="L206">        parseLatOrLon(parseResult, toStringArray(whereToSearch));</span>
-<span class="fc" id="L207">    }</span>
+<span class="fc" id="L423">        parseLatOrLon(parseResult, toStringArray(whereToSearch), false);</span>
+<span class="fc" id="L424">    }</span>
 
-    /** parsing helper: set first finding of lat and lon to parseResult */
-    private static void parseLatOrLon(GeoPointDto parseResult, ArrayList&lt;String&gt; whereToSearch) {
-<span class="fc" id="L211">        Matcher m = parseFindWithPattern(patternLatLonAlt, whereToSearch);</span>
+    /** Parsing helper: Set first finding of lat and lon to parseResult */
+    private static void parseLatOrLon(GeoPointDto parseResult, List&lt;String&gt; whereToSearch, boolean inferMissing) {
+<span class="fc" id="L428">        StringBuilder originalSearchText = new StringBuilder();</span>
+<span class="fc" id="L429">        Matcher m = parseFindWithPattern(PATTERN_LAT_LON_ALT, whereToSearch, originalSearchText);</span>
 
-<span class="fc bfc" id="L213" title="All 2 branches covered.">        if (m != null) {</span>
-            try {
-<span class="fc" id="L215">                final String val = m.group(1);</span>
-<span class="fc" id="L216">                double lat = GeoFormatter.parseLatOrLon(val);</span>
-<span class="fc" id="L217">                double lon = GeoFormatter.parseLatOrLon(m.group(2));</span>
-
-<span class="fc" id="L219">                parseResult.setLatitude(lat).setLongitude(lon);</span>
-<span class="nc" id="L220">            } catch (ParseException e) {</span>
-<span class="nc" id="L221">                e.printStackTrace();</span>
-<span class="fc" id="L222">            }</span>
-        }
-<span class="fc" id="L224">    }</span>
-
-    /** parsing helper: Get the first finding of pattern in whereToSearch if currentValue is not set yet.
-     * Returns currentValue or content of first matching group of pattern. */
-    private static String parseFindFromPattern(Pattern pattern, String currentValue, List&lt;String&gt; whereToSearch) {
-<span class="pc bpc" id="L229" title="1 of 4 branches missed.">        if ((currentValue == null) || (currentValue.length() == 0)) {</span>
-<span class="fc" id="L230">            Matcher m = parseFindWithPattern(pattern, whereToSearch);</span>
-<span class="fc bfc" id="L231" title="All 2 branches covered.">            String found = (m != null) ? m.group(1) : null;</span>
-<span class="fc bfc" id="L232" title="All 2 branches covered.">            if (found != null) {</span>
-<span class="fc" id="L233">                return found;</span>
+<span class="fc bfc" id="L431" title="All 2 branches covered.">        if (m != null) {</span>
+<span class="fc" id="L432">            int start = m.start();</span>
+<span class="fc bfc" id="L433" title="All 4 branches covered.">            boolean valid = inferMissing || start == 0</span>
+<span class="fc bfc" id="L434" title="All 2 branches covered.">                    || originalSearchText.charAt(start - 1) != ' ';</span>
+<span class="fc bfc" id="L435" title="All 2 branches covered.">            if (valid) {</span>
+<span class="fc" id="L436">                setLatLonZoom(parseResult, m.group(1), m.group(2), null);</span>
             }
         }
-<span class="fc" id="L236">        return currentValue;</span>
+<span class="fc" id="L439">    }</span>
+
+    /** Parsing helper: Get the first finding of pattern in whereToSearch if currentValue is not set yet.
+     * Returns currentValue or content of first matching group of pattern. */
+    private static String parseFindFromPattern(Pattern pattern, String currentValue, List&lt;String&gt; whereToSearch) {
+<span class="pc bpc" id="L444" title="1 of 4 branches missed.">        if ((currentValue == null) || (currentValue.length() == 0)) {</span>
+<span class="fc" id="L445">            Matcher m = parseFindWithPattern(pattern, whereToSearch, null);</span>
+<span class="fc bfc" id="L446" title="All 2 branches covered.">            String found = (m != null) ? m.group(1) : null;</span>
+<span class="fc bfc" id="L447" title="All 2 branches covered.">            if (found != null) {</span>
+<span class="fc" id="L448">                return found;</span>
+            }
+        }
+<span class="fc" id="L451">        return currentValue;</span>
     }
 
-    /** parsing helper: Get the first datetime finding in whereToSearch if currentValue is not set yet.
+    /** Parsing helper: Get the first datetime finding in whereToSearch if currentValue is not set yet.
      * Returns currentValue or finding as Date . */
     private static Date parseTimeFromPattern(Date currentValue, String stringValue, List&lt;String&gt; whereToSearch) {
-<span class="fc" id="L242">        String match = parseFindFromPattern(IsoDateTimeParser.ISO8601_FRACTIONAL_PATTERN, stringValue, whereToSearch);</span>
+<span class="fc" id="L457">        String match = parseFindFromPattern(IsoDateTimeParser.ISO8601_FRACTIONAL_PATTERN, stringValue, whereToSearch);</span>
 
-<span class="fc bfc" id="L244" title="All 2 branches covered.">        if (match != null) {</span>
-<span class="fc" id="L245">            return IsoDateTimeParser.parse(match);</span>
+<span class="fc bfc" id="L459" title="All 2 branches covered.">        if (match != null) {</span>
+<span class="fc" id="L460">            return IsoDateTimeParser.parse(match);</span>
         }
-<span class="fc" id="L247">        return currentValue;</span>
+<span class="fc" id="L462">        return currentValue;</span>
     }
 
-    /** parsing helper: returns the match of the first finding of pattern in whereToSearch. */
-    private static Matcher parseFindWithPattern(Pattern pattern, List&lt;String&gt; whereToSearch) {
-<span class="pc bpc" id="L252" title="1 of 2 branches missed.">        if (whereToSearch != null) {</span>
-<span class="fc bfc" id="L253" title="All 2 branches covered.">            for (String candidate : whereToSearch) {</span>
-<span class="fc" id="L254">                Matcher m = parseFindWithPattern(pattern, candidate);</span>
-<span class="fc bfc" id="L255" title="All 2 branches covered.">                if (m != null) return m;</span>
-<span class="fc" id="L256">            }</span>
+    /** Parsing helper: Returns the match of the first finding of pattern in whereToSearch. */
+    private static Matcher parseFindWithPattern(Pattern pattern, List&lt;String&gt; whereToSearch,
+                                                StringBuilder originalSearchText) {
+<span class="pc bpc" id="L468" title="1 of 2 branches missed.">        if (whereToSearch != null) {</span>
+<span class="fc bfc" id="L469" title="All 2 branches covered.">            for (String candidate : whereToSearch) {</span>
+<span class="fc" id="L470">                Matcher m = parseFindWithPattern(pattern, candidate);</span>
+<span class="fc bfc" id="L471" title="All 2 branches covered.">                if (m != null) {</span>
+<span class="fc bfc" id="L472" title="All 2 branches covered.">                    if (originalSearchText != null) {</span>
+<span class="fc" id="L473">                        originalSearchText.append(candidate);</span>
+                    }
+<span class="fc" id="L475">                    return m;</span>
+                }
+<span class="fc" id="L477">            }</span>
         }
-<span class="fc" id="L258">        return null;</span>
+<span class="fc" id="L479">        return null;</span>
     }
 
     private static Matcher parseFindWithPattern(Pattern pattern, String candidate) {
-<span class="fc bfc" id="L262" title="All 2 branches covered.">        if (candidate != null) {</span>
-<span class="fc" id="L263">            Matcher m = pattern.matcher(candidate);</span>
-<span class="pc bpc" id="L264" title="1 of 4 branches missed.">            while (m.find() &amp;&amp; (m.groupCount() &gt; 0)) {</span>
-<span class="fc" id="L265">                return m;</span>
+<span class="fc bfc" id="L483" title="All 2 branches covered.">        if (candidate != null) {</span>
+<span class="fc" id="L484">            Matcher m = pattern.matcher(candidate);</span>
+<span class="pc bpc" id="L485" title="1 of 4 branches missed.">            if (m.find() &amp;&amp; (m.groupCount() &gt; 0)) {</span>
+<span class="fc" id="L486">                return m;</span>
             }
         }
-<span class="fc" id="L268">        return null;</span>
+<span class="fc" id="L489">        return null;</span>
     }
 
-    /** parsing helper: add a found query-parameter to a map for fast lookup */
+    /** Parsing helper: Add a found query-parameter to a map for fast lookup */
     private void parseAddQueryParamToMap(HashMap&lt;String, String&gt; parmLookup, String param) {
-<span class="pc bpc" id="L273" title="1 of 2 branches missed.">        if (param != null) {</span>
-<span class="fc" id="L274">            String[] keyValue = param.split(&quot;=&quot;);</span>
-<span class="pc bpc" id="L275" title="2 of 4 branches missed.">            if ((keyValue != null) &amp;&amp; (keyValue.length == 2)) {</span>
+<span class="pc bpc" id="L494" title="1 of 2 branches missed.">        if (param != null) {</span>
+<span class="fc" id="L495">            String[] keyValue = param.split(&quot;=&quot;);</span>
+<span class="pc bpc" id="L496" title="2 of 4 branches missed.">            if ((keyValue != null) &amp;&amp; (keyValue.length == 2)) {</span>
                 try {
-<span class="fc" id="L277">                    parmLookup.put(keyValue[0], URLDecoder.decode(keyValue[1], DEFAULT_ENCODING));</span>
-<span class="nc" id="L278">                } catch (UnsupportedEncodingException e) {</span>
-<span class="nc" id="L279">                    e.printStackTrace();</span>
-<span class="fc" id="L280">                }</span>
+<span class="fc" id="L498">                    parmLookup.put(keyValue[0], URLDecoder.decode(keyValue[1], DEFAULT_ENCODING));</span>
+<span class="nc" id="L499">                } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L500">                    e.printStackTrace();</span>
+<span class="fc" id="L501">                }</span>
             }
         }
 
-<span class="fc" id="L284">    }</span>
-
-
-    public String toUriString(double latitude, double longitude, int zoomLevel) {
-<span class="nc" id="L288">        return toUriString(new GeoPointDto(latitude, longitude, zoomLevel));</span>
-    }
+<span class="fc" id="L505">    }</span>
 
     /**
-     * Converts a {@link de.k3b.geo.api.IGeoPointInfo} into uri string representatino.&lt;br/&gt;
+     * Converts a {@link IGeoPointInfo} into uri {@link String} representatino.&lt;br/&gt;
      * &lt;br/&gt;
      * Format
      *
      * geo:{lat{,lon{,hight_ignore}}}{?q={lat}{,lon}{,hight_ignore}{(name)}}{&amp;uri=uri}{&amp;id=id}{&amp;d=description}{&amp;z=zmin{&amp;z2=zmax}}{&amp;t=timeOfMeasurement}
+     *
+     * ![GeoUri-toUriString](GeoUri-toUriString.png)
+     *
+	 * For details see [supported geo uri formats](https://github.com/k3b/k3b-geoHelper/wiki/data#geo)
+     *
+     * @startuml GeoUri-toUriString.png
+     * title Convert geo-point to uri string
+     * interface IGeoPointInfo
+     * class GeoPointDto
+     *
+     * class GeoUri
+     * GeoUri : toUriString
+     * IGeoPointInfo &lt;|-- GeoPointDto
+     *
+     * IGeoPointInfo -&gt; GeoUri
+     * GeoUri -&gt; String : &quot;geo:52.1,9.2?...&quot;
+     * @enduml
+     *
      */
     public String toUriString(IGeoPointInfo geoPoint) {
-<span class="fc" id="L299">        StringBuffer result = new StringBuffer();</span>
-<span class="fc" id="L300">        result.append(GEO_SCHEME);</span>
-<span class="fc" id="L301">        formatLatLon(result, geoPoint);</span>
+<span class="fc" id="L533">        StringBuilder result = new StringBuilder();</span>
+<span class="fc" id="L534">        result.append(GEO_SCHEME);</span>
+<span class="fc" id="L535">        formatLatLon(result, geoPoint);</span>
 
-<span class="fc" id="L303">        delim = &quot;?&quot;;</span>
-<span class="fc" id="L304">        appendQueryParameter(result, GeoUriDef.QUERY, formatQuery(geoPoint), false);</span>
-<span class="fc" id="L305">        appendQueryParameter(result, GeoUriDef.ZOOM, geoPoint.getZoomMin());</span>
-<span class="fc" id="L306">        appendQueryParameter(result, GeoUriDef.ZOOM_MAX, geoPoint.getZoomMax());</span>
-<span class="fc" id="L307">        appendQueryParameter(result, GeoUriDef.LINK, geoPoint.getLink(), true);</span>
-<span class="fc" id="L308">        appendQueryParameter(result, GeoUriDef.SYMBOL, geoPoint.getSymbol(), true);</span>
-<span class="fc" id="L309">        appendQueryParameter(result, GeoUriDef.DESCRIPTION, geoPoint.getDescription(), true);</span>
-<span class="fc" id="L310">        appendQueryParameter(result, GeoUriDef.ID, geoPoint.getId(), true);</span>
-<span class="fc bfc" id="L311" title="All 2 branches covered.">        if (geoPoint.getTimeOfMeasurement() != null) {</span>
-<span class="fc" id="L312">            appendQueryParameter(result, GeoUriDef.TIME, GeoFormatter.formatDate(geoPoint.getTimeOfMeasurement()), false);</span>
+<span class="fc" id="L537">        delim = &quot;?&quot;;</span>
+<span class="fc" id="L538">        appendQueryParameter(result, GeoUriDef.QUERY, formatQuery(geoPoint), false);</span>
+<span class="fc" id="L539">        appendQueryParameter(result, GeoUriDef.ZOOM, GeoFormatter.formatZoom(geoPoint.getZoomMin()), false);</span>
+<span class="fc" id="L540">        appendQueryParameter(result, GeoUriDef.ZOOM_MAX, GeoFormatter.formatZoom(geoPoint.getZoomMax()), false);</span>
+<span class="fc" id="L541">        appendQueryParameter(result, GeoUriDef.LINK, geoPoint.getLink(), true);</span>
+<span class="fc" id="L542">        appendQueryParameter(result, GeoUriDef.SYMBOL, geoPoint.getSymbol(), true);</span>
+<span class="fc" id="L543">        appendQueryParameter(result, GeoUriDef.DESCRIPTION, geoPoint.getDescription(), true);</span>
+<span class="fc" id="L544">        appendQueryParameter(result, GeoUriDef.ID, geoPoint.getId(), true);</span>
+<span class="fc bfc" id="L545" title="All 2 branches covered.">        if (geoPoint.getTimeOfMeasurement() != null) {</span>
+<span class="fc" id="L546">            appendQueryParameter(result, GeoUriDef.TIME, GeoFormatter.formatDate(geoPoint.getTimeOfMeasurement()), false);</span>
         }
 
-<span class="fc" id="L315">        return result.toString();</span>
+<span class="fc" id="L549">        return result.toString();</span>
     }
 
 
+    /** Creates area-uri-{@link String} from two bounding {@link IGeoPointInfo}-s.  */
     public String toUriString(IGeoPointInfo northEast, IGeoPointInfo southWest) {
-<span class="fc" id="L320">        StringBuffer result = new StringBuffer();</span>
-<span class="fc" id="L321">        result.append(AREA_SCHEME);</span>
-<span class="fc" id="L322">        result.append(GeoFormatter.formatLatLon(northEast.getLatitude())).append(&quot;,&quot;);</span>
-<span class="fc" id="L323">        result.append(GeoFormatter.formatLatLon(northEast.getLongitude())).append(&quot;,&quot;);</span>
-<span class="fc" id="L324">        result.append(GeoFormatter.formatLatLon(southWest.getLatitude())).append(&quot;,&quot;);</span>
-<span class="fc" id="L325">        result.append(GeoFormatter.formatLatLon(southWest.getLongitude()));</span>
+<span class="fc" id="L555">        StringBuilder result = new StringBuilder();</span>
+<span class="fc" id="L556">        result.append(AREA_SCHEME);</span>
+<span class="fc" id="L557">        result.append(GeoFormatter.formatLatLon(northEast.getLatitude())).append(&quot;,&quot;);</span>
+<span class="fc" id="L558">        result.append(GeoFormatter.formatLatLon(northEast.getLongitude())).append(&quot;,&quot;);</span>
+<span class="fc" id="L559">        result.append(GeoFormatter.formatLatLon(southWest.getLatitude())).append(&quot;,&quot;);</span>
+<span class="fc" id="L560">        result.append(GeoFormatter.formatLatLon(southWest.getLongitude()));</span>
 
-<span class="fc" id="L327">        return result.toString();</span>
+<span class="fc" id="L562">        return result.toString();</span>
     }
 
-    /** formatting helper: */
-    private void appendQueryParameter(StringBuffer result, String paramName, int paramValue) {
-<span class="fc bfc" id="L332" title="All 2 branches covered.">        if (paramValue != IGeoPointInfo.NO_ZOOM) {</span>
-<span class="fc" id="L333">            appendQueryParameter(result, paramName, Integer.toString(paramValue), true);</span>
-        }
-<span class="fc" id="L335">    }</span>
-
-    /** formatting helper: */
-    private void appendQueryParameter(StringBuffer result, String paramName, String paramValue, boolean urlEncode) {
-<span class="fc bfc" id="L339" title="All 2 branches covered.">        if (paramValue != null) {</span>
+    /** Formatting helper: Adds name value to result with optional encoding. */
+    private void appendQueryParameter(StringBuilder result, String paramName, String paramValue, boolean urlEncode) {
+<span class="fc bfc" id="L567" title="All 4 branches covered.">        if ((paramValue != null) &amp;&amp; (paramValue.length() &gt; 0)) {</span>
             try {
-<span class="fc" id="L341">                result.append(delim).append(paramName).append(&quot;=&quot;);</span>
-<span class="fc bfc" id="L342" title="All 2 branches covered.">                if (urlEncode) {</span>
-<span class="fc" id="L343">                    paramValue = encode(paramValue);</span>
+<span class="fc" id="L569">                result.append(delim).append(paramName).append(&quot;=&quot;);</span>
+<span class="fc bfc" id="L570" title="All 2 branches covered.">                if (urlEncode) {</span>
+<span class="fc" id="L571">                    result.append(encode(paramValue));</span>
+                } else {
+<span class="fc" id="L573">                    result.append(paramValue);</span>
                 }
-<span class="fc" id="L345">                result.append(paramValue);</span>
-<span class="fc" id="L346">                delim = &quot;&amp;&quot;;</span>
-<span class="nc" id="L347">            } catch (UnsupportedEncodingException e) {</span>
-<span class="nc" id="L348">                e.printStackTrace();</span>
-<span class="fc" id="L349">            }</span>
+<span class="fc" id="L575">                delim = &quot;&amp;&quot;;</span>
+<span class="nc" id="L576">            } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L577">                e.printStackTrace();</span>
+<span class="fc" id="L578">            }</span>
         }
-<span class="fc" id="L351">    }</span>
+<span class="fc" id="L580">    }</span>
 
-    /** formatting helper: */
-    private void formatLatLon(StringBuffer result, IGeoPointInfo geoPoint) {
-<span class="pc bpc" id="L355" title="1 of 2 branches missed.">        if (geoPoint != null) {</span>
-<span class="fc" id="L356">            result.append(GeoFormatter.formatLatLon(geoPoint.getLatitude()));</span>
+    /** Formatting helper: Adds lat/lon to result. */
+    private void formatLatLon(StringBuilder result, IGeoPointInfo geoPoint) {
+<span class="pc bpc" id="L584" title="1 of 2 branches missed.">        if (geoPoint != null) {</span>
+<span class="fc" id="L585">            result.append(GeoFormatter.formatLatLon(geoPoint.getLatitude()));</span>
 
-<span class="fc bfc" id="L358" title="All 2 branches covered.">            if (geoPoint.getLongitude() != IGeoPointInfo.NO_LAT_LON) {</span>
-<span class="fc" id="L359">                result</span>
-                        .append(&quot;,&quot;)
-                        .append(GeoFormatter.formatLatLon(geoPoint.getLongitude()));
+<span class="fc bfc" id="L587" title="All 2 branches covered.">            if (geoPoint.getLongitude() != IGeoPointInfo.NO_LAT_LON) {</span>
+<span class="fc" id="L588">                result</span>
+<span class="fc" id="L589">                        .append(&quot;,&quot;)</span>
+<span class="fc" id="L590">                        .append(GeoFormatter.formatLatLon(geoPoint.getLongitude()));</span>
             }
         }
-<span class="fc" id="L364">    }</span>
+<span class="fc" id="L593">    }</span>
 
-    /** formatting helper: */
+    /** Formatting helper: Adds {@link IGeoPointInfo} fields to result. */
     private String formatQuery(IGeoPointInfo geoPoint) {
         // {lat{,lon{,hight_ignore}}}{(name)}{|uri{|id}|}{description}
-<span class="fc" id="L369">        StringBuffer result = new StringBuffer();</span>
+<span class="fc" id="L598">        StringBuilder result = new StringBuilder();</span>
 
-<span class="fc bfc" id="L371" title="All 2 branches covered.">        if (isSet(OPT_FORMAT_REDUNDANT_LAT_LON)) {</span>
-<span class="fc" id="L372">            formatLatLon(result, geoPoint);</span>
+<span class="fc bfc" id="L600" title="All 2 branches covered.">        if (isSet(OPT_FORMAT_REDUNDANT_LAT_LON)) {</span>
+<span class="fc" id="L601">            formatLatLon(result, geoPoint);</span>
         }
 
-<span class="fc bfc" id="L375" title="All 2 branches covered.">        if (geoPoint.getName() != null) {</span>
+<span class="fc bfc" id="L604" title="All 2 branches covered.">        if (geoPoint.getName() != null) {</span>
             try {
-<span class="fc" id="L377">                result.append(&quot;(&quot;).append(encode(geoPoint.getName())).append(&quot;)&quot;);</span>
-<span class="nc" id="L378">            } catch (UnsupportedEncodingException e) {</span>
-<span class="nc" id="L379">                e.printStackTrace();</span>
-<span class="fc" id="L380">            }</span>
+<span class="fc" id="L606">                result.append(&quot;(&quot;).append(encode(geoPoint.getName())).append(&quot;)&quot;);</span>
+<span class="nc" id="L607">            } catch (UnsupportedEncodingException e) {</span>
+<span class="nc" id="L608">                e.printStackTrace();</span>
+<span class="fc" id="L609">            }</span>
         }
-<span class="fc bfc" id="L382" title="All 2 branches covered.">        if (result.length() == 0) return null;</span>
+<span class="fc bfc" id="L611" title="All 2 branches covered.">        if (result.length() == 0) return null;</span>
 
-<span class="fc" id="L384">        return result.toString();</span>
+<span class="fc" id="L613">        return result.toString();</span>
     }
 
-    /** formatting helper: */
+    /** Formatting helper: Executes url-encoding. */
     private String encode(String raw) throws UnsupportedEncodingException {
-<span class="fc" id="L389">        return URLEncoder.encode(raw, DEFAULT_ENCODING);</span>
+<span class="fc" id="L618">        return URLEncoder.encode(raw, DEFAULT_ENCODING);</span>
     }
 
-    /** return true, if opt is set */
+    /** Return true, if opt is set */
     private boolean isSet(int opt) {
-<span class="fc bfc" id="L394" title="All 2 branches covered.">        return ((options &amp; opt) != 0);</span>
+<span class="fc bfc" id="L623" title="All 2 branches covered.">        return ((options &amp; opt) != 0);</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
