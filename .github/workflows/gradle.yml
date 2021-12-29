@@ -28,4 +28,4 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build and Test with Gradle
-      run: ./gradlew jar check assemble reports javadoc
+      run: ./gradlew test jacocoTestReport jar assemble javadoc
