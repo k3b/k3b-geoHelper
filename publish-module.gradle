@@ -70,7 +70,7 @@ afterEvaluate {
                     licenses {
                         license {
                             name = LICENSE_TYP
-                            url = 'https://' + SOURCES + '/blob/main/LICENSE'
+                            url = 'https://' + SOURCES + '/blob/master/LICENSE'
                         }
                     }
                     developers {
