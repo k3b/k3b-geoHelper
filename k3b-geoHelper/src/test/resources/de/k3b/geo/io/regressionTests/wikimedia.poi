@@ -29,6 +29,29 @@
                 <thumbnail source="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Kirche_Arucas.JPG/50px-Kirche_Arucas.JPG" width="50" height="34"/>
             </page>
             -->
+
+            <!-- wikidata queery. i.e. https://www.wikidata.org/w/api.php?action=query&format=xml&prop=entityterms|coordinates|info&inprop=url&generator=geosearch&ggscoord=36.45284|28.22016&ggsradius=10000&ggslimit=25 -->
+            <page title="Q31833" >
+                <!-- this is what i assume to be valid wikimedia xml content
+                    except that there is no id element that is used for regression-testing
+                    -->
+                <expectedTestResult:id>geo:52,9?q=(theName)&amp;d=theDesc</expectedTestResult:id>
+
+                <coordinates>
+                    <co lat="52" lon="9" primary="" globe="earth"/>
+                </coordinates>
+                <entityterms>
+                    <label>
+                        <term>theName</term>
+                    </label>
+                    <description>
+                        <term>theDesc</term>
+                    </description>
+                </entityterms>
+                    ...
+            </page>
+
+
         </pages>
     </query>
 </api>

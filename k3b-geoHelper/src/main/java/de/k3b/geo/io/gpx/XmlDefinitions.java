@@ -58,6 +58,10 @@ public class XmlDefinitions {
         public static final String ATTR_IMAGE = "source";
 
         public static final String DESCRIPTION = "extract";
+
+        /** used by wikidata */
+        public static final String NAME = "label";
+
     }
 
     /** xml-elements for gpx version 1.1 */

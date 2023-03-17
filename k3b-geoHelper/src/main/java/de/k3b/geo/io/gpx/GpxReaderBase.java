@@ -151,14 +151,10 @@ public class GpxReaderBase extends DefaultHandler {
             // factory.setValidating(true);
             SAXParser parser = factory.newSAXParser();
             parser.parse(in, this);
-        } catch (ParserConfigurationException e) {
+        } catch (ParserConfigurationException | SAXException e) {
             final String message = "Error parsing xml from " + in;
             logger.error(message, e);
-            throw new IOException(message,e);
-        } catch (SAXException e) {
-            final String message = "Error parsing xml from " + in;
-            logger.error(message, e);
-            throw new IOException(message,e);
+            throw new IOException(message,e); // this call requires android-api 9 or later. Not compatible with api 8
         }
     }
 
@@ -294,8 +290,8 @@ public class GpxReaderBase extends DefaultHandler {
                 // // icon url inside kml icon definition
             id2Symbol.put("#" + currentIconDefinitionId, currentXmlElementContent.trim() );
         } else if (this.currentGeoPoint != null) {
-            if (name.equals(XmlDefinitions.GpxDef_11.NAME)) {
-                this.currentGeoPoint.setName(currentXmlElementContent);
+            if (name.equals(XmlDefinitions.GpxDef_11.NAME) || name.equals(XmlDefinitions.WikimediaDef.NAME)) {
+                this.currentGeoPoint.setName(currentXmlElementContent.trim());
             } else if (name.equals(XmlDefinitions.GpxDef_11.DESC) || name.equals(XmlDefinitions.KmlDef_22.DESCRIPTION) || name.equals(XmlDefinitions.WikimediaDef.DESCRIPTION)) {
                 this.currentGeoPoint.setDescription(currentXmlElementContent.trim());
             } else if (this.currentGeoPoint.getDescription() == null && name.equals(GeoUriDef.DESCRIPTION)) {
@@ -329,7 +325,7 @@ public class GpxReaderBase extends DefaultHandler {
             } else if ((name.equals(XmlDefinitions.KmlDef_22.COORDINATES) || name.equals(XmlDefinitions.KmlDef_22.COORDINATES2)) && currentXmlElementContent.length() > 0) {
                 // <coordinates>lon,lat,height blank lon,lat,height ...</coordinates>
                 try {
-                    String parts[] = currentXmlElementContent.split("[,\\s]");
+                    String[] parts = currentXmlElementContent.split("[,\\s]");
                     if ((parts != null) && (parts.length >= 2)) {
                         // note KmlDef_22.COORDINATES use lon,lat reverse order
                         Double lat = getLatOrLong(parts[1]);

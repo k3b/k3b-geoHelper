@@ -4,10 +4,11 @@ ext {
     // v1.1.7 (101007)
     // v1.1.8 (101008) fix npe
     // v1.1.9 (101009) Support for fuzzy geo uri-s (without lat/lon but with Search expression)
-    // v1.1.10 (101010) Bugfix: "geo:0,0?q=Testgasse 13, 12345 Testhausen" resulted in geo:13,12345
-    // v1.1.11 (101011) Fixed link to license file
-    PUBLISH_VERSION = 'v1.1.11-SNAPSHOT' // SNAPSHOT means latest version in in github branch "master"
-    ANDROID_VERSIONCODE = 101011
+    // 2021.07.14 v1.1.10 (101010) Bugfix: "geo:0,0?q=Testgasse 13, 12345 Testhausen" resulted in geo:13,12345
+    // 2021.12.29 v1.1.11 (101011) Fixed link to license file
+    // 2023.03.17 v1.1.12 (101012) Support for www.wikidata.org results
+    PUBLISH_VERSION = 'v1.1.12-SNAPSHOT' // SNAPSHOT means latest version in github branch "master"
+    ANDROID_VERSIONCODE = 101012
 
     PUBLISH_GROUP_ID = 'com.github.k3b'
     SOURCES = 'github.com/k3b/k3b-geoHelper'

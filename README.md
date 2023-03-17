@@ -1,6 +1,6 @@
 # k3b-geoHelper library
 
-A j2se geo support library that is compatible with Android
+A j2se geo support library that is compatible with Android 2.3 (api 9) or later
 
 ## Status
 
@@ -22,7 +22,7 @@ A j2se geo support library that is compatible with Android
 
 ## Purpose
 
-A j2se geo support library that is compatible with Android
+A j2se geo support library that is compatible with Android 2.3 (api 9) or later
 
 * parse/format [geo-uri-s](https://github.com/k3b/k3b-geoHelper/wiki/data#geo) and geoarea-uri-s .
 	* Example uri: geo:53,10?q=(Hamburg)&z=8
@@ -40,10 +40,15 @@ For more details see [supported data formats](https://github.com/k3b/k3b-geoHelp
 
 ## Usage (with gradle) ##
 
-Add dependencies to local build.gradle (via jcenter or mavencentral)
+Add dependencies to local build.gradle 
+
+    repositories {
+        ...
+        maven { url "https://jitpack.io" }
+    }
 
 	dependencies {
-		compile 'com.github.k3b:k3b-geoHelper:v1.1.5'
+		compile 'com.github.k3b:k3b-geoHelper:v1.1.12'
 	}
 
 ## Dependencies ##

@@ -6,7 +6,7 @@
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name">
-        <activity android:name=".GeoViewerDemoActivity" android:label="Geo-Viewer-Demo">
+        <activity android:name=".GeoViewerDemoActivity" android:label="Geo-Viewer-Demo" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

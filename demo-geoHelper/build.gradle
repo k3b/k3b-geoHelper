@@ -6,13 +6,12 @@ ext {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 31
 
     defaultConfig {
         applicationId "de.k3b.android.demo_geohelper"
-        minSdkVersion 8
-        //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 23
+        minSdkVersion 9
+        targetSdkVersion 31
         versionCode ANDROID_VERSIONCODE
         versionName PUBLISH_VERSION
     }
